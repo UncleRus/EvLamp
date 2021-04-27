@@ -1,54 +1,12 @@
-/**
- * @file matrix.c
- *
- * Matrix effect
- *
- */
-#include <lib8tion.h>
-#include <stdlib.h>
-
 #include "effects/matrix.h"
 
-#define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
-#define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
+#include <lib8tion.h>
 
-typedef struct
-{
-    uint8_t density;
-} params_t;
+#define P_DENSITY 0
 
-esp_err_t led_effect_matrix_init(framebuffer_t *fb, uint8_t density)
-{
-    CHECK_ARG(fb);
-
-    // allocate internal storage
-    fb->internal = calloc(1, sizeof(params_t));
-    if (!fb->internal)
-        return ESP_ERR_NO_MEM;
-
-    return led_effect_matrix_set_params(fb, density);
-}
-
-esp_err_t led_effect_matrix_done(framebuffer_t *fb)
-{
-    CHECK_ARG(fb && fb->internal);
-
-    // free internal storage
-    if (fb->internal)
-        free(fb->internal);
-
-    return ESP_OK;
-}
-
-esp_err_t led_effect_matrix_set_params(framebuffer_t *fb, uint8_t density)
-{
-    CHECK_ARG(fb && fb->internal);
-
-    params_t *params = (params_t *)fb->internal;
-    params->density = 255 - density;
-
-    return ESP_OK;
-}
+EFFECT_PARAMS(matrix, 1) = {
+    DECL_PARAM(P_DENSITY, "Density", 0, 255, 150),
+};
 
 #define MATRIX_START_COLOR   0x9bf800
 #define MATRIX_DIM_COLOR     0x558800
@@ -57,11 +15,9 @@ esp_err_t led_effect_matrix_set_params(framebuffer_t *fb, uint8_t density)
 #define MATRIX_OFF_THRESH    0x030000
 #define MATRIX_DIMMEST_COLOR 0x020300
 
-esp_err_t led_effect_matrix_run(framebuffer_t *fb)
+esp_err_t effect_matrix_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
-
-    params_t *params = (params_t *)fb->internal;
 
     for (size_t x = 0; x < fb->width; x++)
     {
@@ -81,7 +37,7 @@ esp_err_t led_effect_matrix_run(framebuffer_t *fb)
             if (upper_code == MATRIX_START_COLOR && random8_to(7 * fb->height) != 0)
                 fb_set_pixel_rgb(fb, x, y, upper_color);
             // if current pixel is off, light up new tails with some probability
-            else if (cur_code == 0 && random8_to(params->density) == 0)
+            else if (cur_code == 0 && random8_to(EPARAM(matrix, P_DENSITY)) == 0)
                 fb_set_pixel_rgb(fb, x, y, rgb_from_code(MATRIX_START_COLOR));
             // if current pixel is almost off, try to make the fading out slower
             else if (cur_code <= MATRIX_ALMOST_OFF)
@@ -107,7 +63,7 @@ esp_err_t led_effect_matrix_run(framebuffer_t *fb)
         // if current top pixel is off, fill it with some probability
         if (cur_code == 0)
         {
-            if (random8_to(params->density) == 0)
+            if (random8_to(EPARAM(matrix, P_DENSITY)) == 0)
                 fb_set_pixel_rgb(fb, x, fb->height - 1, rgb_from_code(MATRIX_START_COLOR));
         }
         // if current pixel is almost off, try to make the fading out slower

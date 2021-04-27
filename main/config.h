@@ -1,0 +1,29 @@
+#ifndef MAIN_CONFIG_H_
+#define MAIN_CONFIG_H_
+
+#define APP_NAME "EvLamp"
+
+#define TAG APP_NAME
+#define NVS_STORAGE_NAME APP_NAME
+
+#ifdef CONFIG_EL_WIFI_MODE_AP
+#define DEFAULT_WIFI_MODE WIFI_MODE_AP
+#else
+#define DEFAULT_WIFI_MODE WIFI_MODE_STA
+#endif
+
+#if CONFIG_EL_WIFI_DHCP
+#define DEFAULT_WIFI_DHCP true
+#else
+#define DEFAULT_WIFI_DHCP false
+#endif
+
+#define DEFAULT_WIFI_AP_MAXCONN 5
+
+#define BUS_QUEUE_LEN 5
+#define BUS_TIMEOUT_MS 500
+
+#define MAIN_TASK_STACK_SIZE 8192
+#define MAIN_TASK_PRIORITY 5
+
+#endif /* MAIN_CONFIG_H_ */

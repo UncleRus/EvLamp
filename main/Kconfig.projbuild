@@ -1,0 +1,68 @@
+menu "EvLamp configuration"
+
+    menu "Default WiFi configuration"
+    	
+        choice WIFI_MODE_C
+            prompt "Default WiFi mode"
+            default EL_WIFI_MODE_AP
+
+            config EL_WIFI_MODE_AP
+                bool "Access point"
+
+            config EL_WIFI_MODE_STA
+                bool "Station"
+
+        endchoice
+
+        menu "Access point mode"
+        
+            config EL_WIFI_AP_SSID
+                string "SSID"
+                default "EvLamp"
+                
+            config EL_WIFI_AP_PASSWD
+                string "Password"
+                default ""
+    
+            config EL_WIFI_AP_CHANNEL
+                int "Channel"
+                range 0 13
+                default 6
+
+        endmenu
+
+        menu "Station mode"
+        
+            config EL_WIFI_STA_SSID
+                string "SSID"
+                default "MYNETWORK"
+                
+            config EL_WIFI_STA_PASSWD
+                string "Password"
+                default ""
+    
+        endmenu
+
+        config EL_WIFI_DHCP
+            bool "Enable DHCP"
+            default y
+            
+        config EL_WIFI_IP
+            string "IP address"
+            default "192.168.1.1"
+
+        config EL_WIFI_NETMASK
+            string "Netmask"
+            default "255.255.255.0"
+
+        config EL_WIFI_GATEWAY
+            string "Gateway"
+            default "192.168.1.1"
+            
+        config EL_WIFI_DNS
+            string "DNS server"
+            default "192.168.1.1"
+            
+    endmenu
+
+endmenu

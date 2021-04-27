@@ -1,9 +1,4 @@
 /**
- * @file waterfall.h
- *
- * @defgroup led_effect_waterfall led_effect_waterfall
- * @{
- *
  * Waterfall/Fire effect
  *
  * Parameters:
@@ -14,36 +9,17 @@
  *
  * Recommended parameters for fire mode: cooling = 90, sparking = 80
  */
-#ifndef __LED_EFFECTS_WATERFALL_H__
-#define __LED_EFFECTS_WATERFALL_H__
+#ifndef __EFFECTS_WATERFALL_H__
+#define __EFFECTS_WATERFALL_H__
 
-#include <framebuffer.h>
+#include "effect.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern EFFECT_PARAMS(waterfall, 4);
 
-typedef enum {
-    WATERFALL_SIMPLE = 0,
-    WATERFALL_COLORS,
-    WATERFALL_FIRE,
-    WATERFALL_COLD_FIRE,
-} led_effect_waterfall_mode_t;
+esp_err_t effect_waterfall_prepare(framebuffer_t *fb);
 
-esp_err_t led_effect_waterfall_init(framebuffer_t *fb, led_effect_waterfall_mode_t mode,
-        uint8_t hue, uint8_t cooling, uint8_t sparking);
+esp_err_t effect_waterfall_run(framebuffer_t *fb);
 
-esp_err_t led_effect_waterfall_done(framebuffer_t *fb);
+#define DESCR_EFFECT_WATERFALL DECL_EFFECT_FULL(waterfall, "Waterfall")
 
-esp_err_t led_effect_waterfall_set_params(framebuffer_t *fb, led_effect_waterfall_mode_t mode,
-        uint8_t hue, uint8_t cooling, uint8_t sparking);
-
-esp_err_t led_effect_waterfall_run(framebuffer_t *fb);
-
-#ifdef __cplusplus
-}
-#endif
-
-/**@}*/
-
-#endif /* __LED_EFFECTS_WATERFALL_H__ */
+#endif /* __EFFECTS_WATERFALL_H__ */

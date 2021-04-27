@@ -1,70 +1,27 @@
 /**
- * @file rays.c
- *
  * Colored rays effect
  *
  * Author: Yaroslaw Turbin (https://vk.com/ldirko, https://www.reddit.com/user/ldirko/)
- *
  * https://editor.soulmatelights.com/gallery/819-colored-bursts
  *
  * Max supported framebuffer size is 256x256
- *
- * Parameters:
- *   - speed:    Speed of rays movement, 0 - 50
- *   - min_rays: Minimal rays count, 1 - 10
- *   - max_rays: Maximal rays count, 10 - 20
  */
-#include <lib8tion.h>
-#include <stdlib.h>
-
 #include "effects/rays.h"
 
-#define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
-#define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
+#include <lib8tion.h>
 
-typedef struct
-{
-    uint8_t speed;
-    uint8_t min_rays;
-    uint8_t max_rays;
-    uint8_t hue;
-    uint8_t num_rays;
-} params_t;
+#define P_SPEED    0
+#define P_MIN_RAYS 1
+#define P_MAX_RAYS 2
 
-esp_err_t led_effect_rays_init(framebuffer_t *fb, uint8_t speed, uint8_t min_rays, uint8_t max_rays)
-{
-    CHECK_ARG(fb);
+EFFECT_PARAMS(rays, 3) = {
+    DECL_PARAM(P_SPEED, "Speed", 0, 2, 0),
+    DECL_PARAM(P_MIN_RAYS, "Minimal rays number", 1, 10, 3),
+    DECL_PARAM(P_MAX_RAYS, "Maximal rays number", 1, 20, 6),
+};
 
-    // allocate internal storage
-    fb->internal = calloc(1, sizeof(params_t));
-    if (!fb->internal)
-        return ESP_ERR_NO_MEM;
-
-    return led_effect_rays_set_params(fb, speed, min_rays, max_rays);
-}
-
-esp_err_t led_effect_rays_done(framebuffer_t *fb)
-{
-    CHECK_ARG(fb && fb->internal);
-
-    // free internal storage
-    if (fb->internal)
-        free(fb->internal);
-
-    return ESP_OK;
-}
-
-esp_err_t led_effect_rays_set_params(framebuffer_t *fb, uint8_t speed, uint8_t min_rays, uint8_t max_rays)
-{
-    CHECK_ARG(fb && fb->internal);
-
-    params_t *params = (params_t *)fb->internal;
-    params->speed = speed;
-    params->min_rays = params->num_rays = min_rays;
-    params->max_rays = max_rays;
-
-    return ESP_OK;
-}
+static uint8_t hue;
+static uint8_t num_rays;
 
 static void line(framebuffer_t *fb, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, rgb_t color)
 {
@@ -83,35 +40,31 @@ static void line(framebuffer_t *fb, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t 
     }
 }
 
-esp_err_t led_effect_rays_run(framebuffer_t *fb)
+esp_err_t effect_rays_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 
-    params_t *params = (params_t *)fb->internal;
-
     // change number of rays
-    if (params->max_rays > params->min_rays && !(fb->frame_num % 10))
+    if (EPARAM(rays, P_MAX_RAYS) > EPARAM(rays, P_MIN_RAYS) && !(fb->frame_num % 10))
     {
         if (random8_to(2))
-            params->num_rays++;
+            num_rays++;
         else
-            params->num_rays--;
-        if (params->num_rays < params->min_rays)
-            params->num_rays = params->min_rays;
-        if (params->num_rays > params->max_rays)
-            params->num_rays = params->max_rays;
+            num_rays--;
     }
+    if (num_rays < EPARAM(rays, P_MIN_RAYS)) num_rays = EPARAM(rays, P_MIN_RAYS);
+    if (num_rays > EPARAM(rays, P_MAX_RAYS)) num_rays = EPARAM(rays, P_MAX_RAYS);
 
-    params->hue += 5;
+    hue += 5;
     fb_fade(fb, 40);
-    for (uint8_t i = 0; i < params->num_rays; i++)
+    for (uint8_t i = 0; i < num_rays; i++)
     {
-        uint8_t x1 = beatsin8(4 + params->speed, 0, (fb->width - 1), 0, 0);
-        uint8_t x2 = beatsin8(2 + params->speed, 0, (fb->width - 1), 0, 0);
-        uint8_t y1 = beatsin8(8 + params->speed, 0, (fb->height - 1), 0, i * 24);
-        uint8_t y2 = beatsin8(10 + params->speed, 0, (fb->height - 1), 0, i * 48 + 64);
+        uint8_t x1 = beatsin8(4 + EPARAM(rays, P_SPEED), 0, (fb->width - 1), 0, 0);
+        uint8_t x2 = beatsin8(2 + EPARAM(rays, P_SPEED), 0, (fb->width - 1), 0, 0);
+        uint8_t y1 = beatsin8(8 + EPARAM(rays, P_SPEED), 0, (fb->height - 1), 0, i * 24);
+        uint8_t y2 = beatsin8(10 + EPARAM(rays, P_SPEED), 0, (fb->height - 1), 0, i * 48 + 64);
 
-        line(fb, x1, x2, y1, y2, hsv2rgb_rainbow(hsv_from_values(i * 255 / params->num_rays + params->hue, 255, 255)));
+        line(fb, x1, x2, y1, y2, hsv2rgb_rainbow(hsv_from_values(i * 255 / num_rays + hue, 255, 255)));
     }
     fb_blur2d(fb, 8);
 

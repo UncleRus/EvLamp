@@ -1,77 +1,46 @@
 /**
- * @file rain.c
- *
  * Rain effect by Shaitan
- *
  */
-#include <lib8tion.h>
-#include <stdlib.h>
-
 #include "effects/rain.h"
 
-#define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
-#define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
+#include <lib8tion.h>
 
-typedef struct
+#define MODE_SINGLE_COLOR 0
+
+#define P_MODE    0
+#define P_HUE     1
+#define P_DENSITY 2
+#define P_TAIL    3
+
+EFFECT_PARAMS(rain, 4) = {
+    DECL_PARAM(P_MODE, "Mode", 0, 1, 0),
+    DECL_PARAM(P_HUE, "Hue", 0, 255, 0),
+    DECL_PARAM(P_DENSITY, "Density", 0, 100, 50),
+    DECL_PARAM(P_TAIL, "Tail length", 100, 200, 150),
+};
+
+static uint8_t density;
+
+esp_err_t effect_rain_prepare(framebuffer_t *fb)
 {
-    led_effect_rain_mode_t mode;
-    uint8_t hue;
-    uint8_t density;
-    uint8_t tail;
-} params_t;
-
-esp_err_t led_effect_rain_init(framebuffer_t *fb, led_effect_rain_mode_t mode, uint8_t hue, uint8_t density, uint8_t tail)
-{
-    CHECK_ARG(fb);
-
-    // allocate internal storage
-    fb->internal = calloc(1, sizeof(params_t));
-    if (!fb->internal)
-        return ESP_ERR_NO_MEM;
-
-    return led_effect_rain_set_params(fb, mode, hue, density, tail);
-}
-
-esp_err_t led_effect_rain_done(framebuffer_t *fb)
-{
-    CHECK_ARG(fb && fb->internal);
-
-    // free internal storage
-    if (fb->internal)
-        free(fb->internal);
-
+    density = 255 - qadd8(EPARAM(rain, P_DENSITY), 155);
     return ESP_OK;
 }
 
-esp_err_t led_effect_rain_set_params(framebuffer_t *fb, led_effect_rain_mode_t mode, uint8_t hue, uint8_t density, uint8_t tail)
-{
-    CHECK_ARG(fb && fb->internal);
-
-    params_t *params = (params_t *)fb->internal;
-    params->mode = mode;
-    params->hue = hue;
-    params->density = 255 - qadd8(density, 155);
-    params->tail = tail;
-
-    return ESP_OK;
-}
-
-esp_err_t led_effect_rain_run(framebuffer_t *fb)
+esp_err_t effect_rain_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
-
-    params_t *params = (params_t *)fb->internal;
 
     for (size_t x = 0; x < fb->width; x++)
     {
         rgb_t c;
         fb_get_pixel_rgb(fb, x, fb->height - 1, &c);
-        if (!rgb_luma(c) && random8_to(params->density) == 0)
+        if (!rgb_luma(c) && random8_to(density) == 0)
             fb_set_pixel_hsv(fb, x, fb->height - 1,
-                    hsv_from_values(params->mode == RAIN_MODE_SINGLE_COLOR ? params->hue : random8(), 255, 255));
+                    hsv_from_values(EPARAM(rain, P_MODE) == MODE_SINGLE_COLOR ? EPARAM(rain, P_HUE) : random8(), 255, 255));
         else
         {
-            c = rgb_scale(c, params->tail + random8_to(100) - 50);
+            c = rgb_scale(c, EPARAM(rain, P_TAIL) + random8_to(100) - 50);
             fb_set_pixel_rgb(fb, x, fb->height - 1, rgb_luma(c) < 3 ? rgb_from_values(0, 0, 0) : c);
         }
     }

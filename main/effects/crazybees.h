@@ -1,36 +1,19 @@
 /**
- * @file crazybees.h
- *
- * @defgroup led_effect_crazybees led_effect_crazybees
- * @{
- *
  * Crazy Bees effect
  *
  * Author: Stepko
  */
-#ifndef __LED_EFFECTS_CRAZYBEES_H__
-#define __LED_EFFECTS_CRAZYBEES_H__
+#ifndef __EFFECTS_CRAZYBEES_H__
+#define __EFFECTS_CRAZYBEES_H__
 
-#include <framebuffer.h>
+#include "effect.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern EFFECT_PARAMS(crazybees, 1);
 
-#define CRAZYBEES_MAX_BEES 10
+esp_err_t effect_crazybees_prepare(framebuffer_t *fb);
 
-esp_err_t led_effect_crazybees_init(framebuffer_t *fb, uint8_t num_bees);
+esp_err_t effect_crazybees_run(framebuffer_t *fb);
 
-esp_err_t led_effect_crazybees_done(framebuffer_t *fb);
-
-esp_err_t led_effect_crazybees_set_params(framebuffer_t *fb, uint8_t num_bees);
-
-esp_err_t led_effect_crazybees_run(framebuffer_t *fb);
-
-#ifdef __cplusplus
-}
-#endif
-
-/**@}*/
+#define DESCR_EFFECT_CRAZYBEES DECL_EFFECT_FULL(crazybees, "Crazy bees")
 
 #endif /* __LED_EFFECTS_CRAZYBEES_H__ */

@@ -1,33 +1,15 @@
 /**
- * @file sparkles.h
- *
- * @defgroup led_effect_sparkles led_effect_sparkles
- * @{
- *
- * Colored sparkles effect.
- *
+ * Colored sparkles effect
  */
-#ifndef __LED_EFFECTS_SPARKLES_H__
-#define __LED_EFFECTS_SPARKLES_H__
+#ifndef __EFFECTS_SPARKLES_H__
+#define __EFFECTS_SPARKLES_H__
 
-#include <framebuffer.h>
+#include "effect.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern EFFECT_PARAMS(sparkles, 2);
 
-esp_err_t led_effect_sparkles_init(framebuffer_t *fb, uint8_t max_sparkles, uint8_t fadeout_speed);
+esp_err_t effect_sparkles_run(framebuffer_t *fb);
 
-esp_err_t led_effect_sparkles_done(framebuffer_t *fb);
+#define DESCR_EFFECT_SPARKLES DECL_EFFECT_SHORT(sparkles, "Sparkles")
 
-esp_err_t led_effect_sparkles_set_params(framebuffer_t *fb, uint8_t max_sparkles, uint8_t fadeout_speed);
-
-esp_err_t led_effect_sparkles_run(framebuffer_t *fb);
-
-#ifdef __cplusplus
-}
-#endif
-
-/**@}*/
-
-#endif /* __LED_EFFECTS_SPARKLES_H__ */
+#endif /* __EFFECTS_SPARKLES_H__ */
