@@ -15,7 +15,7 @@
 #define P_MAX_RAYS 2
 
 EFFECT_PARAMS(rays, 3) = {
-    DECL_PARAM(P_SPEED, "Speed", 0, 2, 0),
+    DECL_PARAM(P_SPEED, "Speed", 0, 50, 10),
     DECL_PARAM(P_MIN_RAYS, "Minimal rays number", 1, 10, 3),
     DECL_PARAM(P_MAX_RAYS, "Maximal rays number", 1, 20, 6),
 };

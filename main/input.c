@@ -5,7 +5,7 @@
 
 #if CONFIG_EL_BUTTON_ENABLE
 
-#define TIMER_INTERVAL_US (100 * 1000) // 100ms = 10Hz
+#define TIMER_INTERVAL_US (200 * 1000) // 200ms = 5Hz
 #define DEAD_TIME_US (10 * 1000) // 10ms antijitter
 
 typedef enum {

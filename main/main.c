@@ -52,7 +52,7 @@ void app_main()
     ESP_ERROR_CHECK(bus_init());
 
     // Initialize input
-    ESP_ERROR_CHECK(input_init());
+    //ESP_ERROR_CHECK(input_init());
 
     // Try to start WIFI
     esp_err_t res = wifi_init();
