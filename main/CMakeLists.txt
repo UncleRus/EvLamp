@@ -6,6 +6,7 @@ idf_component_register(
         wifi.c
         bus.c
         effect.c
+        surface.c
         
         effects/crazybees.c
         effects/dna.c

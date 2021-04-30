@@ -3,6 +3,7 @@
 #include "wifi.h"
 #include "bus.h"
 #include "effect.h"
+#include "surface.h"
 
 static void main_loop(void *arg)
 {
@@ -28,15 +29,18 @@ static void main_loop(void *arg)
 
 void app_main()
 {
-    ESP_LOGI(TAG, "Starting EvLamp");
+    ESP_LOGI(TAG, "Starting " APP_NAME);
 
     // Initialize NVS
     ESP_ERROR_CHECK(settings_init());
-    // Load settings from NVS
-    ESP_ERROR_CHECK(settings_load());
+    // Load system settings from NVS
+    ESP_ERROR_CHECK(sys_settings_load());
+    // Load volatile settings
+    ESP_ERROR_CHECK(vol_settings_load());
     // Load effect parameters
-    if (effects_load() != ESP_OK)
-        ESP_ERROR_CHECK(effects_reset());
+    ESP_ERROR_CHECK(effects_init());
+    // Init surface
+    ESP_ERROR_CHECK(surface_init());
 
     // Initialize bus
     ESP_ERROR_CHECK(bus_init());

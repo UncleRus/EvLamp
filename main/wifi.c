@@ -23,21 +23,21 @@ static void log_ip_info()
 
 static void set_ip_info()
 {
-    if (settings.wifi.ip.dhcp)
+    if (sys_settings.wifi.ip.dhcp)
         return;
 
-    if (settings.wifi.mode == WIFI_MODE_AP)
+    if (sys_settings.wifi.mode == WIFI_MODE_AP)
         esp_netif_dhcps_stop(iface);
     else
         esp_netif_dhcpc_stop(iface);
 
     esp_netif_ip_info_t ip_info;
-    ip_info.ip.addr      = ipaddr_addr(settings.wifi.ip.ip);
-    ip_info.netmask.addr = ipaddr_addr(settings.wifi.ip.netmask);
-    ip_info.gw.addr      = ipaddr_addr(settings.wifi.ip.gateway);
+    ip_info.ip.addr      = ipaddr_addr(sys_settings.wifi.ip.ip);
+    ip_info.netmask.addr = ipaddr_addr(sys_settings.wifi.ip.netmask);
+    ip_info.gw.addr      = ipaddr_addr(sys_settings.wifi.ip.gateway);
     esp_netif_set_ip_info(iface, &ip_info);
 
-    if (settings.wifi.mode == WIFI_MODE_AP)
+    if (sys_settings.wifi.mode == WIFI_MODE_AP)
         esp_netif_dhcps_start(iface);
 }
 
@@ -56,7 +56,7 @@ static void wifi_handler(void *arg, esp_event_base_t event_base, int32_t event_i
             esp_wifi_connect();
             break;
         case WIFI_EVENT_STA_CONNECTED:
-            ESP_LOGI(TAG, "WiFi connected to '%s'", settings.wifi.sta.ssid);
+            ESP_LOGI(TAG, "WiFi connected to '%s'", sys_settings.wifi.sta.ssid);
             set_ip_info();
             break;
         default:
@@ -94,11 +94,11 @@ static esp_err_t init_ap()
     CHECK(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_handler, NULL, NULL));
 
     wifi_config_t wifi_cfg = { 0 };
-    memcpy(wifi_cfg.ap.ssid, settings.wifi.ap.ssid, sizeof(wifi_cfg.ap.ssid));
-    wifi_cfg.ap.ssid_len = strlen((const char *)settings.wifi.ap.ssid);
-    memcpy(wifi_cfg.ap.password, settings.wifi.ap.password, sizeof(wifi_cfg.ap.password));
-    wifi_cfg.ap.max_connection = settings.wifi.ap.max_connection;
-    wifi_cfg.ap.authmode = settings.wifi.ap.authmode;
+    memcpy(wifi_cfg.ap.ssid, sys_settings.wifi.ap.ssid, sizeof(wifi_cfg.ap.ssid));
+    wifi_cfg.ap.ssid_len = strlen((const char *)sys_settings.wifi.ap.ssid);
+    memcpy(wifi_cfg.ap.password, sys_settings.wifi.ap.password, sizeof(wifi_cfg.ap.password));
+    wifi_cfg.ap.max_connection = sys_settings.wifi.ap.max_connection;
+    wifi_cfg.ap.authmode = sys_settings.wifi.ap.authmode;
 
     ESP_LOGI(TAG, "WiFi access point settings:");
     ESP_LOGI(TAG, "--------------------------------------------------");
@@ -128,9 +128,9 @@ static esp_err_t init_sta()
     CHECK(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_LOST_IP, &ip_handler, NULL, NULL));
 
     wifi_config_t wifi_cfg = { 0 };
-    memcpy(wifi_cfg.sta.ssid, settings.wifi.sta.ssid, sizeof(wifi_cfg.sta.ssid));
-    memcpy(wifi_cfg.sta.password, settings.wifi.sta.password, sizeof(wifi_cfg.sta.password));
-    wifi_cfg.sta.threshold.authmode = settings.wifi.sta.threshold.authmode;
+    memcpy(wifi_cfg.sta.ssid, sys_settings.wifi.sta.ssid, sizeof(wifi_cfg.sta.ssid));
+    memcpy(wifi_cfg.sta.password, sys_settings.wifi.sta.password, sizeof(wifi_cfg.sta.password));
+    wifi_cfg.sta.threshold.authmode = sys_settings.wifi.sta.threshold.authmode;
 
     CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_cfg));
@@ -144,7 +144,7 @@ esp_err_t wifi_init()
     CHECK(esp_netif_init());
     CHECK(esp_event_loop_create_default());
 
-    if (settings.wifi.mode == WIFI_MODE_AP)
+    if (sys_settings.wifi.mode == WIFI_MODE_AP)
         CHECK(init_ap());
     else
         CHECK(init_sta());

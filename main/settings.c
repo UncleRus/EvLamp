@@ -2,16 +2,20 @@
 #include <string.h>
 #include <nvs_flash.h>
 #include <nvs.h>
+#include <led_strip.h>
 
-#define OPT_MAGIC        "magic"
-#define OPT_SYS_SETTINGS "settings"
-#define OPT_EFF_SETTINGS "effects"
+static const char *STORAGE_SYSTEM_NAME   = "system";
+static const char *STORAGE_VOLATILE_NAME = "volatile";
 
-#define SETTINGS_MAGIC 0xdead0001
+static const char *OPT_MAGIC    = "magic";
+static const char *OPT_SETTINGS = "settings";
 
-system_settings_t settings = { 0 };
+#define SETTINGS_MAGIC 0xbeef0001 // TODO project version to magic
 
-static system_settings_t defaults = {
+system_settings_t sys_settings = { 0 };
+volatile_settings_t vol_settings = { 0 };
+
+static system_settings_t sys_defaults = {
     .wifi = {
         .mode = DEFAULT_WIFI_MODE,
         .ip = {
@@ -33,78 +37,78 @@ static system_settings_t defaults = {
             .threshold.authmode = WIFI_AUTH_WPA2_PSK,
         },
     },
+    .leds = {
+        .width = CONFIG_EL_MATRIX_WIDTH,
+        .height = CONFIG_EL_MATRIX_HEIGHT,
+        .type = DEFAULT_LED_TYPE,
+        .gpio = CONFIG_EL_MATRIX_GPIO,
+        .current_limit = CONFIG_EL_MATRIX_MAX_CURRENT,
+    },
 };
 
-esp_err_t settings_reset()
-{
-    ESP_LOGI(TAG, "Resetting settings to defaults");
+static const volatile_settings_t vol_defaults = {
+    .fps        = CONFIG_EL_FPS_DEFAULT,
+    .brightness = CONFIG_EL_BRIGHTNESS_DEFAULT,
+    .effect     = CONFIG_EL_EFFECT_DEFAULT,
+};
 
-    if (!defaults.wifi.ap.password || !strlen((const char *)defaults.wifi.ap.password))
-        defaults.wifi.ap.authmode = WIFI_AUTH_OPEN;
-    if (!defaults.wifi.sta.password || !strlen((const char *)defaults.wifi.sta.password))
-        defaults.wifi.sta.threshold.authmode = WIFI_AUTH_OPEN;
-
-    memcpy(&settings, &defaults, sizeof(system_settings_t));
-    CHECK(settings_save());
-
-    ESP_LOGI(TAG, "Settings have been reset to defaults");
-
-    return ESP_OK;
-}
-
-esp_err_t settings_save()
-{
-    ESP_LOGI(TAG, "Saving settings...");
-
-    nvs_handle_t nvs;
-    CHECK_LOGE(nvs_open(NVS_STORAGE_NAME, NVS_READWRITE, &nvs),
-            "Could not open NVS to write");
-    CHECK_LOGE(nvs_set_u32(nvs, OPT_MAGIC, SETTINGS_MAGIC),
-            "Error writing NVS magic");
-    CHECK_LOGE(nvs_set_blob(nvs, OPT_SYS_SETTINGS, &settings, sizeof(system_settings_t)),
-            "Error writing NVS settings");
-    nvs_close(nvs);
-
-    ESP_LOGI(TAG, "Settings saved");
-
-    return ESP_OK;
-}
-
-esp_err_t settings_load()
+static esp_err_t _storage_load(const char *storage_name, void *target, size_t size)
 {
     nvs_handle_t nvs;
     esp_err_t res;
 
-    ESP_LOGI(TAG, "Reading settings...");
+    ESP_LOGI(TAG, "Reading settings from '%s'...", storage_name);
 
-    res = nvs_open(NVS_STORAGE_NAME, NVS_READONLY, &nvs);
-    if (res != ESP_OK)
-        return settings_reset();
+    CHECK(nvs_open(storage_name, NVS_READONLY, &nvs));
 
     uint32_t magic = 0;
     res = nvs_get_u32(nvs, OPT_MAGIC, &magic);
-    if (res != ESP_OK || magic != SETTINGS_MAGIC)
+    if (res != ESP_OK)
     {
-        ESP_LOGE(TAG, "Invalid magic 0x%08x, expected 0x%08x", magic, SETTINGS_MAGIC);
+        if (magic != SETTINGS_MAGIC)
+        {
+            ESP_LOGE(TAG, "Invalid magic 0x%08x, expected 0x%08x", magic, SETTINGS_MAGIC);
+            res = ESP_FAIL;
+        }
         nvs_close(nvs);
-        return settings_reset();
+        return res;
     }
 
-    size_t size = sizeof(system_settings_t);
-    res = nvs_get_blob(nvs, OPT_SYS_SETTINGS, &settings, &size);
-    if (res != ESP_OK || size != sizeof(system_settings_t))
+    size_t tmp = size;
+    res = nvs_get_blob(nvs, OPT_SETTINGS, target, &tmp);
+    if (res != ESP_OK || tmp != size)
     {
         ESP_LOGE(TAG, "Error reading settings %d (%s)", res, esp_err_to_name(res));
         nvs_close(nvs);
-        return settings_reset();
+        return res;
     }
 
     nvs_close(nvs);
 
-    ESP_LOGI(TAG, "Settings read");
+    ESP_LOGI(TAG, "Settings read from '%s'", storage_name);
 
     return ESP_OK;
 }
+
+static esp_err_t _storage_save(const char *storage_name, const void *source, size_t size)
+{
+    ESP_LOGI(TAG, "Saving settings to '%s'...", storage_name);
+
+    nvs_handle_t nvs;
+    CHECK_LOGE(nvs_open(storage_name, NVS_READWRITE, &nvs),
+            "Could not open NVS to write");
+    CHECK_LOGE(nvs_set_u32(nvs, OPT_MAGIC, SETTINGS_MAGIC),
+            "Error writing NVS magic");
+    CHECK_LOGE(nvs_set_blob(nvs, OPT_SETTINGS, source, size),
+            "Error writing NVS settings");
+    nvs_close(nvs);
+
+    ESP_LOGI(TAG, "Settings saved to '%s'", storage_name);
+
+    return ESP_OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 esp_err_t settings_init()
 {
@@ -113,7 +117,65 @@ esp_err_t settings_init()
     {
         CHECK_LOGE(nvs_flash_erase(), "Could not erase NVS flash");
         CHECK_LOGE(nvs_flash_init(), "Could not init NVS flash");
-        return settings_reset();
+        CHECK_LOGE(sys_settings_reset(), "Could not reset system settings");
+        CHECK_LOGE(vol_settings_reset(), "Could not reset volatile settings");
     }
     return res;
+}
+
+esp_err_t sys_settings_reset()
+{
+    ESP_LOGI(TAG, "Resetting system settings to defaults");
+
+    if (!sys_defaults.wifi.ap.password || !strlen((const char *)sys_defaults.wifi.ap.password))
+        sys_defaults.wifi.ap.authmode = WIFI_AUTH_OPEN;
+    if (!sys_defaults.wifi.sta.password || !strlen((const char *)sys_defaults.wifi.sta.password))
+        sys_defaults.wifi.sta.threshold.authmode = WIFI_AUTH_OPEN;
+
+    memcpy(&sys_settings, &sys_defaults, sizeof(system_settings_t));
+    CHECK(sys_settings_save());
+
+    ESP_LOGI(TAG, "System settings have been reset to defaults");
+
+    return ESP_OK;
+}
+
+esp_err_t sys_settings_load()
+{
+    esp_err_t res = _storage_load(STORAGE_SYSTEM_NAME, &sys_settings, sizeof(system_settings_t));
+    if (res != ESP_OK)
+        return sys_settings_reset();
+
+    return ESP_OK;
+}
+
+esp_err_t sys_settings_save()
+{
+    return _storage_save(STORAGE_SYSTEM_NAME, &sys_settings, sizeof(system_settings_t));
+}
+
+esp_err_t vol_settings_reset()
+{
+    ESP_LOGI(TAG, "Resetting volatile settings to defaults");
+
+    memcpy(&vol_settings, &vol_defaults, sizeof(volatile_settings_t));
+    CHECK(vol_settings_save());
+
+    ESP_LOGI(TAG, "Volatile settings have been reset to defaults");
+
+    return ESP_OK;
+}
+
+esp_err_t vol_settings_load()
+{
+    esp_err_t res = _storage_load(STORAGE_VOLATILE_NAME, &vol_settings, sizeof(volatile_settings_t));
+    if (res != ESP_OK)
+        return vol_settings_reset();
+
+    return ESP_OK;
+}
+
+esp_err_t vol_settings_save()
+{
+    return _storage_save(STORAGE_VOLATILE_NAME, &vol_settings, sizeof(volatile_settings_t));
 }

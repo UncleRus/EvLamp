@@ -1,68 +1,120 @@
 menu "EvLamp configuration"
 
-    menu "Default WiFi configuration"
-    	
-        choice WIFI_MODE_C
-            prompt "Default WiFi mode"
-            default EL_WIFI_MODE_AP
+	config EL_EFFECT_DEFAULT
+		int "Default effect number"
+		default 0
+		
+	config EL_FPS_DEFAULT
+		int "Default FPS"
+		range 1 120
+		default 30
 
-            config EL_WIFI_MODE_AP
-                bool "Access point"
+	config EL_BRIGHTNESS_DEFAULT
+		int "Default brightness"
+		range 1 255
+		default 255
 
-            config EL_WIFI_MODE_STA
-                bool "Station"
+	menu "Default WiFi configuration"
+		
+		choice WIFI_MODE_C
+			prompt "Default WiFi mode"
+			default EL_WIFI_MODE_AP
 
-        endchoice
+			config EL_WIFI_MODE_AP
+				bool "Access point"
 
-        menu "Access point mode"
-        
-            config EL_WIFI_AP_SSID
-                string "SSID"
-                default "EvLamp"
-                
-            config EL_WIFI_AP_PASSWD
-                string "Password"
-                default ""
-    
-            config EL_WIFI_AP_CHANNEL
-                int "Channel"
-                range 0 13
-                default 6
+			config EL_WIFI_MODE_STA
+				bool "Station"
 
-        endmenu
+		endchoice
 
-        menu "Station mode"
-        
-            config EL_WIFI_STA_SSID
-                string "SSID"
-                default "MYNETWORK"
-                
-            config EL_WIFI_STA_PASSWD
-                string "Password"
-                default ""
-    
-        endmenu
+		menu "Access point mode"
+		
+			config EL_WIFI_AP_SSID
+				string "SSID"
+				default "EvLamp"
+				
+			config EL_WIFI_AP_PASSWD
+				string "Password"
+				default ""
+	
+			config EL_WIFI_AP_CHANNEL
+				int "Channel"
+				range 0 13
+				default 6
 
-        config EL_WIFI_DHCP
-            bool "Enable DHCP"
-            default y
-            
-        config EL_WIFI_IP
-            string "IP address"
-            default "192.168.1.1"
+		endmenu
 
-        config EL_WIFI_NETMASK
-            string "Netmask"
-            default "255.255.255.0"
+		menu "Station mode"
+		
+			config EL_WIFI_STA_SSID
+				string "SSID"
+				default "MYNETWORK"
+				
+			config EL_WIFI_STA_PASSWD
+				string "Password"
+				default ""
+	
+		endmenu
 
-        config EL_WIFI_GATEWAY
-            string "Gateway"
-            default "192.168.1.1"
-            
-        config EL_WIFI_DNS
-            string "DNS server"
-            default "192.168.1.1"
-            
-    endmenu
+		config EL_WIFI_DHCP
+			bool "Enable DHCP"
+			default y
+			
+		config EL_WIFI_IP
+			string "IP address"
+			default "192.168.1.1"
+
+		config EL_WIFI_NETMASK
+			string "Netmask"
+			default "255.255.255.0"
+
+		config EL_WIFI_GATEWAY
+			string "Gateway"
+			default "192.168.1.1"
+			
+		config EL_WIFI_DNS
+			string "DNS server"
+			default "192.168.1.1"
+			
+	endmenu
+	
+	menu "Hardware configuration"
+	
+		config EL_MATRIX_GPIO
+			int "GPIO output for LED strip"
+			range 0 32
+			default 5
+		
+		config EL_MATRIX_WIDTH
+			int "LED matrix width"
+			range 8 64
+			default 16
+	
+		config EL_MATRIX_HEIGHT
+			int "LED matrix height"
+			range 8 64
+			default 16
+			
+		choice EL_LED_TYPE_C
+			prompt "LED type"
+			default EL_LED_TYPE_WS2812
+			
+			config EL_LED_TYPE_WS2812
+				bool "WS2812"
+
+			config EL_LED_TYPE_SK6812
+				bool "SK6812"
+
+			config EL_LED_TYPE_APA106
+				bool "APA106"
+		
+		endchoice
+			
+		config EL_MATRIX_MAX_CURRENT
+			int "Maximal current consuming by LEDs, mA"
+			default 3000
+
+	endmenu
 
 endmenu

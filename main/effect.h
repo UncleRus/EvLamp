@@ -54,4 +54,6 @@ esp_err_t effects_load();
 
 esp_err_t effect_param_set(size_t effect, size_t param, uint8_t value);
 
+esp_err_t effects_init();
+
 #endif /* _MAIN_EFFECT_H_ */
