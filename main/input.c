@@ -1,12 +1,13 @@
 #include "input.h"
 #include <driver/gpio.h>
-#include <esp_timer.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/timers.h>
 #include "bus.h"
 
 #if CONFIG_EL_BUTTON_ENABLE
 
-#define TIMER_INTERVAL_US (200 * 1000) // 200ms = 5Hz
-#define DEAD_TIME_US (10 * 1000) // 10ms antijitter
+#define TIMER_INTERVAL_MS 100 // 100ms = 10z
+#define DEAD_TIME_MS 10 // 10ms antijitter
 
 typedef enum {
     BTN_RELEASED = 0,
@@ -15,74 +16,77 @@ typedef enum {
     BTN_CLICKED,
 } button_state_t;
 
-static esp_timer_handle_t timer;
 static button_state_t btn_state = BTN_RELEASED;
-static uint64_t btn_pressed_time_us = 0;
+static uint64_t btn_pressed_time_ms = 0;
 
-static void check_button(void *arg)
+static void input_task(void *arg)
 {
-    if (btn_state == BTN_PRESSED && btn_pressed_time_us < DEAD_TIME_US)
-    {
-        // Dead time
-        btn_pressed_time_us += TIMER_INTERVAL_US;
-        return;
-    }
+    ESP_LOGI(TAG, "Button init, GPIO %d", CONFIG_EL_BUTTON_GPIO);
 
-    // read button state
-    if (gpio_get_level(CONFIG_EL_BUTTON_GPIO) == CONFIG_EL_BUTTON_LEVEL)
+    gpio_set_direction(CONFIG_EL_BUTTON_GPIO, GPIO_MODE_INPUT);
+#if CONFIG_EL_BUTTON_PULLUPDOWN
+#if CONFIG_EL_BUTTON_LEVEL == 0
+    gpio_set_pull_mode(CONFIG_EL_BUTTON_GPIO, GPIO_PULLUP_ONLY);
+#else
+    gpio_set_pull_mode(CONFIG_EL_BUTTON_GPIO, GPIO_PULLDOWN_ONLY);
+#endif /* CONFIG_EL_BUTTON_LEVEL */
+#endif /* CONFIG_EL_BUTTON_PULLUPDOWN */
+
+    while (1)
     {
-        if (btn_state == BTN_RELEASED)
+        if (btn_state == BTN_PRESSED && btn_pressed_time_ms < DEAD_TIME_MS)
         {
-            // first press
-            btn_state = BTN_PRESSED;
-            btn_pressed_time_us = 0;
-            bus_send_event(EVENT_BUTTON_PRESSED, NULL, 0);
-            return;
+            // Dead time
+            btn_pressed_time_ms += DEAD_TIME_MS;
+            goto end;
         }
 
-        btn_pressed_time_us += TIMER_INTERVAL_US;
-
-        if (btn_state == BTN_PRESSED && btn_pressed_time_us >= CONFIG_EL_BUTTON_LONG_PRESS_TIME * 1000)
+        // read button state
+        if (gpio_get_level(CONFIG_EL_BUTTON_GPIO) == CONFIG_EL_BUTTON_LEVEL)
         {
-            // Long press
-            btn_state = BTN_LONG_PRESSED;
-            bus_send_event(EVENT_BUTTON_LONG_PRESSED, NULL, 0);
-            return;
+            if (btn_state == BTN_RELEASED)
+            {
+                // first press
+                btn_state = BTN_PRESSED;
+                btn_pressed_time_ms = 0;
+                bus_send_event(EVENT_BUTTON_PRESSED, NULL, 0);
+                goto end;
+            }
+
+            btn_pressed_time_ms += TIMER_INTERVAL_MS;
+
+            if (btn_state == BTN_PRESSED && btn_pressed_time_ms >= CONFIG_EL_BUTTON_LONG_PRESS_TIME)
+            {
+                // Long press
+                btn_state = BTN_LONG_PRESSED;
+                bus_send_event(EVENT_BUTTON_LONG_PRESSED, NULL, 0);
+            }
         }
-    }
-    else if (btn_state != BTN_RELEASED)
-    {
-        bool clicked = btn_state == BTN_PRESSED;
-        // released
-        btn_state = BTN_RELEASED;
-        bus_send_event(EVENT_BUTTON_RELEASED, NULL, 0);
-        if (clicked)
-            bus_send_event(EVENT_BUTTON_CLICKED, NULL, 0);
+        else if (btn_state != BTN_RELEASED)
+        {
+            bool clicked = btn_state == BTN_PRESSED;
+            // released
+            btn_state = BTN_RELEASED;
+            bus_send_event(EVENT_BUTTON_RELEASED, NULL, 0);
+            if (clicked)
+                bus_send_event(EVENT_BUTTON_CLICKED, NULL, 0);
+        }
+
+end:
+        vTaskDelay(pdMS_TO_TICKS(TIMER_INTERVAL_MS));
     }
 }
-
-static const esp_timer_create_args_t timer_args = {
-    .name = "button",
-    .arg = NULL,
-    .callback = check_button,
-    .dispatch_method = ESP_TIMER_TASK
-};
 
 #endif
 
 esp_err_t input_init()
 {
 #if CONFIG_EL_BUTTON_ENABLE
-    CHECK(gpio_set_direction(CONFIG_EL_BUTTON_GPIO, GPIO_MODE_INPUT));
-#if CONFIG_EL_BUTTON_PULLUPDOWN
-#if CONFIG_EL_BUTTON_LEVEL == 0
-    CHECK(gpio_set_pull_mode(CONFIG_EL_BUTTON_GPIO, GPIO_PULLUP_ONLY));
-#else
-    CHECK(gpio_set_pull_mode(CONFIG_EL_BUTTON_GPIO, GPIO_PULLDOWN_ONLY));
-#endif /* CONFIG_EL_BUTTON_LEVEL */
-#endif /* CONFIG_EL_BUTTON_PULLUPDOWN */
-    CHECK(esp_timer_create(&timer_args, &timer));
-    CHECK(esp_timer_start_periodic(timer, TIMER_INTERVAL_US));
+    if (xTaskCreate(input_task, "input", INPUT_TASK_STACK_SIZE, NULL, INPUT_TASK_PRIORITY, NULL) != pdPASS)
+    {
+        ESP_LOGE(TAG, "Could not create input task");
+        return ESP_FAIL;
+    }
 #endif
     return ESP_OK;
 }
