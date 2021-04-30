@@ -9,6 +9,12 @@ esp_err_t surface_prepare_effect(size_t effect);
 
 esp_err_t surface_set_effect(size_t num);
 
+esp_err_t surface_play();
+
+esp_err_t surface_stop();
+
+bool surface_is_playing();
+
 esp_err_t surface_next_effect();
 
 esp_err_t surface_set_brightness(uint8_t val);

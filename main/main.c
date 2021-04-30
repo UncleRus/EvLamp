@@ -17,8 +17,14 @@ static void main_loop(void *arg)
         switch (e.type)
         {
             case EVENT_BUTTON_CLICKED:
-                ESP_LOGI(TAG, "Button clicked, changing effect");
                 surface_next_effect();
+                break;
+
+            case EVENT_BUTTON_LONG_PRESSED:
+                if (surface_is_playing())
+                    surface_stop();
+                else
+                    surface_play();
                 break;
 
             case EVENT_NETWORK_UP:

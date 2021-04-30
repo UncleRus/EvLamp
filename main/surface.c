@@ -8,6 +8,7 @@
 static led_strip_t strip;
 static framebuffer_t framebuffer;
 static fb_animation_t animation;
+static bool playing = false;
 
 // frame renderer, framebuffer -> LED strip
 static esp_err_t render_frame(framebuffer_t *fb, void *arg)
@@ -54,7 +55,7 @@ esp_err_t surface_init()
     CHECK(fb_animation_init(&animation, &framebuffer));
 
     // Run
-    return surface_set_effect(vol_settings.effect);
+    return surface_play();
 }
 
 esp_err_t surface_prepare_effect(size_t effect)
@@ -82,6 +83,7 @@ esp_err_t surface_set_effect(size_t num)
     // prepare
     if (effects[num].prepare)
         CHECK(effects[num].prepare(&framebuffer));
+    playing = true;
     // play new
     return fb_animation_play(&animation, vol_settings.fps, effects[num].run, NULL);
 }
@@ -111,4 +113,32 @@ esp_err_t surface_set_fps(uint8_t val)
 
     vol_settings.fps = val;
     return surface_set_effect(vol_settings.effect);
+}
+
+esp_err_t surface_play()
+{
+    if (playing) return ESP_OK;
+
+    ESP_LOGI(TAG, "Starting animation");
+
+    return surface_set_effect(vol_settings.effect);
+}
+
+esp_err_t surface_stop()
+{
+    if (!playing) return ESP_OK;
+
+    ESP_LOGI(TAG, "Stopping animation");
+
+    fb_animation_stop(&animation);
+    fb_clear(&framebuffer);
+    render_frame(&framebuffer, NULL);
+    playing = false;
+
+    return ESP_OK;
+}
+
+bool surface_is_playing()
+{
+    return playing;
 }
