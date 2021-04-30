@@ -11,7 +11,7 @@
 #define P_NUM_BEES 0
 
 EFFECT_PARAMS(crazybees, 1) = {
-    DECL_PARAM(P_NUM_BEES, "Number of bees", 1, MAX_BEES, 4),
+    DECL_PARAM(P_NUM_BEES, "Number of bees", 1, MAX_BEES, 3),
 };
 
 typedef struct

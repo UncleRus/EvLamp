@@ -37,7 +37,6 @@ static const rgb_t C_BGREEN = { .r = 155, .g = 255, .b = 155 };
 
 esp_err_t effect_fire_prepare(framebuffer_t *fb)
 {
-    ESP_LOGW(TAG, "effect_fire_prepare()");
     switch (EPARAM(fire, P_PALETTE))
     {
         case PALETTE_BLUE:

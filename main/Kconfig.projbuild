@@ -81,39 +81,75 @@ menu "EvLamp configuration"
 	
 	menu "Hardware configuration"
 	
-		config EL_MATRIX_GPIO
-			int "GPIO output for LED strip"
-			range 0 32
-			default 5
-		
-		config EL_MATRIX_WIDTH
-			int "LED matrix width"
-			range 8 64
-			default 16
+		config EL_BUTTON_ENABLE
+			bool "Use hardware button"
+			default y
+
+		menu "Button"
+		depends on EL_BUTTON_ENABLE
+			
+			config EL_BUTTON_GPIO
+				int "GPIO input for button"
+				depends on EL_BUTTON_ENABLE
+				range 0 32
+				default 4
+			
+			config EL_BUTTON_LEVEL
+				int "Button logic level for 'pressed' state"
+				depends on EL_BUTTON_ENABLE
+				range 0 1
+				default 0
+
+			config EL_BUTTON_PULLUPDOWN
+				bool "Enable internal pullup/pulldown resistor"
+				depends on EL_BUTTON_ENABLE
+				default y
+
+			config EL_BUTTON_LONG_PRESS_TIME
+				int "Long button press time, milliseconds"
+				depends on EL_BUTTON_ENABLE
+				range 500 10000
+				default 1000
+
+		endmenu
+
+		menu "LED matrix"
 	
-		config EL_MATRIX_HEIGHT
-			int "LED matrix height"
-			range 8 64
-			default 16
+			config EL_MATRIX_GPIO
+				int "GPIO output for LED matrix"
+				range 0 32
+				default 5
 			
-		choice EL_LED_TYPE_C
-			prompt "LED type"
-			default EL_LED_TYPE_WS2812
-			
-			config EL_LED_TYPE_WS2812
-				bool "WS2812"
-
-			config EL_LED_TYPE_SK6812
-				bool "SK6812"
-
-			config EL_LED_TYPE_APA106
-				bool "APA106"
+			config EL_MATRIX_WIDTH
+				int "LED matrix width"
+				range 8 64
+				default 16
 		
-		endchoice
+			config EL_MATRIX_HEIGHT
+				int "LED matrix height"
+				range 8 64
+				default 16
+				
+			choice EL_LED_TYPE_C
+				prompt "LED type"
+				default EL_LED_TYPE_WS2812
+				
+				config EL_LED_TYPE_WS2812
+					bool "WS2812"
+	
+				config EL_LED_TYPE_SK6812
+					bool "SK6812"
+	
+				config EL_LED_TYPE_APA106
+					bool "APA106"
 			
-		config EL_MATRIX_MAX_CURRENT
-			int "Maximal current consuming by LEDs, mA"
-			default 3000
+			endchoice
+				
+			config EL_MATRIX_MAX_CURRENT
+				int "Maximal current consuming by LEDs, mA"
+				default 3000
+	
+		endmenu
 
 	endmenu
 

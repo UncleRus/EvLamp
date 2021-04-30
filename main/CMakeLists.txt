@@ -7,6 +7,7 @@ idf_component_register(
         bus.c
         effect.c
         surface.c
+        input.c
         
         effects/crazybees.c
         effects/dna.c

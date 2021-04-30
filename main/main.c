@@ -4,6 +4,7 @@
 #include "bus.h"
 #include "effect.h"
 #include "surface.h"
+#include "input.h"
 
 static void main_loop(void *arg)
 {
@@ -15,6 +16,11 @@ static void main_loop(void *arg)
 
         switch (e.type)
         {
+            case EVENT_BUTTON_CLICKED:
+                ESP_LOGI(TAG, "Button clicked, changing effect");
+                surface_next_effect();
+                break;
+
             case EVENT_NETWORK_UP:
                 ESP_LOGI(TAG, "Network is up! starting webserver");
                 break;
@@ -44,6 +50,9 @@ void app_main()
 
     // Initialize bus
     ESP_ERROR_CHECK(bus_init());
+
+    // Initialize input
+    ESP_ERROR_CHECK(input_init());
 
     // Try to start WIFI
     esp_err_t res = wifi_init();
