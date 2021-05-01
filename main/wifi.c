@@ -19,6 +19,14 @@ static void log_ip_info()
     ESP_LOGI(TAG, "Netmask:    " IPSTR, IP2STR(&ip_info.netmask));
     ESP_LOGI(TAG, "Gateway:    " IPSTR, IP2STR(&ip_info.gw));
     ESP_LOGI(TAG, "--------------------------------------------------");
+
+    esp_netif_dns_info_t dns;
+    for (esp_netif_dns_type_t t = ESP_NETIF_DNS_MAIN; t < ESP_NETIF_DNS_MAX; t++)
+    {
+        esp_netif_get_dns_info(iface, t, &dns);
+        ESP_LOGI(TAG, "DNS %d:      " IPSTR, t, IP2STR(&ip_info.ip));
+    }
+    ESP_LOGI(TAG, "--------------------------------------------------");
 }
 
 static void set_ip_info()
@@ -35,10 +43,19 @@ static void set_ip_info()
     ip_info.ip.addr      = ipaddr_addr(sys_settings.wifi.ip.ip);
     ip_info.netmask.addr = ipaddr_addr(sys_settings.wifi.ip.netmask);
     ip_info.gw.addr      = ipaddr_addr(sys_settings.wifi.ip.gateway);
-    esp_netif_set_ip_info(iface, &ip_info);
+    esp_err_t res = esp_netif_set_ip_info(iface, &ip_info);
+    if (res != ESP_OK)
+        ESP_LOGW(TAG, "Error setting IP address %d (%s)", res, esp_err_to_name(res));
 
     if (sys_settings.wifi.mode == WIFI_MODE_AP)
         esp_netif_dhcps_start(iface);
+
+    esp_netif_dns_info_t dns;
+    dns.ip.type = IPADDR_TYPE_V4;
+    dns.ip.u_addr.ip4.addr = ipaddr_addr(sys_settings.wifi.ip.dns);
+    res = esp_netif_set_dns_info(iface, ESP_NETIF_DNS_MAIN, &dns);
+    if (res != ESP_OK)
+        ESP_LOGW(TAG, "Error setting DNS address %d (%s)", res, esp_err_to_name(res));
 }
 
 static void wifi_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)

@@ -12,6 +12,7 @@ typedef struct
             char ip[16];
             char netmask[16];
             char gateway[16];
+            char dns[16];
         } ip;
         wifi_ap_config_t ap;
         wifi_sta_config_t sta;

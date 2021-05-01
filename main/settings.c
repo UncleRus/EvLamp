@@ -23,6 +23,7 @@ static system_settings_t sys_defaults = {
             .ip      = CONFIG_EL_WIFI_IP,
             .netmask = CONFIG_EL_WIFI_NETMASK,
             .gateway = CONFIG_EL_WIFI_GATEWAY,
+            .dns     = CONFIG_EL_WIFI_DNS,
         },
         .ap = {
             .ssid           = CONFIG_EL_WIFI_AP_SSID,
@@ -63,20 +64,25 @@ static esp_err_t _storage_load(const char *storage_name, void *target, size_t si
 
     uint32_t magic = 0;
     res = nvs_get_u32(nvs, OPT_MAGIC, &magic);
+    if (magic != SETTINGS_MAGIC)
+    {
+        ESP_LOGE(TAG, "Invalid magic 0x%08x, expected 0x%08x", magic, SETTINGS_MAGIC);
+        res = ESP_FAIL;
+    }
     if (res != ESP_OK)
     {
-        if (magic != SETTINGS_MAGIC)
-        {
-            ESP_LOGE(TAG, "Invalid magic 0x%08x, expected 0x%08x", magic, SETTINGS_MAGIC);
-            res = ESP_FAIL;
-        }
         nvs_close(nvs);
         return res;
     }
 
     size_t tmp = size;
     res = nvs_get_blob(nvs, OPT_SETTINGS, target, &tmp);
-    if (res != ESP_OK || tmp != size)
+    if (tmp != size)
+    {
+        ESP_LOGE(TAG, "Invalid settings size");
+        res = ESP_FAIL;
+    }
+    if (res != ESP_OK)
     {
         ESP_LOGE(TAG, "Error reading settings %d (%s)", res, esp_err_to_name(res));
         nvs_close(nvs);
