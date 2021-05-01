@@ -10,7 +10,7 @@ static const char *STORAGE_VOLATILE_NAME = "volatile";
 static const char *OPT_MAGIC    = "magic";
 static const char *OPT_SETTINGS = "settings";
 
-#define SETTINGS_MAGIC 0xbeef0001 // TODO project version to magic
+#define SETTINGS_MAGIC 0xbeef0002 // TODO project version to magic
 
 system_settings_t sys_settings = { 0 };
 volatile_settings_t vol_settings = { 0 };
