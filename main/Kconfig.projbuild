@@ -6,7 +6,7 @@ menu "EvLamp configuration"
 		
 	config EL_FPS_DEFAULT
 		int "Default FPS"
-		range 1 120
+		range 1 100
 		default 30
 
 	config EL_BRIGHTNESS_DEFAULT

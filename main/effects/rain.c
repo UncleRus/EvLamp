@@ -14,7 +14,7 @@
 
 EFFECT_PARAMS(rain, 4) = {
     DECL_PARAM(P_MODE, "Mode", 0, 1, 0),
-    DECL_PARAM(P_HUE, "Hue", 0, 255, 0),
+    DECL_PARAM(P_HUE, "Hue", 0, 255, HUE_AQUA),
     DECL_PARAM(P_DENSITY, "Density", 0, 100, 50),
     DECL_PARAM(P_TAIL, "Tail length", 100, 200, 150),
 };

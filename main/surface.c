@@ -1,32 +1,49 @@
 #include "surface.h"
 #include <framebuffer.h>
-#include <fbanimation.h>
 #include <led_strip.h>
 #include "settings.h"
 #include "effect.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/task.h>
+#include <soc/soc.h>
 
 static led_strip_t strip;
-static framebuffer_t framebuffer;
-static fb_animation_t animation;
+static framebuffer_t fb;
+static TaskHandle_t task;
 static bool playing = false;
 
 // frame renderer, framebuffer -> LED strip
-static esp_err_t render_frame(framebuffer_t *fb, void *arg)
+static esp_err_t render_frame()
 {
-    for (size_t y = 0; y < fb->height; y++)
-        for (size_t x = 0; x < fb->width; x++)
+    for (size_t y = 0; y < fb.height; y++)
+        for (size_t x = 0; x < fb.width; x++)
         {
             // calculate strip index of pixel
-            size_t strip_idx = y * fb->width + (y % 2 ? fb->width - x - 1 : x);
+            size_t strip_idx = y * fb.width + (y % 2 ? fb.width - x - 1 : x);
             // find pixel offset in state frame buffer
-            rgb_t color = fb->data[FB_OFFSET(fb, x, y)];
-            // limit brightness and consuming current
-            color = rgb_scale_video(color, vol_settings.brightness);
+            rgb_t color = fb.data[FB_OFFSET(&fb, x, y)];
+            if (vol_settings.brightness != 255)
+                color = rgb_scale_video(color, vol_settings.brightness);
             CHECK(led_strip_set_pixel(&strip, strip_idx, color));
         }
 
     // flush strip buffer
     return led_strip_flush(&strip);
+}
+
+void surface_task(void *arg)
+{
+    vTaskSuspend(NULL);
+    while (1)
+    {
+        TickType_t last_wake_time = xTaskGetTickCount();
+        if (effects[vol_settings.effect].run(&fb) != ESP_OK)
+            ESP_LOGW(TAG, "Frame draw error");
+        if (render_frame() != ESP_OK)
+            ESP_LOGW(TAG, "Frame dropped");
+        vTaskDelayUntil(&last_wake_time, pdMS_TO_TICKS(1000 / vol_settings.fps));
+    }
 }
 
 esp_err_t surface_init()
@@ -48,11 +65,14 @@ esp_err_t surface_init()
             sys_settings.leds.width, sys_settings.leds.height, strip.gpio, strip.type);
 
     // Framebuffer
-    memset(&framebuffer, 0, sizeof(framebuffer_t));
-    CHECK(fb_init(&framebuffer, sys_settings.leds.width, sys_settings.leds.height, render_frame));
+    memset(&fb, 0, sizeof(framebuffer_t));
+    CHECK(fb_init(&fb, sys_settings.leds.width, sys_settings.leds.height, render_frame));
 
-    // Animation
-    CHECK(fb_animation_init(&animation, &framebuffer));
+    if (xTaskCreatePinnedToCore(surface_task, "render", 8192, NULL, 5, &task, APP_CPU_NUM) != pdPASS)
+    {
+        ESP_LOGE(TAG, "Could not create surface task");
+        return ESP_FAIL;
+    }
 
     // Run
     return surface_play();
@@ -61,7 +81,7 @@ esp_err_t surface_init()
 esp_err_t surface_prepare_effect(size_t effect)
 {
     if (effects[effect].prepare)
-        return effects[effect].prepare(&framebuffer);
+        return effects[effect].prepare(&fb);
 
     return ESP_OK;
 }
@@ -70,22 +90,22 @@ esp_err_t surface_set_effect(size_t num)
 {
     CHECK_ARG(num < effects_count);
 
+    surface_stop();
+
+    // prepare
+    if (effects[num].prepare)
+        CHECK(effects[num].prepare(&fb));
+
     vol_settings.effect = num;
     if (vol_settings_save() != ESP_OK)
         ESP_LOGW(TAG, "Could not save volatile settings");
 
     ESP_LOGI(TAG, "Switching to effect '%s' (%d)", effects[num].name, num);
 
-    // stop previous
-    fb_animation_stop(&animation);
-    // clear frambuffer
-    fb_clear(&framebuffer);
-    // prepare
-    if (effects[num].prepare)
-        CHECK(effects[num].prepare(&framebuffer));
     playing = true;
-    // play new
-    return fb_animation_play(&animation, vol_settings.fps, effects[num].run, NULL);
+    vTaskResume(task);
+
+    return ESP_OK;
 }
 
 esp_err_t surface_next_effect()
@@ -130,10 +150,10 @@ esp_err_t surface_stop()
 
     ESP_LOGI(TAG, "Stopping animation");
 
-    fb_animation_stop(&animation);
-    fb_clear(&framebuffer);
-    render_frame(&framebuffer, NULL);
+    vTaskSuspend(task);
     playing = false;
+    fb_clear(&fb);
+    render_frame();
 
     return ESP_OK;
 }

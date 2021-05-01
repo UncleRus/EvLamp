@@ -4,7 +4,7 @@
 
 ## Hardware
 
-- ESP32 or ESP32-S2 devkit
+- ESP32 devkit
 - WS2812B/SK6812/APA106 LED matrix
 - Button (optional)
 

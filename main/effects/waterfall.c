@@ -21,9 +21,9 @@
 
 EFFECT_PARAMS(waterfall, 4) = {
     DECL_PARAM(P_MODE, "Mode", 0, 2, 0),
-    DECL_PARAM(P_HUE, "Color", 0, 255, 220),
-    DECL_PARAM(P_COOLING, "Cooling", 20, 100, 60),
-    DECL_PARAM(P_SPARKING, "Sparking", 20, 200, 60),
+    DECL_PARAM(P_HUE, "Color", 0, 255, 160),
+    DECL_PARAM(P_COOLING, "Cooling", 20, 100, 30),
+    DECL_PARAM(P_SPARKING, "Sparking", 20, 200, 40),
 };
 
 enum {
@@ -48,10 +48,10 @@ esp_err_t effect_waterfall_prepare(framebuffer_t *fb)
     {
         case WATERFALL_COLORS:
             rgb_fill_gradient4_hsv(palette, PALETTE_SIZE,
-                    hsv_from_values(0, 0, 0),
+                    hsv_from_values(EPARAM(waterfall, P_HUE), 0, 0),
                     hsv_from_values(EPARAM(waterfall, P_HUE), 0, 255),
                     hsv_from_values(EPARAM(waterfall, P_HUE), 128, 255),
-                    hsv_from_values(255, 255, 255),
+                    hsv_from_values(EPARAM(waterfall, P_HUE), 255, 255),
                     COLOR_SHORTEST_HUES);
             break;
         case WATERFALL_FIRE:

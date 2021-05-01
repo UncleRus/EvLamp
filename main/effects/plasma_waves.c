@@ -10,7 +10,7 @@
 #define P_SPEED 0
 
 EFFECT_PARAMS(plasma_waves, 1) = {
-    DECL_PARAM(P_SPEED, "Speed", 10, 60, 30),
+    DECL_PARAM(P_SPEED, "Speed", 10, 60, 40),
 };
 
 static uint8_t speed;
