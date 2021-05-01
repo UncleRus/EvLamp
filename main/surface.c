@@ -11,11 +11,14 @@
 static led_strip_t strip;
 static framebuffer_t fb;
 static TaskHandle_t task;
+static uint8_t global_brightness;
 static bool playing = false;
 
 // frame renderer, framebuffer -> LED strip
 static esp_err_t render_frame()
 {
+    while (led_strip_busy(&strip)) {}
+
     for (size_t y = 0; y < fb.height; y++)
         for (size_t x = 0; x < fb.width; x++)
         {
@@ -25,7 +28,7 @@ static esp_err_t render_frame()
             rgb_t color = fb.data[FB_OFFSET(&fb, x, y)];
             if (vol_settings.brightness != 255)
                 color = rgb_scale_video(color, vol_settings.brightness);
-            CHECK(led_strip_set_pixel(&strip, strip_idx, color));
+            CHECK(led_strip_set_pixel(&strip, strip_idx, rgb_scale_video(color, global_brightness)));
         }
 
     // flush strip buffer
@@ -53,13 +56,12 @@ esp_err_t surface_init()
     memset(&strip, 0, sizeof(led_strip_t));
 
     strip.length = sys_settings.leds.width * sys_settings.leds.height;
-    strip.channel = LED_STRIP_RMT_CHANNEL;
     strip.gpio = sys_settings.leds.gpio;
     strip.type = sys_settings.leds.type;
-    // TODO : calculate single LED current based on its type or just move it to config
-    strip.brightness = ((float)sys_settings.leds.current_limit / strip.length) / (SINGLE_LED_CURRENT_MA / 256);
-
     CHECK(led_strip_init(&strip));
+
+    // TODO : calculate single LED current based on its type or just move it to config
+    global_brightness = ((float)sys_settings.leds.current_limit / strip.length) / (SINGLE_LED_CURRENT_MA / 256);
 
     ESP_LOGI(TAG, "Hardware config: w: %d, h: %d, GPIO = %d, type = %d",
             sys_settings.leds.width, sys_settings.leds.height, strip.gpio, strip.type);

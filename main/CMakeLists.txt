@@ -22,4 +22,5 @@ idf_component_register(
         effects/sparkles.c
         effects/waterfall.c
         effects/metaballs.c
+        effects/water.c
 )
