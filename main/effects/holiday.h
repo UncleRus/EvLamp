@@ -21,6 +21,6 @@ enum {
 
 esp_err_t effect_holiday_run(framebuffer_t *fb);
 
-#define DESCR_EFFECT_HOLIDAY DECL_EFFECT_SHORT(holiday, "holiday")
+#define DESCR_EFFECT_HOLIDAY DECL_EFFECT_SHORT(holiday, "Holiday lights")
 
 #endif /* __EFFECTS_HOLIDAY_H__ */

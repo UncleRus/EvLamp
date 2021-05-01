@@ -24,4 +24,5 @@ idf_component_register(
         effects/metaballs.c
         effects/water.c
         effects/holiday.c
+        effects/hoop.c
 )
