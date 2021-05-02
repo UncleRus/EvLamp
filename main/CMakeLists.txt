@@ -26,3 +26,5 @@ idf_component_register(
         effects/holiday.c
         effects/hoop.c
 )
+
+spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)

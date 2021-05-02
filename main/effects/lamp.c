@@ -6,7 +6,7 @@
 
 EFFECT_PARAMS(lamp, 3) = {
     DECL_PARAM(P_HUE, "Hue",        0, 255, 60),
-    DECL_PARAM(P_SAT, "Saturation", 0, 255, 40),
+    DECL_PARAM(P_SAT, "Saturation", 0, 255, 180),
     DECL_PARAM(P_VAL, "Value",      0, 255, 255),
 };
 

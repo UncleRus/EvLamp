@@ -2,14 +2,16 @@
 #include <framebuffer.h>
 #include <fbanimation.h>
 #include <led_strip.h>
+#include <soc/soc.h>
 #include "settings.h"
 #include "effect.h"
 
 static led_strip_t strip;
 static framebuffer_t framebuffer;
 static fb_animation_t animation;
-static uint8_t global_brightness;
 static bool playing = false;
+
+static SemaphoreHandle_t init_mutex;
 
 // frame renderer, framebuffer -> LED strip
 static esp_err_t render_frame(framebuffer_t *fb, void *arg)
@@ -21,14 +23,16 @@ static esp_err_t render_frame(framebuffer_t *fb, void *arg)
         {
             size_t strip_idx = y * fb->width + (y % 2 ? fb->width - x - 1 : x);
             rgb_t color = rgb_scale_video(fb->data[FB_OFFSET(fb, x, y)], vol_settings.brightness);
-            CHECK(led_strip_set_pixel(&strip, strip_idx, rgb_scale_video(color, global_brightness)));
+            CHECK(led_strip_set_pixel(&strip, strip_idx, color));
         }
 
     return led_strip_flush(&strip);
 }
 
-esp_err_t surface_init()
+static void init_task(void *arg)
 {
+    xSemaphoreTake(init_mutex, portMAX_DELAY);
+
     led_strip_install();
     // LED strip
     memset(&strip, 0, sizeof(led_strip_t));
@@ -36,13 +40,39 @@ esp_err_t surface_init()
     strip.length = sys_settings.leds.width * sys_settings.leds.height;
     strip.gpio = sys_settings.leds.gpio;
     strip.type = sys_settings.leds.type;
+    strip.channel = RMT_CHANNEL_0;
     // TODO : calculate single LED current based on its type or just move it to config
-    global_brightness = ((float)sys_settings.leds.current_limit / strip.length) / (SINGLE_LED_CURRENT_MA / 256);
+    strip.brightness = ((float)sys_settings.leds.current_limit / strip.length) / (SINGLE_LED_CURRENT_MA / 256);
 
-    CHECK(led_strip_init(&strip));
+    ESP_ERROR_CHECK(led_strip_init(&strip));
 
     ESP_LOGI(TAG, "Hardware config: w: %d, h: %d, GPIO = %d, type = %d",
             sys_settings.leds.width, sys_settings.leds.height, strip.gpio, strip.type);
+
+    xSemaphoreGive(init_mutex);
+
+    vTaskDelete(NULL);
+}
+
+esp_err_t surface_init()
+{
+    init_mutex = xSemaphoreCreateMutex();
+    if (!init_mutex)
+    {
+        ESP_LOGE(TAG, "Could not create surface init mutex");
+        ESP_ERROR_CHECK(ESP_FAIL);
+    }
+    if (xTaskCreatePinnedToCore(init_task, "surface_init", 2048, NULL, uxTaskPriorityGet(NULL) + 1, NULL, APP_CPU_NUM) != pdPASS)
+    {
+        ESP_LOGE(TAG, "Could not create surface init task");
+        ESP_ERROR_CHECK(ESP_FAIL);
+    }
+    portYIELD();
+    ESP_LOGI(TAG, "Waiting to LED strip initialize...");
+    xSemaphoreTake(init_mutex, portMAX_DELAY);
+    xSemaphoreGive(init_mutex);
+    vSemaphoreDelete(init_mutex);;
+    ESP_LOGI(TAG, "LED strip initilaized");
 
     // Framebuffer
     memset(&framebuffer, 0, sizeof(framebuffer_t));

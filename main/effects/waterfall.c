@@ -22,8 +22,8 @@
 EFFECT_PARAMS(waterfall, 4) = {
     DECL_PARAM(P_MODE, "Mode", 0, 2, 0),
     DECL_PARAM(P_HUE, "Color", 0, 255, 160),
-    DECL_PARAM(P_COOLING, "Cooling", 20, 100, 30),
-    DECL_PARAM(P_SPARKING, "Sparking", 20, 200, 40),
+    DECL_PARAM(P_COOLING, "Cooling", 5, 100, 10),
+    DECL_PARAM(P_SPARKING, "Sparking", 20, 200, 60),
 };
 
 enum {

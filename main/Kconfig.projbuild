@@ -147,7 +147,7 @@ menu "EvLamp configuration"
 				
 			config EL_MATRIX_MAX_CURRENT
 				int "Maximal current consuming by LEDs, mA"
-				default 3000
+				default 5000
 	
 		endmenu
 
