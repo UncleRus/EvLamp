@@ -97,7 +97,7 @@ esp_err_t effect_params_load()
     // read effect params
     for (size_t e = 0; e < effects_count; e++)
     {
-        ESP_LOGD(TAG, "Effect %d: '%s'", e, effects[e].name);
+        ESP_LOGI(TAG, "Effect %d: '%s'", e, effects[e].name);
         for (size_t p = 0; p < effects[e].params_count; p++)
         {
             snprintf(key, sizeof(key), NVS_KEY_FMT, e, p);
@@ -111,7 +111,7 @@ esp_err_t effect_params_load()
             }
             PARAM(e, p).value = val;
 
-            ESP_LOGD(TAG, "    %s: %d (min %d, max %d, def %d)",
+            ESP_LOGI(TAG, "    %s: %d (min %d, max %d, def %d)",
                     PARAM(e, p).name, PARAM(e, p).value, PARAM(e, p).min, PARAM(e, p).max, PARAM(e, p).def);
         }
     }
