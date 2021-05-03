@@ -22,7 +22,7 @@ EFFECT_PARAMS(fire, 1) = {
 #define PALETTE_BLUE  1
 #define PALETTE_GREEN 2
 
-#define PALETTE_SIZE 16
+#define PALETTE_SIZE 4
 
 static rgb_t palette[PALETTE_SIZE];
 
@@ -37,16 +37,21 @@ static const rgb_t C_BGREEN = { .r = 155, .g = 255, .b = 155 };
 
 esp_err_t effect_fire_prepare(framebuffer_t *fb)
 {
+    palette[0] = C_BLACK;
+    palette[3] = C_WHITE;
     switch (EPARAM(fire, P_PALETTE))
     {
         case PALETTE_BLUE:
-            rgb_fill_gradient4_rgb(palette, PALETTE_SIZE, C_BLACK, C_DBLUE, C_CYAN, C_WHITE);
+            palette[1] = C_DBLUE;
+            palette[2] = C_CYAN;
             break;
         case PALETTE_GREEN:
-            rgb_fill_gradient4_rgb(palette, PALETTE_SIZE, C_BLACK, C_DGREEN, C_BGREEN, C_WHITE);
+            palette[1] = C_DGREEN;
+            palette[2] = C_BGREEN;
             break;
         default:
-            rgb_fill_gradient4_rgb(palette, PALETTE_SIZE, C_BLACK, C_RED, C_YELLOW, C_WHITE);
+            palette[1] = C_RED;
+            palette[2] = C_YELLOW;
     }
 
     return ESP_OK;

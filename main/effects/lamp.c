@@ -1,23 +1,24 @@
 #include "effects/lamp.h"
 
-#define P_HUE 0
-#define P_SAT 1
-#define P_VAL 2
+#define P_RED   0
+#define P_GREEN 1
+#define P_BLUE  2
 
+// 2500 K by default
 EFFECT_PARAMS(lamp, 3) = {
-    DECL_PARAM(P_HUE, "Hue",        0, 255, 60),
-    DECL_PARAM(P_SAT, "Saturation", 0, 255, 180),
-    DECL_PARAM(P_VAL, "Value",      0, 255, 255),
+    DECL_PARAM(P_RED, "Red", 0, 255, 255),
+    DECL_PARAM(P_GREEN, "Green", 0, 255, 159),
+    DECL_PARAM(P_BLUE, "Blue", 0, 255, 70),
 };
 
 esp_err_t effect_lamp_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 
-    hsv_t color = { .h = EPARAM(lamp, P_HUE), .s = EPARAM(lamp, P_SAT), .v = EPARAM(lamp, P_VAL) };
+    rgb_t color = { .r = EPARAM(lamp, P_RED), .g = EPARAM(lamp, P_GREEN), .b = EPARAM(lamp, P_BLUE) };
 
     for (size_t i = 0; i < fb->height * fb->width; i++)
-        fb->data[i] = hsv2rgb_rainbow(color);
+        fb->data[i] = color;
 
     return fb_end(fb);
 }
