@@ -19,7 +19,7 @@ EFFECT_PARAMS(metaballs, 1) = {
 #define PALETTE_BLUE  1
 #define PALETTE_GREEN 2
 
-#define PALETTE_SIZE 16
+#define PALETTE_SIZE 5
 
 static rgb_t palette[PALETTE_SIZE];
 
@@ -42,16 +42,22 @@ static uint8_t dist(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 
 esp_err_t effect_metaballs_prepare(framebuffer_t *fb)
 {
+    palette[0] = C_BLACK;
+    palette[1] = C_BLACK;
+    palette[4] = C_WHITE;
     switch (EPARAM(metaballs, P_PALETTE))
     {
         case PALETTE_BLUE:
-            rgb_fill_gradient4_rgb(palette, PALETTE_SIZE, C_BLACK, C_DBLUE, C_CYAN, C_WHITE);
+            palette[2] = C_DBLUE;
+            palette[3] = C_CYAN;
             break;
         case PALETTE_GREEN:
-            rgb_fill_gradient4_rgb(palette, PALETTE_SIZE, C_BLACK, C_DGREEN, C_BGREEN, C_WHITE);
+            palette[2] = C_DGREEN;
+            palette[3] = C_BGREEN;
             break;
         default:
-            rgb_fill_gradient4_rgb(palette, PALETTE_SIZE, C_BLACK, C_RED, C_YELLOW, C_WHITE);
+            palette[2] = C_RED;
+            palette[3] = C_YELLOW;
     }
 
     return ESP_OK;

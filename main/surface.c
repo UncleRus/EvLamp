@@ -11,13 +11,9 @@ static framebuffer_t framebuffer;
 static fb_animation_t animation;
 static bool playing = false;
 
-static SemaphoreHandle_t init_mutex;
-
 // frame renderer, framebuffer -> LED strip
 static esp_err_t render_frame(framebuffer_t *fb, void *arg)
 {
-    while (led_strip_busy(&strip)) {}
-
     for (size_t y = 0; y < fb->height; y++)
         for (size_t x = 0; x < fb->width; x++)
         {
@@ -31,8 +27,6 @@ static esp_err_t render_frame(framebuffer_t *fb, void *arg)
 
 static void init_task(void *arg)
 {
-    xSemaphoreTake(init_mutex, portMAX_DELAY);
-
     led_strip_install();
     // LED strip
     memset(&strip, 0, sizeof(led_strip_t));
@@ -40,49 +34,38 @@ static void init_task(void *arg)
     strip.length = sys_settings.leds.width * sys_settings.leds.height;
     strip.gpio = sys_settings.leds.gpio;
     strip.type = sys_settings.leds.type;
-    strip.channel = RMT_CHANNEL_0;
+    strip.channel = RMT_CHANNEL;
     // TODO : calculate single LED current based on its type or just move it to config
     strip.brightness = ((float)sys_settings.leds.current_limit / strip.length) / (SINGLE_LED_CURRENT_MA / 256);
 
     ESP_ERROR_CHECK(led_strip_init(&strip));
 
-    ESP_LOGI(TAG, "Hardware config: w: %d, h: %d, GPIO = %d, type = %d",
+    ESP_LOGI(TAG, "LED strip config: %dx%d, GPIO = %d, type = %d",
             sys_settings.leds.width, sys_settings.leds.height, strip.gpio, strip.type);
 
-    xSemaphoreGive(init_mutex);
+    // Framebuffer
+    memset(&framebuffer, 0, sizeof(framebuffer_t));
+    ESP_ERROR_CHECK(fb_init(&framebuffer, sys_settings.leds.width, sys_settings.leds.height, render_frame));
+
+    // Animation
+    ESP_ERROR_CHECK(fb_animation_init(&animation, &framebuffer));
+
+    ESP_LOGI(TAG, "Surface initialized");
+
+    ESP_ERROR_CHECK(surface_play());
 
     vTaskDelete(NULL);
 }
 
 esp_err_t surface_init()
 {
-    init_mutex = xSemaphoreCreateMutex();
-    if (!init_mutex)
-    {
-        ESP_LOGE(TAG, "Could not create surface init mutex");
-        ESP_ERROR_CHECK(ESP_FAIL);
-    }
     if (xTaskCreatePinnedToCore(init_task, "surface_init", 2048, NULL, uxTaskPriorityGet(NULL) + 1, NULL, APP_CPU_NUM) != pdPASS)
     {
         ESP_LOGE(TAG, "Could not create surface init task");
-        ESP_ERROR_CHECK(ESP_FAIL);
+        return ESP_FAIL;
     }
-    portYIELD();
-    ESP_LOGI(TAG, "Waiting to LED strip initialize...");
-    xSemaphoreTake(init_mutex, portMAX_DELAY);
-    xSemaphoreGive(init_mutex);
-    vSemaphoreDelete(init_mutex);;
-    ESP_LOGI(TAG, "LED strip initilaized");
 
-    // Framebuffer
-    memset(&framebuffer, 0, sizeof(framebuffer_t));
-    CHECK(fb_init(&framebuffer, sys_settings.leds.width, sys_settings.leds.height, render_frame));
-
-    // Animation
-    CHECK(fb_animation_init(&animation, &framebuffer));
-
-    // Run
-    return surface_play();
+    return ESP_OK;
 }
 
 esp_err_t surface_prepare_effect(size_t effect)
@@ -117,10 +100,9 @@ esp_err_t surface_set_effect(size_t num)
 
 esp_err_t surface_next_effect()
 {
-    if (vol_settings.effect == effects_count - 1)
-        return surface_set_effect(0);
-    else
-        return surface_set_effect(vol_settings.effect + 1);
+    return surface_set_effect(vol_settings.effect < effects_count - 1
+            ? vol_settings.effect + 1
+            : 0);
 }
 
 esp_err_t surface_set_brightness(uint8_t val)
@@ -146,21 +128,25 @@ esp_err_t surface_play()
 {
     if (playing) return ESP_OK;
 
-    ESP_LOGI(TAG, "Starting animation");
+    CHECK(surface_set_effect(vol_settings.effect));
 
-    return surface_set_effect(vol_settings.effect);
+    ESP_LOGI(TAG, "Animation started");
+
+    return ESP_OK;
 }
 
 esp_err_t surface_stop()
 {
     if (!playing) return ESP_OK;
 
-    ESP_LOGI(TAG, "Stopping animation");
-
     fb_animation_stop(&animation);
+
     fb_clear(&framebuffer);
     render_frame(&framebuffer, NULL);
+
     playing = false;
+
+    ESP_LOGI(TAG, "Animation stopped");
 
     return ESP_OK;
 }

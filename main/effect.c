@@ -52,15 +52,13 @@ static const char *NVS_KEY_FMT = "e%04x:p%04x";
 
 esp_err_t effects_reset()
 {
-    ESP_LOGI(TAG, "Resetting effect parameters to defaults");
-
     // FIXME not effective
     for (size_t e = 0; e < effects_count; e++)
         for (size_t p = 0; p < effects[e].params_count; p++)
             CHECK_LOGE(effect_param_set(e, p, PARAM(e, p).def),
                     "Could not set %s.%s to %d", effects[e].name, PARAM(e, p).name, PARAM(e, p).def);
 
-    ESP_LOGI(TAG, "Effect parameters have bin reset to defaults");
+    ESP_LOGW(TAG, "Effect parameters have been reset to defaults");
 
     return ESP_OK;
 }
@@ -89,8 +87,6 @@ esp_err_t effect_param_set(size_t effect, size_t param, uint8_t value)
 
 esp_err_t effect_params_load()
 {
-    ESP_LOGI(TAG, "Loading effect parameters");
-
     char key[NVS_KEY_NAME_MAX_SIZE];
     uint8_t val;
 
@@ -101,7 +97,7 @@ esp_err_t effect_params_load()
     // read effect params
     for (size_t e = 0; e < effects_count; e++)
     {
-        ESP_LOGI(TAG, "Effect %d: '%s'", e, effects[e].name);
+        ESP_LOGD(TAG, "Effect %d: '%s'", e, effects[e].name);
         for (size_t p = 0; p < effects[e].params_count; p++)
         {
             snprintf(key, sizeof(key), NVS_KEY_FMT, e, p);
@@ -115,7 +111,7 @@ esp_err_t effect_params_load()
             }
             PARAM(e, p).value = val;
 
-            ESP_LOGI(TAG, "    %s: %d (min %d, max %d, def %d)",
+            ESP_LOGD(TAG, "    %s: %d (min %d, max %d, def %d)",
                     PARAM(e, p).name, PARAM(e, p).value, PARAM(e, p).min, PARAM(e, p).max, PARAM(e, p).def);
         }
     }

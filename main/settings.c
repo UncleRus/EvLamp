@@ -10,8 +10,6 @@ static const char *STORAGE_VOLATILE_NAME = "volatile";
 static const char *OPT_MAGIC    = "magic";
 static const char *OPT_SETTINGS = "settings";
 
-#define SETTINGS_MAGIC 0xbeef0003 // TODO project version to magic
-
 system_settings_t sys_settings = { 0 };
 volatile_settings_t vol_settings = { 0 };
 
@@ -58,7 +56,7 @@ static esp_err_t _storage_load(const char *storage_name, void *target, size_t si
     nvs_handle_t nvs;
     esp_err_t res;
 
-    ESP_LOGI(TAG, "Reading settings from '%s'...", storage_name);
+    ESP_LOGD(TAG, "Reading settings from '%s'...", storage_name);
 
     CHECK(nvs_open(storage_name, NVS_READONLY, &nvs));
 
@@ -66,7 +64,7 @@ static esp_err_t _storage_load(const char *storage_name, void *target, size_t si
     res = nvs_get_u32(nvs, OPT_MAGIC, &magic);
     if (magic != SETTINGS_MAGIC)
     {
-        ESP_LOGE(TAG, "Invalid magic 0x%08x, expected 0x%08x", magic, SETTINGS_MAGIC);
+        ESP_LOGW(TAG, "Invalid magic 0x%08x, expected 0x%08x", magic, SETTINGS_MAGIC);
         res = ESP_FAIL;
     }
     if (res != ESP_OK)
@@ -79,7 +77,7 @@ static esp_err_t _storage_load(const char *storage_name, void *target, size_t si
     res = nvs_get_blob(nvs, OPT_SETTINGS, target, &tmp);
     if (tmp != size)
     {
-        ESP_LOGE(TAG, "Invalid settings size");
+        ESP_LOGW(TAG, "Invalid settings size");
         res = ESP_FAIL;
     }
     if (res != ESP_OK)
@@ -91,14 +89,14 @@ static esp_err_t _storage_load(const char *storage_name, void *target, size_t si
 
     nvs_close(nvs);
 
-    ESP_LOGI(TAG, "Settings read from '%s'", storage_name);
+    ESP_LOGD(TAG, "Settings read from '%s'", storage_name);
 
     return ESP_OK;
 }
 
 static esp_err_t _storage_save(const char *storage_name, const void *source, size_t size)
 {
-    ESP_LOGI(TAG, "Saving settings to '%s'...", storage_name);
+    ESP_LOGD(TAG, "Saving settings to '%s'...", storage_name);
 
     nvs_handle_t nvs;
     CHECK_LOGE(nvs_open(storage_name, NVS_READWRITE, &nvs),
@@ -109,7 +107,7 @@ static esp_err_t _storage_save(const char *storage_name, const void *source, siz
             "Error writing NVS settings");
     nvs_close(nvs);
 
-    ESP_LOGI(TAG, "Settings saved to '%s'", storage_name);
+    ESP_LOGD(TAG, "Settings saved to '%s'", storage_name);
 
     return ESP_OK;
 }
@@ -131,8 +129,6 @@ esp_err_t settings_init()
 
 esp_err_t sys_settings_reset()
 {
-    ESP_LOGI(TAG, "Resetting system settings to defaults");
-
     if (!sys_defaults.wifi.ap.password || !strlen((const char *)sys_defaults.wifi.ap.password))
         sys_defaults.wifi.ap.authmode = WIFI_AUTH_OPEN;
     if (!sys_defaults.wifi.sta.password || !strlen((const char *)sys_defaults.wifi.sta.password))
@@ -141,7 +137,7 @@ esp_err_t sys_settings_reset()
     memcpy(&sys_settings, &sys_defaults, sizeof(system_settings_t));
     CHECK(sys_settings_save());
 
-    ESP_LOGI(TAG, "System settings have been reset to defaults");
+    ESP_LOGW(TAG, "System settings have been reset to defaults");
 
     return ESP_OK;
 }
@@ -162,12 +158,10 @@ esp_err_t sys_settings_save()
 
 esp_err_t vol_settings_reset()
 {
-    ESP_LOGI(TAG, "Resetting volatile settings to defaults");
-
     memcpy(&vol_settings, &vol_defaults, sizeof(volatile_settings_t));
     CHECK(vol_settings_save());
 
-    ESP_LOGI(TAG, "Volatile settings have been reset to defaults");
+    ESP_LOGW(TAG, "Volatile settings have been reset to defaults");
 
     return ESP_OK;
 }
