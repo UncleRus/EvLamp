@@ -5,10 +5,13 @@
 #include "effect.h"
 #include "surface.h"
 #include "input.h"
+#include "webserver.h"
 
 static void main_loop(void *arg)
 {
     event_t e;
+    esp_err_t err;
+
     while (1)
     {
         if (bus_receive_event(&e, 1000) != ESP_OK)
@@ -28,11 +31,19 @@ static void main_loop(void *arg)
                 break;
 
             case EVENT_NETWORK_UP:
-                ESP_LOGI(TAG, "Network is up! starting webserver");
+                ESP_LOGI(TAG, "Network is up, starting HTTPD...");
+                err = webserver_start();
+                if (err != ESP_OK)
+                    ESP_LOGW(TAG, "Error starting HTTPD: %d (%s)", err, esp_err_to_name(err));
                 break;
+
             case EVENT_NETWORK_DOWN:
-                ESP_LOGI(TAG, "Network is down! stopping webserver");
+                ESP_LOGI(TAG, "Network is down, stopping HTTPD...");
+                err = webserver_stop();
+                if (err != ESP_OK)
+                    ESP_LOGW(TAG, "Error stopping HTTPD: %d (%s)", err, esp_err_to_name(err));
                 break;
+
             default:
                 ESP_LOGI(TAG, "Event %d", e.type);
         }

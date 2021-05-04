@@ -104,6 +104,7 @@ static esp_err_t init_ap()
 
     // create default interface
     iface = esp_netif_create_default_wifi_ap();
+    CHECK(esp_netif_set_hostname(iface, APP_NAME));
 
     wifi_init_config_t init_cfg = WIFI_INIT_CONFIG_DEFAULT();
     CHECK(esp_wifi_init(&init_cfg));
@@ -136,6 +137,7 @@ static esp_err_t init_sta()
     ESP_LOGI(TAG, "Starting WiFi in station mode");
 
     iface = esp_netif_create_default_wifi_sta();
+    CHECK(esp_netif_set_hostname(iface, APP_NAME));
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     CHECK(esp_wifi_init(&cfg));

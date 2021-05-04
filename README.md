@@ -1,6 +1,6 @@
 # EvLamp
 
-"Clean" implementation of Alex Guyver's FireLamp in pure C.
+"Clean" implementation of Alex Guyver's FireLamp analogue in pure C for ESP32.
 
 ## Hardware
 

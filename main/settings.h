@@ -2,6 +2,7 @@
 #define MAIN_SETTINGS_H_
 
 #include "common.h"
+#include <cJSON.h>
 
 typedef struct
 {
@@ -50,5 +51,7 @@ esp_err_t vol_settings_reset();
 esp_err_t vol_settings_load();
 
 esp_err_t vol_settings_save();
+
+cJSON *sys_settings_json();
 
 #endif /* MAIN_SETTINGS_H_ */
