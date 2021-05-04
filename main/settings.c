@@ -122,7 +122,7 @@ cJSON *sys_settings_json()
     cJSON_AddItemToObject(root, "wifi", wifi);
 
     cJSON *ip = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "ip", ip);
+    cJSON_AddItemToObject(wifi, "ip", ip);
     cJSON_AddBoolToObject(ip, "dhcp", sys_settings.wifi.ip.dhcp);
     cJSON_AddStringToObject(ip, "ip", sys_settings.wifi.ip.ip);
     cJSON_AddStringToObject(ip, "netmask", sys_settings.wifi.ip.netmask);
@@ -130,7 +130,7 @@ cJSON *sys_settings_json()
     cJSON_AddStringToObject(ip, "dns", sys_settings.wifi.ip.dns);
 
     cJSON *ap = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "ap", ap);
+    cJSON_AddItemToObject(wifi, "ap", ap);
     cJSON_AddStringToObject(ap, "ssid", (char *)sys_settings.wifi.ap.ssid);
     cJSON_AddNumberToObject(ap, "channel", sys_settings.wifi.ap.channel);
     cJSON_AddStringToObject(ap, "password", (char *)sys_settings.wifi.ap.password);
@@ -138,7 +138,7 @@ cJSON *sys_settings_json()
     cJSON_AddNumberToObject(ap, "authmode", sys_settings.wifi.ap.authmode);
 
     cJSON *sta = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "sta", sta);
+    cJSON_AddItemToObject(wifi, "sta", sta);
     cJSON_AddStringToObject(sta, "ssid", (char *)sys_settings.wifi.sta.ssid);
     cJSON_AddStringToObject(sta, "password", (char *)sys_settings.wifi.sta.password);
     cJSON_AddNumberToObject(sta, "authmode", sys_settings.wifi.sta.threshold.authmode);

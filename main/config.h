@@ -59,4 +59,9 @@
 #define SINGLE_LED_CURRENT_MA 60.0f
 #define FPS_MAX 120
 
+////////////////////////////////////////////////////////////////////////////////
+/// Webserver
+
+#define HTTPD_STACK_SIZE 32768
+
 #endif /* MAIN_CONFIG_H_ */
