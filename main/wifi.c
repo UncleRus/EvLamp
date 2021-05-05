@@ -24,36 +24,38 @@ static void log_ip_info()
     for (esp_netif_dns_type_t t = ESP_NETIF_DNS_MAIN; t < ESP_NETIF_DNS_MAX; t++)
     {
         esp_netif_get_dns_info(iface, t, &dns);
-        ESP_LOGI(TAG, "DNS %d:      " IPSTR, t, IP2STR(&ip_info.ip));
+        ESP_LOGI(TAG, "DNS %d:      " IPSTR, t, IP2STR(&dns.ip.u_addr.ip4));
     }
     ESP_LOGI(TAG, "--------------------------------------------------");
 }
 
 static void set_ip_info()
 {
-    if (sys_settings.wifi.ip.dhcp)
-        return;
+    esp_err_t res;
 
-    if (sys_settings.wifi.mode == WIFI_MODE_AP)
-        esp_netif_dhcps_stop(iface);
-    else
-        esp_netif_dhcpc_stop(iface);
+    if (!sys_settings.wifi.ip.dhcp)
+    {
+        if (sys_settings.wifi.mode == WIFI_MODE_AP)
+            esp_netif_dhcps_stop(iface);
+        else
+            esp_netif_dhcpc_stop(iface);
 
-    esp_netif_ip_info_t ip_info;
-    ip_info.ip.addr      = ipaddr_addr(sys_settings.wifi.ip.ip);
-    ip_info.netmask.addr = ipaddr_addr(sys_settings.wifi.ip.netmask);
-    ip_info.gw.addr      = ipaddr_addr(sys_settings.wifi.ip.gateway);
-    esp_err_t res = esp_netif_set_ip_info(iface, &ip_info);
-    if (res != ESP_OK)
-        ESP_LOGW(TAG, "Error setting IP address %d (%s)", res, esp_err_to_name(res));
+        esp_netif_ip_info_t ip_info;
+        ip_info.ip.addr      = ipaddr_addr(sys_settings.wifi.ip.ip);
+        ip_info.netmask.addr = ipaddr_addr(sys_settings.wifi.ip.netmask);
+        ip_info.gw.addr      = ipaddr_addr(sys_settings.wifi.ip.gateway);
+        res = esp_netif_set_ip_info(iface, &ip_info);
+        if (res != ESP_OK)
+            ESP_LOGW(TAG, "Error setting IP address %d (%s)", res, esp_err_to_name(res));
 
-    if (sys_settings.wifi.mode == WIFI_MODE_AP)
-        esp_netif_dhcps_start(iface);
+        if (sys_settings.wifi.mode == WIFI_MODE_AP)
+            esp_netif_dhcps_start(iface);
+    }
 
     esp_netif_dns_info_t dns;
     dns.ip.type = IPADDR_TYPE_V4;
     dns.ip.u_addr.ip4.addr = ipaddr_addr(sys_settings.wifi.ip.dns);
-    res = esp_netif_set_dns_info(iface, ESP_NETIF_DNS_MAIN, &dns);
+    res = esp_netif_set_dns_info(iface, sys_settings.wifi.ip.dhcp ? ESP_NETIF_DNS_FALLBACK : ESP_NETIF_DNS_MAIN, &dns);
     if (res != ESP_OK)
         ESP_LOGW(TAG, "Error setting DNS address %d (%s)", res, esp_err_to_name(res));
 }
