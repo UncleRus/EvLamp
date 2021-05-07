@@ -16,11 +16,12 @@ static esp_err_t respond_json(httpd_req_t *req, cJSON *resp)
     return res;
 }
 
-static esp_err_t respond_api(httpd_req_t *req, esp_err_t err)
+static esp_err_t respond_api(httpd_req_t *req, esp_err_t err, const char *message)
 {
     cJSON *resp = cJSON_CreateObject();
     cJSON_AddNumberToObject(resp, "result", err);
     cJSON_AddStringToObject(resp, "name", esp_err_to_name(err));
+    cJSON_AddStringToObject(resp, "message", message ? message : "");
 
     return respond_json(req, resp);
 }
@@ -40,11 +41,64 @@ static cJSON *effect_params(size_t effect)
     }
     return params;
 }
+
+static esp_err_t parse_post_json(httpd_req_t *req, const char **msg, cJSON **json)
+{
+    *msg = NULL;
+    *json = NULL;
+    esp_err_t err = ESP_OK;
+
+    char *buf = NULL;
+
+    if (!req->content_len)
+    {
+        err = ESP_ERR_INVALID_ARG;
+        *msg = "No POST data";
+        goto exit;
+    }
+
+    if (req->content_len >= MAX_POST_SIZE)
+    {
+        err = ESP_ERR_NO_MEM;
+        *msg = "POST data too big";
+        goto exit;
+    }
+
+    buf = malloc(req->content_len + 1);
+    if (!buf)
+    {
+        err = ESP_ERR_NO_MEM;
+        *msg = "Out of memory";
+        goto exit;
+    }
+
+    int res = httpd_req_recv(req, buf, req->content_len);
+    if (res != req->content_len)
+    {
+        err = ESP_FAIL;
+        *msg = res ? "Socket error" : "Connection closed by peer";
+        goto exit;
+    }
+    buf[req->content_len] = 0;
+
+    *json = cJSON_Parse(buf);
+    if (!*json)
+    {
+        err = ESP_ERR_INVALID_ARG;
+        *msg = "Invalid JSON";
+    }
+
+exit:
+    if (buf)
+        free(buf);
+    return err;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static esp_err_t get_settings_reset(httpd_req_t *req)
 {
-    return respond_api(req, sys_settings_reset());
+    return respond_api(req, sys_settings_reset(), NULL);
 }
 
 static const httpd_uri_t route_get_settings_reset = {
@@ -149,7 +203,7 @@ static const httpd_uri_t route_get_effects = {
 
 static esp_err_t get_effects_reset(httpd_req_t *req)
 {
-    return respond_api(req, effects_reset());
+    return respond_api(req, effects_reset(), NULL);
 }
 
 static const httpd_uri_t route_get_effects_reset = {
@@ -179,6 +233,97 @@ static const httpd_uri_t route_get_lamp_state = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static esp_err_t post_lamp_state(httpd_req_t *req)
+{
+    const char *msg = NULL;
+    cJSON *json = NULL;
+
+    esp_err_t err = parse_post_json(req, &msg, &json);
+    if (err != ESP_OK)
+        goto exit;
+
+    cJSON *on_item = cJSON_GetObjectItem(json, "on");
+    if (on_item && !cJSON_IsBool(on_item))
+    {
+        err = ESP_ERR_INVALID_ARG;
+        msg = "Invalid `on` item";
+        goto exit;
+    }
+    cJSON *effect_item = cJSON_GetObjectItem(json, "effect");
+    if (effect_item && !cJSON_IsNumber(effect_item))
+    {
+        err = ESP_ERR_INVALID_ARG;
+        msg = "Invalid `effect` item";
+        goto exit;
+    }
+    cJSON *brightness_item = cJSON_GetObjectItem(json, "brightness");
+    if (brightness_item && !cJSON_IsNumber(brightness_item))
+    {
+        err = ESP_ERR_INVALID_ARG;
+        msg = "Invalid `brightness` item";
+        goto exit;
+    }
+    cJSON *fps_item = cJSON_GetObjectItem(json, "fps");
+    if (fps_item && !cJSON_IsNumber(fps_item))
+    {
+        err = ESP_ERR_INVALID_ARG;
+        msg = "Invalid `fps` item";
+        goto exit;
+    }
+
+    if (effect_item)
+    {
+        err = surface_set_effect((size_t)cJSON_GetNumberValue(effect_item));
+        if (err != ESP_OK)
+        {
+            msg = "Effect setting error";
+            goto exit;
+        }
+    }
+
+    if (on_item)
+    {
+        err = cJSON_IsTrue(on_item) ? surface_play() : surface_stop();
+        if (err != ESP_OK)
+        {
+            msg = "On/off lamp error";
+            goto exit;
+        }
+    }
+
+    if (brightness_item)
+    {
+        err = surface_set_brightness((uint8_t)cJSON_GetNumberValue(brightness_item));
+        if (err != ESP_OK)
+        {
+            msg = "Brightness setting error";
+            goto exit;
+        }
+    }
+
+    if (fps_item)
+    {
+        err = surface_set_fps((uint8_t)cJSON_GetNumberValue(fps_item));
+        if (err != ESP_OK)
+        {
+            msg = "FPS setting error";
+            goto exit;
+        }
+    }
+
+exit:
+    if (json) cJSON_Delete(json);
+    return respond_api(req, err, msg);
+}
+
+static const httpd_uri_t route_post_lamp_state = {
+    .uri = "/api/lamp/state",
+    .method = HTTP_POST,
+    .handler = post_lamp_state
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 esp_err_t api_init(httpd_handle_t server)
 {
     CHECK(httpd_register_uri_handler(server, &route_get_settings_reset));
@@ -188,6 +333,7 @@ esp_err_t api_init(httpd_handle_t server)
     CHECK(httpd_register_uri_handler(server, &route_get_effects));
     CHECK(httpd_register_uri_handler(server, &route_get_effects_reset));
     CHECK(httpd_register_uri_handler(server, &route_get_lamp_state));
+    CHECK(httpd_register_uri_handler(server, &route_post_lamp_state));
 
     return ESP_OK;
 }
