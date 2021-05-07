@@ -18,8 +18,6 @@
 // POST /api/lamp/state             -> set current lamp state, effect, brightness and FPS
 // GET  /api/lamp/effect            -> get current effect settings
 // POST /api/lamp/effect            -> set current effect settings
-// GET  /api/lamp/on                -> switch lamp on
-// GET  /api/lamp/off               -> switch lamp off
 
 esp_err_t api_init(httpd_handle_t server);
 

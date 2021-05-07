@@ -76,6 +76,7 @@ esp_err_t webserver_start()
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     //config.uri_match_fn = httpd_uri_match_wildcard;
+    config.max_uri_handlers = 100;
     config.stack_size = HTTPD_STACK_SIZE;
     config.lru_purge_enable = true;
 

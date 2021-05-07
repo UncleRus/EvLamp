@@ -26,7 +26,7 @@ static esp_err_t respond_api(httpd_req_t *req, esp_err_t err, const char *messag
     return respond_json(req, resp);
 }
 
-static cJSON *effect_params(size_t effect)
+static cJSON *effect_params_json(size_t effect)
 {
     cJSON *params = cJSON_CreateArray();
     for (size_t c = 0; c < effects[effect].params_count; c++)
@@ -187,7 +187,7 @@ static esp_err_t get_effects(httpd_req_t *req)
         cJSON *e = cJSON_CreateObject();
         cJSON_AddItemToArray(res, e);
         cJSON_AddStringToObject(e, "name", effects[i].name);
-        cJSON_AddItemToObject(e, "params", effect_params(i));
+        cJSON_AddItemToObject(e, "params", effect_params_json(i));
     }
 
     return respond_json(req, res);
@@ -324,6 +324,72 @@ static const httpd_uri_t route_post_lamp_state = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static esp_err_t get_lamp_effect(httpd_req_t *req)
+{
+    return respond_json(req, effect_params_json(vol_settings.effect));
+}
+
+static const httpd_uri_t route_get_lamp_effect = {
+    .uri = "/api/lamp/effect",
+    .method = HTTP_GET,
+    .handler = get_lamp_effect
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+static esp_err_t post_lamp_effect(httpd_req_t *req)
+{
+    const char *msg = NULL;
+    cJSON *json = NULL;
+
+    esp_err_t err = parse_post_json(req, &msg, &json);
+    if (err != ESP_OK)
+        goto exit;
+
+    if (!cJSON_IsArray(json))
+    {
+        err = ESP_ERR_INVALID_ARG;
+        msg = "Invalid JSON, array expected";
+        goto exit;
+    }
+
+    if (cJSON_GetArraySize(json) != effects[vol_settings.effect].params_count)
+    {
+        err = ESP_ERR_INVALID_ARG;
+        msg = "Invalid JSON, array size is not equal to effect params count";
+        goto exit;
+    }
+
+    for (size_t p = 0; p < effects[vol_settings.effect].params_count; p++)
+    {
+        cJSON *item = cJSON_GetArrayItem(json, p);
+        if (!cJSON_IsNumber(item))
+        {
+            err = ESP_ERR_INVALID_ARG;
+            msg = "Invalid JSON, parameter value must be numeric";
+            goto exit;
+        }
+        err = effect_param_set(vol_settings.effect, p, (uint8_t)cJSON_GetNumberValue(item));
+        if (err != ESP_OK)
+        {
+            msg = "Error set parameter";
+            goto exit;
+        }
+    }
+
+exit:
+    if (json) cJSON_Delete(json);
+    return respond_api(req, err, msg);
+}
+
+static const httpd_uri_t route_post_lamp_effect = {
+    .uri = "/api/lamp/effect",
+    .method = HTTP_POST,
+    .handler = post_lamp_effect
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 esp_err_t api_init(httpd_handle_t server)
 {
     CHECK(httpd_register_uri_handler(server, &route_get_settings_reset));
@@ -334,6 +400,8 @@ esp_err_t api_init(httpd_handle_t server)
     CHECK(httpd_register_uri_handler(server, &route_get_effects_reset));
     CHECK(httpd_register_uri_handler(server, &route_get_lamp_state));
     CHECK(httpd_register_uri_handler(server, &route_post_lamp_state));
+    CHECK(httpd_register_uri_handler(server, &route_get_lamp_effect));
+    CHECK(httpd_register_uri_handler(server, &route_post_lamp_effect));
 
     return ESP_OK;
 }
