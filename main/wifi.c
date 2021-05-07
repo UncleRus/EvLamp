@@ -137,7 +137,7 @@ static esp_err_t init_ap()
 
 static esp_err_t init_sta()
 {
-    ESP_LOGI(TAG, "Starting WiFi in station mode");
+    ESP_LOGI(TAG, "Starting WiFi in station mode, connecting to '%s'", sys_settings.wifi.sta.ssid);
 
     iface = esp_netif_create_default_wifi_sta();
     CHECK(esp_netif_set_hostname(iface, APP_NAME));
@@ -150,8 +150,10 @@ static esp_err_t init_sta()
     CHECK(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_LOST_IP, &ip_handler, NULL, NULL));
 
     wifi_config_t wifi_cfg = { 0 };
-    memcpy(wifi_cfg.sta.ssid, sys_settings.wifi.sta.ssid, sizeof(wifi_cfg.sta.ssid));
-    memcpy(wifi_cfg.sta.password, sys_settings.wifi.sta.password, sizeof(wifi_cfg.sta.password));
+    memcpy(wifi_cfg.sta.ssid, sys_settings.wifi.sta.ssid, strlen((char *)sys_settings.wifi.sta.ssid) + 1);
+    memcpy(wifi_cfg.sta.password, sys_settings.wifi.sta.password, strlen((char *)sys_settings.wifi.sta.ssid) + 1);
+    ESP_LOGI(TAG, "SSID: %s", (char *)wifi_cfg.sta.ssid);
+    ESP_LOGI(TAG, "PASSWD: %s", (char *)wifi_cfg.sta.password);
     wifi_cfg.sta.threshold.authmode = sys_settings.wifi.sta.threshold.authmode;
 
     CHECK(esp_wifi_set_mode(WIFI_MODE_STA));

@@ -1,10 +1,9 @@
 #include "webserver.h"
-#include <esp_ota_ops.h>
 #include <esp_http_server.h>
 #include <cJSON.h>
-#include <mustach-cjson.h>
-#include "templates.h"
+//#include <mustach-cjson.h>
 #include "api.h"
+#include "embed.h"
 
 static httpd_handle_t server = NULL;
 
@@ -16,18 +15,6 @@ static httpd_handle_t server = NULL;
 //    return httpd_resp_send_chunk((httpd_req_t *)ctx, buffer, size);
 //}
 //
-//static cJSON *app_info()
-//{
-//    const esp_app_desc_t *app_desc = esp_ota_get_app_description();
-//
-//    cJSON *res = cJSON_CreateObject();
-//    cJSON_AddStringToObject(res, "app_name", app_desc->project_name);
-//    cJSON_AddStringToObject(res, "app_version", app_desc->version);
-//    cJSON_AddStringToObject(res, "build_date", app_desc->date);
-//    cJSON_AddStringToObject(res, "idf_ver", app_desc->idf_ver);
-//
-//    return res;
-//}
 //
 //static esp_err_t render_part(httpd_req_t *req, const char *tpl)
 //{
@@ -51,6 +38,32 @@ static httpd_handle_t server = NULL;
 //    return ESP_OK;
 //}
 
+////////////////////////////////////////////////////////////////////////////////
+/// Handlers
+
+esp_err_t get_jquery(httpd_req_t *req)
+{
+    httpd_resp_set_type(req, "text/javascript");
+    return httpd_resp_sendstr(req, embed_jquery_js);
+}
+
+static const httpd_uri_t route_get_jquery = {
+    .uri = "/jquery.js",
+    .method = HTTP_GET,
+    .handler = get_jquery
+};
+
+esp_err_t get_styles(httpd_req_t *req)
+{
+    httpd_resp_set_type(req, "text/css");
+    return httpd_resp_sendstr(req, embed_styles_css);
+}
+
+static const httpd_uri_t route_get_styles = {
+    .uri = "/styles.css",
+    .method = HTTP_GET,
+    .handler = get_styles
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Init
@@ -59,6 +72,9 @@ static esp_err_t init()
 {
     // registering handlers
     CHECK(api_init(server));
+
+    CHECK(httpd_register_uri_handler(server, &route_get_jquery));
+    CHECK(httpd_register_uri_handler(server, &route_get_styles));
 
     return ESP_OK;
 }

@@ -6,6 +6,7 @@
 
 // API Handlers
 //
+// GET  /api/info                   -> Application name, version, build date etc
 // GET  /api/settings/reset         -> reset wifi and led settings to defaults
 // GET  /api/settings/wifi          -> return current wifi settings
 // POST /api/settings/wifi          -> set wifi settings

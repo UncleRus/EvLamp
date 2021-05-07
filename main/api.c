@@ -1,6 +1,7 @@
 #include "api.h"
 #include <driver/gpio.h>
 #include <led_strip.h>
+#include <esp_ota_ops.h>
 #include "settings.h"
 #include "effect.h"
 #include "surface.h"
@@ -95,6 +96,27 @@ exit:
         free(buf);
     return err;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+static esp_err_t get_info(httpd_req_t *req)
+{
+    const esp_app_desc_t *app_desc = esp_ota_get_app_description();
+
+    cJSON *res = cJSON_CreateObject();
+    cJSON_AddStringToObject(res, "app_name", app_desc->project_name);
+    cJSON_AddStringToObject(res, "app_version", app_desc->version);
+    cJSON_AddStringToObject(res, "build_date", app_desc->date);
+    cJSON_AddStringToObject(res, "idf_ver", app_desc->idf_ver);
+
+    return respond_json(req, res);
+}
+
+static const httpd_uri_t route_get_info = {
+    .uri = "/api/info",
+    .method = HTTP_GET,
+    .handler = get_info
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -312,9 +334,9 @@ static esp_err_t post_settings_wifi(httpd_req_t *req)
     strncpy(sys_settings.wifi.ip.dns, cJSON_GetStringValue(ip_dns_item), sizeof(sys_settings.wifi.ip.dns) - 1);
     sys_settings.wifi.ap.channel = ap_channel;
     strncpy((char *)sys_settings.wifi.ap.ssid, ap_ssid, sizeof(sys_settings.wifi.ap.ssid) - 1);
-    strncpy((char *)sys_settings.wifi.ap.password, ap_ssid, sizeof(sys_settings.wifi.ap.password) - 1);
+    strncpy((char *)sys_settings.wifi.ap.password, ap_password, sizeof(sys_settings.wifi.ap.password) - 1);
     strncpy((char *)sys_settings.wifi.sta.ssid, sta_ssid, sizeof(sys_settings.wifi.sta.ssid) - 1);
-    strncpy((char *)sys_settings.wifi.sta.password, sta_ssid, sizeof(sys_settings.wifi.sta.password) - 1);
+    strncpy((char *)sys_settings.wifi.sta.password, sta_password, sizeof(sys_settings.wifi.sta.password) - 1);
 
     err = sys_settings_save();
     msg = err != ESP_OK
@@ -681,6 +703,7 @@ static const httpd_uri_t route_post_lamp_effect = {
 
 esp_err_t api_init(httpd_handle_t server)
 {
+    CHECK(httpd_register_uri_handler(server, &route_get_info));
     CHECK(httpd_register_uri_handler(server, &route_get_settings_reset));
     CHECK(httpd_register_uri_handler(server, &route_get_settings_wifi));
     CHECK(httpd_register_uri_handler(server, &route_post_settings_wifi));
