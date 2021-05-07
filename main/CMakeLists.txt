@@ -9,6 +9,7 @@ idf_component_register(
         surface.c
         input.c
         webserver.c
+        api.c
         
         effects/crazybees.c
         effects/dna.c
