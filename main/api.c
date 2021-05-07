@@ -591,7 +591,6 @@ static esp_err_t post_lamp_state(httpd_req_t *req)
             goto exit;
         }
     }
-
     if (on_item)
     {
         err = cJSON_IsTrue(on_item) ? surface_play() : surface_stop();
@@ -601,7 +600,6 @@ static esp_err_t post_lamp_state(httpd_req_t *req)
             goto exit;
         }
     }
-
     if (brightness_item)
     {
         err = surface_set_brightness((uint8_t)cJSON_GetNumberValue(brightness_item));
@@ -611,7 +609,6 @@ static esp_err_t post_lamp_state(httpd_req_t *req)
             goto exit;
         }
     }
-
     if (fps_item)
     {
         err = surface_set_fps((uint8_t)cJSON_GetNumberValue(fps_item));
@@ -637,7 +634,10 @@ static const httpd_uri_t route_post_lamp_state = {
 
 static esp_err_t get_lamp_effect(httpd_req_t *req)
 {
-    return respond_json(req, effect_params_json(vol_settings.effect));
+    cJSON *res = cJSON_CreateObject();
+    cJSON_AddNumberToObject(res, "effect", vol_settings.effect);
+    cJSON_AddItemToObject(res, "params", effect_params_json(vol_settings.effect));
+    return respond_json(req, res);
 }
 
 static const httpd_uri_t route_get_lamp_effect = {
@@ -657,30 +657,45 @@ static esp_err_t post_lamp_effect(httpd_req_t *req)
     if (err != ESP_OK)
         goto exit;
 
-    if (!cJSON_IsArray(json))
+    size_t effect = vol_settings.effect;
+
+    cJSON *effect_item = cJSON_GetObjectItem(json, "effect");
+    if (cJSON_IsNumber(effect_item))
+    {
+        effect = (size_t)cJSON_GetNumberValue(effect_item);
+        if (effect >= effects_count)
+        {
+            err = ESP_ERR_INVALID_ARG;
+            msg = "Invalid `effect` value";
+            goto exit;
+        }
+    }
+
+    cJSON *params = cJSON_GetObjectItem(json, "params");
+    if (!cJSON_IsArray(params))
     {
         err = ESP_ERR_INVALID_ARG;
-        msg = "Invalid JSON, array expected";
+        msg = "Invalid JSON, `params` must be array";
         goto exit;
     }
 
-    if (cJSON_GetArraySize(json) != effects[vol_settings.effect].params_count)
+    if (cJSON_GetArraySize(params) != effects[effect].params_count)
     {
         err = ESP_ERR_INVALID_ARG;
         msg = "Invalid JSON, array size is not equal to effect params count";
         goto exit;
     }
 
-    for (size_t p = 0; p < effects[vol_settings.effect].params_count; p++)
+    for (size_t p = 0; p < effects[effect].params_count; p++)
     {
-        cJSON *item = cJSON_GetArrayItem(json, p);
+        cJSON *item = cJSON_GetArrayItem(params, p);
         if (!cJSON_IsNumber(item))
         {
             err = ESP_ERR_INVALID_ARG;
             msg = "Invalid JSON, parameter value must be numeric";
             goto exit;
         }
-        err = effect_param_set(vol_settings.effect, p, (uint8_t)cJSON_GetNumberValue(item));
+        err = effect_param_set(effect, p, (uint8_t)cJSON_GetNumberValue(item));
         if (err != ESP_OK)
         {
             msg = "Error set parameter";
