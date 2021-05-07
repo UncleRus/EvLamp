@@ -34,6 +34,8 @@
     #define DEFAULT_LED_TYPE LED_STRIP_WS2812
 #endif
 
+#define MIN_LED_CURRENT_LIMIT 100
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Bus
 

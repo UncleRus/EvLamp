@@ -1,4 +1,6 @@
 #include "api.h"
+#include <driver/gpio.h>
+#include <led_strip.h>
 #include "settings.h"
 #include "effect.h"
 #include "surface.h"
@@ -160,6 +162,105 @@ static const httpd_uri_t route_get_settings_leds = {
     .uri = "/api/settings/leds",
     .method = HTTP_GET,
     .handler = get_settings_leds
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+static esp_err_t post_settings_leds(httpd_req_t *req)
+{
+    const char *msg = NULL;
+    cJSON *json = NULL;
+
+    esp_err_t err = parse_post_json(req, &msg, &json);
+    if (err != ESP_OK)
+        goto exit;
+
+    cJSON *width_item = cJSON_GetObjectItem(json, "width");
+    if (!width_item || !cJSON_IsNumber(width_item))
+    {
+        msg = "Item `width` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *height_item = cJSON_GetObjectItem(json, "height");
+    if (!height_item || !cJSON_IsNumber(height_item))
+    {
+        msg = "Item `height` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *type_item = cJSON_GetObjectItem(json, "type");
+    if (!type_item || !cJSON_IsNumber(type_item))
+    {
+        msg = "Item `type` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *gpio_item = cJSON_GetObjectItem(json, "gpio");
+    if (!gpio_item || !cJSON_IsNumber(gpio_item))
+    {
+        msg = "Item `gpio` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *limit_item = cJSON_GetObjectItem(json, "current_limit");
+    if (!limit_item || !cJSON_IsNumber(limit_item))
+    {
+        msg = "Item `current_limit` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+
+    size_t width = (size_t)cJSON_GetNumberValue(width_item);
+    size_t height = (size_t)cJSON_GetNumberValue(height_item);
+    if (width < 2 || width > 256 || height < 2 || height > 256)
+    {
+        msg = "Invalid matrix dimensions";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    uint8_t type = (uint8_t)cJSON_GetNumberValue(type_item);
+    if (type > LED_STRIP_APA106)
+    {
+        msg = "Invalid LED type";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    int gpio = (int)cJSON_GetNumberValue(gpio_item);
+    if (gpio < 0 || gpio >= GPIO_NUM_MAX)
+    {
+        msg = "Invalid GPIO num";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    uint32_t limit = (uint32_t)cJSON_GetNumberValue(limit_item);
+    if (limit < MIN_LED_CURRENT_LIMIT)
+    {
+        msg = "Current limit too low";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+
+    sys_settings.leds.width = width;
+    sys_settings.leds.height = height;
+    sys_settings.leds.type = type;
+    sys_settings.leds.gpio = gpio;
+    sys_settings.leds.current_limit = limit;
+
+    err = sys_settings_save();
+    msg = err != ESP_OK
+            ? "Error saving system settings"
+            : "Settings saved, reboot to apply";
+
+exit:
+    if (json) cJSON_Delete(json);
+    return respond_api(req, err, msg);
+}
+
+static const httpd_uri_t route_post_settings_leds = {
+    .uri = "/api/settings/leds",
+    .method = HTTP_POST,
+    .handler = post_settings_leds
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -395,6 +496,7 @@ esp_err_t api_init(httpd_handle_t server)
     CHECK(httpd_register_uri_handler(server, &route_get_settings_reset));
     CHECK(httpd_register_uri_handler(server, &route_get_settings_wifi));
     CHECK(httpd_register_uri_handler(server, &route_get_settings_leds));
+    CHECK(httpd_register_uri_handler(server, &route_post_settings_leds));
     CHECK(httpd_register_uri_handler(server, &route_get_reboot));
     CHECK(httpd_register_uri_handler(server, &route_get_effects));
     CHECK(httpd_register_uri_handler(server, &route_get_effects_reset));
