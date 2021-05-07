@@ -114,46 +114,6 @@ static esp_err_t _storage_save(const char *storage_name, const void *source, siz
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cJSON *sys_settings_json()
-{
-    cJSON *root = cJSON_CreateObject();
-
-    cJSON *wifi = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "wifi", wifi);
-
-    cJSON *ip = cJSON_CreateObject();
-    cJSON_AddItemToObject(wifi, "ip", ip);
-    cJSON_AddBoolToObject(ip, "dhcp", sys_settings.wifi.ip.dhcp);
-    cJSON_AddStringToObject(ip, "ip", sys_settings.wifi.ip.ip);
-    cJSON_AddStringToObject(ip, "netmask", sys_settings.wifi.ip.netmask);
-    cJSON_AddStringToObject(ip, "gateway", sys_settings.wifi.ip.gateway);
-    cJSON_AddStringToObject(ip, "dns", sys_settings.wifi.ip.dns);
-
-    cJSON *ap = cJSON_CreateObject();
-    cJSON_AddItemToObject(wifi, "ap", ap);
-    cJSON_AddStringToObject(ap, "ssid", (char *)sys_settings.wifi.ap.ssid);
-    cJSON_AddNumberToObject(ap, "channel", sys_settings.wifi.ap.channel);
-    cJSON_AddStringToObject(ap, "password", (char *)sys_settings.wifi.ap.password);
-    cJSON_AddNumberToObject(ap, "max_connection", sys_settings.wifi.ap.max_connection);
-    cJSON_AddNumberToObject(ap, "authmode", sys_settings.wifi.ap.authmode);
-
-    cJSON *sta = cJSON_CreateObject();
-    cJSON_AddItemToObject(wifi, "sta", sta);
-    cJSON_AddStringToObject(sta, "ssid", (char *)sys_settings.wifi.sta.ssid);
-    cJSON_AddStringToObject(sta, "password", (char *)sys_settings.wifi.sta.password);
-    cJSON_AddNumberToObject(sta, "authmode", sys_settings.wifi.sta.threshold.authmode);
-
-    cJSON *leds = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "leds", leds);
-    cJSON_AddNumberToObject(leds, "width", sys_settings.leds.width);
-    cJSON_AddNumberToObject(leds, "height", sys_settings.leds.height);
-    cJSON_AddNumberToObject(leds, "type", sys_settings.leds.type);
-    cJSON_AddNumberToObject(leds, "gpio", sys_settings.leds.gpio);
-    cJSON_AddNumberToObject(leds, "current_limit", sys_settings.leds.current_limit);
-
-    return root;
-}
-
 esp_err_t settings_init()
 {
     esp_err_t res = nvs_flash_init();

@@ -52,6 +52,4 @@ esp_err_t vol_settings_load();
 
 esp_err_t vol_settings_save();
 
-cJSON *sys_settings_json();
-
 #endif /* MAIN_SETTINGS_H_ */

@@ -63,5 +63,6 @@
 /// Webserver
 
 #define HTTPD_STACK_SIZE 32768
+#define MAX_POST_SIZE 4096
 
 #endif /* MAIN_CONFIG_H_ */

@@ -26,6 +26,14 @@ idf_component_register(
         effects/water.c
         effects/holiday.c
         effects/hoop.c
+	EMBED_TXTFILES
+		templates/header.tpl
+		templates/footer.tpl
+		templates/index.tpl
+		templates/wifi_form.tpl
+		templates/wifi_done.tpl
+		templates/leds_form.tpl
+		templates/leds_done.tpl
 )
 
 #spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)
