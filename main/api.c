@@ -146,6 +146,194 @@ static const httpd_uri_t route_get_settings_wifi = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static esp_err_t post_settings_wifi(httpd_req_t *req)
+{
+    const char *msg = NULL;
+    cJSON *json = NULL;
+
+    esp_err_t err = parse_post_json(req, &msg, &json);
+    if (err != ESP_OK)
+        goto exit;
+
+    cJSON *mode_item = cJSON_GetObjectItem(json, "mode");
+    if (!cJSON_IsNumber(mode_item))
+    {
+        msg = "Item `mode` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+
+    cJSON *ip = cJSON_GetObjectItem(json, "ip");
+    if (!ip)
+    {
+        msg = "Object `ip` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *ip_dhcp_item = cJSON_GetObjectItem(ip, "dhcp");
+    if (!cJSON_IsBool(ip_dhcp_item))
+    {
+        msg = "Object `ip.dhcp` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *ip_ip_item = cJSON_GetObjectItem(ip, "ip");
+    if (!cJSON_IsString(ip_ip_item) || ipaddr_addr(cJSON_GetStringValue(ip_ip_item)) == IPADDR_NONE)
+    {
+        msg = "Item `ip.ip` not found, invalid or not an IP address";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *ip_netmask_item = cJSON_GetObjectItem(ip, "netmask");
+    if (!cJSON_IsString(ip_netmask_item) || ipaddr_addr(cJSON_GetStringValue(ip_netmask_item)) == IPADDR_NONE)
+    {
+        msg = "Item `ip.netmask` not found, invalid or not an IP address";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *ip_gateway_item = cJSON_GetObjectItem(ip, "gateway");
+    if (!cJSON_IsString(ip_gateway_item) || ipaddr_addr(cJSON_GetStringValue(ip_gateway_item)) == IPADDR_NONE)
+    {
+        msg = "Item `ip.gateway` not found, invalid or not an IP address";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *ip_dns_item = cJSON_GetObjectItem(ip, "dns");
+    if (!cJSON_IsString(ip_dns_item) || ipaddr_addr(cJSON_GetStringValue(ip_dns_item)) == IPADDR_NONE)
+    {
+        msg = "Item `ip.dns` not found, invalid or not an IP address";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+
+    cJSON *ap = cJSON_GetObjectItem(json, "ap");
+    if (!ap)
+    {
+        msg = "Object `ap` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *ap_ssid_item = cJSON_GetObjectItem(ap, "ssid");
+    if (!cJSON_IsString(ap_ssid_item))
+    {
+        msg = "Item `ap.ssid` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *ap_channel_item = cJSON_GetObjectItem(ap, "channel");
+    if (!cJSON_IsNumber(ap_channel_item))
+    {
+        msg = "Item `ap.channel` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *ap_password_item = cJSON_GetObjectItem(ap, "password");
+    if (!cJSON_IsString(ap_password_item))
+    {
+        msg = "Item `ap.password` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+
+    cJSON *sta = cJSON_GetObjectItem(json, "sta");
+    if (!sta)
+    {
+        msg = "Object `sta` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *sta_ssid_item = cJSON_GetObjectItem(sta, "ssid");
+    if (!cJSON_IsString(sta_ssid_item))
+    {
+        msg = "Item `sta.ssid` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *sta_password_item = cJSON_GetObjectItem(sta, "password");
+    if (!cJSON_IsString(sta_password_item))
+    {
+        msg = "Item `sta.password` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+
+    uint8_t mode = (uint8_t)cJSON_GetNumberValue(mode_item);
+    if (mode != WIFI_MODE_AP && mode != WIFI_MODE_STA)
+    {
+        msg = "Invalid mode value";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    const char *ap_ssid = cJSON_GetStringValue(ap_ssid_item);
+    size_t len = strlen(ap_ssid);
+    if (!len || len >= sizeof(sys_settings.wifi.ap.ssid))
+    {
+        msg = "Invalid ap.ssid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    uint8_t ap_channel = (uint8_t)cJSON_GetNumberValue(ap_channel_item);
+    if (ap_channel > 32)
+    {
+        msg = "Invalid ap.channel";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    const char *ap_password = cJSON_GetStringValue(ap_password_item);
+    len = strlen(ap_password);
+    if (len >= sizeof(sys_settings.wifi.ap.password))
+    {
+        msg = "ap.password too long";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    const char *sta_ssid = cJSON_GetStringValue(sta_ssid_item);
+    len = strlen(sta_ssid);
+    if (!len || len >= sizeof(sys_settings.wifi.sta.ssid))
+    {
+        msg = "Invalid sta.ssid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    const char *sta_password = cJSON_GetStringValue(sta_password_item);
+    len = strlen(sta_password);
+    if (len >= sizeof(sys_settings.wifi.sta.password))
+    {
+        msg = "sta.password too long";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+
+    sys_settings.wifi.mode = mode;
+    sys_settings.wifi.ip.dhcp = cJSON_IsTrue(ip_dhcp_item);
+    strncpy(sys_settings.wifi.ip.ip, cJSON_GetStringValue(ip_ip_item), sizeof(sys_settings.wifi.ip.ip) - 1);
+    strncpy(sys_settings.wifi.ip.netmask, cJSON_GetStringValue(ip_netmask_item), sizeof(sys_settings.wifi.ip.netmask) - 1);
+    strncpy(sys_settings.wifi.ip.gateway, cJSON_GetStringValue(ip_gateway_item), sizeof(sys_settings.wifi.ip.gateway) - 1);
+    strncpy(sys_settings.wifi.ip.dns, cJSON_GetStringValue(ip_dns_item), sizeof(sys_settings.wifi.ip.dns) - 1);
+    sys_settings.wifi.ap.channel = ap_channel;
+    strncpy((char *)sys_settings.wifi.ap.ssid, ap_ssid, sizeof(sys_settings.wifi.ap.ssid) - 1);
+    strncpy((char *)sys_settings.wifi.ap.password, ap_ssid, sizeof(sys_settings.wifi.ap.password) - 1);
+    strncpy((char *)sys_settings.wifi.sta.ssid, sta_ssid, sizeof(sys_settings.wifi.sta.ssid) - 1);
+    strncpy((char *)sys_settings.wifi.sta.password, sta_ssid, sizeof(sys_settings.wifi.sta.password) - 1);
+
+    err = sys_settings_save();
+    msg = err != ESP_OK
+            ? "Error saving system settings"
+            : "Settings saved, reboot to apply";
+
+exit:
+    if (json) cJSON_Delete(json);
+    return respond_api(req, err, msg);
+}
+
+static const httpd_uri_t route_post_settings_wifi = {
+    .uri = "/api/settings/wifi",
+    .method = HTTP_POST,
+    .handler = post_settings_wifi
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 static esp_err_t get_settings_leds(httpd_req_t *req)
 {
     cJSON *res = cJSON_CreateObject();
@@ -176,35 +364,35 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
         goto exit;
 
     cJSON *width_item = cJSON_GetObjectItem(json, "width");
-    if (!width_item || !cJSON_IsNumber(width_item))
+    if (!cJSON_IsNumber(width_item))
     {
         msg = "Item `width` not found or invalid";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
     cJSON *height_item = cJSON_GetObjectItem(json, "height");
-    if (!height_item || !cJSON_IsNumber(height_item))
+    if (!cJSON_IsNumber(height_item))
     {
         msg = "Item `height` not found or invalid";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
     cJSON *type_item = cJSON_GetObjectItem(json, "type");
-    if (!type_item || !cJSON_IsNumber(type_item))
+    if (!cJSON_IsNumber(type_item))
     {
         msg = "Item `type` not found or invalid";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
     cJSON *gpio_item = cJSON_GetObjectItem(json, "gpio");
-    if (!gpio_item || !cJSON_IsNumber(gpio_item))
+    if (!cJSON_IsNumber(gpio_item))
     {
         msg = "Item `gpio` not found or invalid";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
     cJSON *limit_item = cJSON_GetObjectItem(json, "current_limit");
-    if (!limit_item || !cJSON_IsNumber(limit_item))
+    if (!cJSON_IsNumber(limit_item))
     {
         msg = "Item `current_limit` not found or invalid";
         err = ESP_ERR_INVALID_ARG;
@@ -495,6 +683,7 @@ esp_err_t api_init(httpd_handle_t server)
 {
     CHECK(httpd_register_uri_handler(server, &route_get_settings_reset));
     CHECK(httpd_register_uri_handler(server, &route_get_settings_wifi));
+    CHECK(httpd_register_uri_handler(server, &route_post_settings_wifi));
     CHECK(httpd_register_uri_handler(server, &route_get_settings_leds));
     CHECK(httpd_register_uri_handler(server, &route_post_settings_leds));
     CHECK(httpd_register_uri_handler(server, &route_get_reboot));

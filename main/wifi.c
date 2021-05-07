@@ -119,6 +119,7 @@ static esp_err_t init_ap()
     memcpy(wifi_cfg.ap.password, sys_settings.wifi.ap.password, sizeof(wifi_cfg.ap.password));
     wifi_cfg.ap.max_connection = sys_settings.wifi.ap.max_connection;
     wifi_cfg.ap.authmode = sys_settings.wifi.ap.authmode;
+    wifi_cfg.ap.channel = sys_settings.wifi.ap.channel;
 
     ESP_LOGI(TAG, "WiFi access point settings:");
     ESP_LOGI(TAG, "--------------------------------------------------");
