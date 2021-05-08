@@ -30,6 +30,10 @@ idf_component_register(
 	EMBED_TXTFILES
 		web/jquery.js
 		web/styles.css
+		web/jquery-ui.css
+		web/jquery-ui.js
+		web/jquery-ui.structure.css
+		web/jquery-ui.theme.css
 )
 
 #spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)

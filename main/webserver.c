@@ -38,43 +38,40 @@ static httpd_handle_t server = NULL;
 //    return ESP_OK;
 //}
 
+#define DECLARE_EMBED_HANDLER(NAME, URI, CT) \
+    esp_err_t get_##NAME(httpd_req_t *req) { \
+        httpd_resp_set_type(req, CT); \
+        return httpd_resp_sendstr(req, embed_##NAME); \
+    } \
+    static const httpd_uri_t route_get_##NAME = { .uri = (URI), .method = HTTP_GET, .handler = get_##NAME }
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Handlers
 
-esp_err_t get_jquery(httpd_req_t *req)
-{
-    httpd_resp_set_type(req, "text/javascript");
-    return httpd_resp_sendstr(req, embed_jquery_js);
-}
+DECLARE_EMBED_HANDLER(jquery_js, "/jquery.js", "text/javascript");
+DECLARE_EMBED_HANDLER(jquery_ui_js, "/jquery-ui.js", "text/javascript");
+DECLARE_EMBED_HANDLER(jquery_ui_css, "/jquery-ui.css", "text/css");
+DECLARE_EMBED_HANDLER(jquery_ui_structure_css, "/jquery-ui.structure.css", "text/css");
+DECLARE_EMBED_HANDLER(jquery_ui_theme_css, "/jquery-ui.theme.css", "text/css");
 
-static const httpd_uri_t route_get_jquery = {
-    .uri = "/jquery.js",
-    .method = HTTP_GET,
-    .handler = get_jquery
-};
-
-esp_err_t get_styles(httpd_req_t *req)
-{
-    httpd_resp_set_type(req, "text/css");
-    return httpd_resp_sendstr(req, embed_styles_css);
-}
-
-static const httpd_uri_t route_get_styles = {
-    .uri = "/styles.css",
-    .method = HTTP_GET,
-    .handler = get_styles
-};
+DECLARE_EMBED_HANDLER(styles_css, "/styles.css", "text/css");
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Init
 
 static esp_err_t init()
 {
-    // registering handlers
+    // API handlers
     CHECK(api_init(server));
 
-    CHECK(httpd_register_uri_handler(server, &route_get_jquery));
-    CHECK(httpd_register_uri_handler(server, &route_get_styles));
+    // Static file handlers
+    CHECK(httpd_register_uri_handler(server, &route_get_jquery_js));
+    CHECK(httpd_register_uri_handler(server, &route_get_jquery_ui_js));
+    CHECK(httpd_register_uri_handler(server, &route_get_jquery_ui_css));
+    CHECK(httpd_register_uri_handler(server, &route_get_jquery_ui_structure_css));
+    CHECK(httpd_register_uri_handler(server, &route_get_jquery_ui_theme_css));
+
+    CHECK(httpd_register_uri_handler(server, &route_get_styles_css));
 
     return ESP_OK;
 }
