@@ -81,38 +81,6 @@ menu "EvLamp configuration"
 	
 	menu "Hardware configuration"
 	
-		config EL_BUTTON_ENABLE
-			bool "Use hardware button"
-			default y
-
-		menu "Button"
-		depends on EL_BUTTON_ENABLE
-			
-			config EL_BUTTON_GPIO
-				int "GPIO input for button"
-				depends on EL_BUTTON_ENABLE
-				range 0 32
-				default 4
-			
-			config EL_BUTTON_LEVEL
-				int "Button logic level for 'pressed' state"
-				depends on EL_BUTTON_ENABLE
-				range 0 1
-				default 0
-
-			config EL_BUTTON_PULLUPDOWN
-				bool "Enable internal pullup/pulldown resistor"
-				depends on EL_BUTTON_ENABLE
-				default y
-
-			config EL_BUTTON_LONG_PRESS_TIME
-				int "Long button press time, milliseconds"
-				depends on EL_BUTTON_ENABLE
-				range 500 10000
-				default 1000
-
-		endmenu
-
 		menu "LED matrix"
 	
 			config EL_MATRIX_GPIO
@@ -150,6 +118,78 @@ menu "EvLamp configuration"
 				default 5000
 	
 		endmenu
+
+		config EL_BUTTON_ENABLE
+			bool "Use hardware button"
+			default y
+
+		menu "Button configuration"
+		depends on EL_BUTTON_ENABLE
+			
+			config EL_BUTTON_GPIO
+				int "GPIO pin"
+				depends on EL_BUTTON_ENABLE
+				range 0 32
+				default 4
+			
+			config EL_BUTTON_LEVEL
+				int "Button logic level for 'pressed' state"
+				depends on EL_BUTTON_ENABLE
+				range 0 1
+				default 0
+
+			config EL_BUTTON_PULLUPDOWN
+				bool "Enable internal pullup/pulldown resistor"
+				depends on EL_BUTTON_ENABLE
+				default y
+
+			config EL_BUTTON_LONG_PRESS_TIME
+				int "Long button press time, milliseconds"
+				depends on EL_BUTTON_ENABLE
+				range 500 10000
+				default 1000
+
+		endmenu
+
+#		config EL_SDCARD_ENABLE
+#			bool "Use SD card connected to SPI"
+#			default y
+#
+#		menu "SD card configuration"
+#		depends on EL_SDCARD_ENABLE
+#			
+#			config EL_SDCARD_MISO
+#				int "MISO (D0) GPIO pin"
+#				depends on EL_SDCARD_ENABLE
+#				range 0 32
+#				default 19
+#
+#			config EL_SDCARD_MOSI
+#				int "MOSI (CMD) GPIO pin"
+#				depends on EL_SDCARD_ENABLE
+#				range 0 32
+#				default 22
+#				
+#			config EL_SDCARD_SCK
+#				int "SCK (CLK) GPIO pin"
+#				depends on EL_SDCARD_ENABLE
+#				range 0 32
+#				default 18
+#
+#			config EL_SDCARD_CS
+#				int "CS (D3) GPIO pin"
+#				depends on EL_SDCARD_ENABLE
+#				range 0 32
+#				default 21
+#			
+#			config EL_SDCARD_CD
+#				int "CD (Card Detect) GPIO pin"
+#				depends on EL_SDCARD_ENABLE
+#				range 0 32
+#				default 23
+#
+#		endmenu
+
 
 	endmenu
 

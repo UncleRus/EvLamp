@@ -37,10 +37,9 @@ static system_settings_t sys_defaults = {
         },
     },
     .leds = {
-        .width = CONFIG_EL_MATRIX_WIDTH,
-        .height = CONFIG_EL_MATRIX_HEIGHT,
-        .type = DEFAULT_LED_TYPE,
-        .gpio = CONFIG_EL_MATRIX_GPIO,
+        .width         = CONFIG_EL_MATRIX_WIDTH,
+        .height        = CONFIG_EL_MATRIX_HEIGHT,
+        .type          = DEFAULT_LED_TYPE,
         .current_limit = CONFIG_EL_MATRIX_MAX_CURRENT,
     },
 };

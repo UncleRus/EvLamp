@@ -1,6 +1,7 @@
 idf_component_register(
 	INCLUDE_DIRS .
 	SRCS
+		common.c
 		main.c
 		settings.c
 		wifi.c

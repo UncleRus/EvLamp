@@ -22,7 +22,6 @@ typedef struct
         uint8_t width;
         uint8_t height;
         uint8_t type;
-        uint8_t gpio;
         uint32_t current_limit;
     } leds;
 } system_settings_t;

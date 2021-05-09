@@ -32,7 +32,7 @@ static void init_task(void *arg)
     memset(&strip, 0, sizeof(led_strip_t));
 
     strip.length = sys_settings.leds.width * sys_settings.leds.height;
-    strip.gpio = sys_settings.leds.gpio;
+    strip.gpio = CONFIG_EL_MATRIX_GPIO;
     strip.type = sys_settings.leds.type;
     strip.channel = RMT_CHANNEL;
     // TODO : calculate single LED current based on its type or just move it to config

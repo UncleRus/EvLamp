@@ -1,6 +1,3 @@
 [submodule "libs/esp-idf-lib"]
 	path = libs/esp-idf-lib
 	url = https://github.com/UncleRus/esp-idf-lib.git
-[submodule "components/libnsgif/libnsgif"]
-	path = components/libnsgif/libnsgif
-	url = https://git.netsurf-browser.org/libnsgif.git

@@ -1,5 +1,4 @@
 #include "api.h"
-#include <driver/gpio.h>
 #include <led_strip.h>
 #include <esp_ota_ops.h>
 #include "settings.h"
@@ -362,7 +361,6 @@ static esp_err_t get_settings_leds(httpd_req_t *req)
     cJSON_AddNumberToObject(res, "width", sys_settings.leds.width);
     cJSON_AddNumberToObject(res, "height", sys_settings.leds.height);
     cJSON_AddNumberToObject(res, "type", sys_settings.leds.type);
-    cJSON_AddNumberToObject(res, "gpio", sys_settings.leds.gpio);
     cJSON_AddNumberToObject(res, "current_limit", sys_settings.leds.current_limit);
 
     return respond_json(req, res);
@@ -406,13 +404,6 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
-    cJSON *gpio_item = cJSON_GetObjectItem(json, "gpio");
-    if (!cJSON_IsNumber(gpio_item))
-    {
-        msg = "Item `gpio` not found or invalid";
-        err = ESP_ERR_INVALID_ARG;
-        goto exit;
-    }
     cJSON *limit_item = cJSON_GetObjectItem(json, "current_limit");
     if (!cJSON_IsNumber(limit_item))
     {
@@ -436,13 +427,6 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
-    int gpio = (int)cJSON_GetNumberValue(gpio_item);
-    if (gpio < 0 || gpio >= GPIO_NUM_MAX)
-    {
-        msg = "Invalid GPIO num";
-        err = ESP_ERR_INVALID_ARG;
-        goto exit;
-    }
     uint32_t limit = (uint32_t)cJSON_GetNumberValue(limit_item);
     if (limit < MIN_LED_CURRENT_LIMIT)
     {
@@ -454,7 +438,6 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
     sys_settings.leds.width = width;
     sys_settings.leds.height = height;
     sys_settings.leds.type = type;
-    sys_settings.leds.gpio = gpio;
     sys_settings.leds.current_limit = limit;
 
     err = sys_settings_save();
