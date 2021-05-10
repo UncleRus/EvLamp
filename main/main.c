@@ -7,6 +7,40 @@
 #include "input.h"
 #include "webserver.h"
 
+static void process_button_event(event_t *e)
+{
+    size_t button_id = *((size_t *)e->data);
+
+    //ESP_LOGI(TAG, "Got button %d event %d", button_id, e->type);
+
+    if (button_id == INPUT_BTN_MAIN)
+    {
+        switch (e->type)
+        {
+            case EVENT_BUTTON_CLICKED:
+                surface_next_effect();
+                break;
+            case EVENT_BUTTON_PRESSED_LONG:
+                if (surface_is_playing())
+                    surface_stop();
+                else
+                    surface_play();
+                break;
+            default:
+                //ESP_LOGW(TAG, "Unprocessed 'Main' button event %d", e->type);
+                break;
+        }
+        return;
+    }
+
+    // up/down
+    if (e->type == EVENT_BUTTON_CLICKED &&
+            (button_id == INPUT_BTN_UP || button_id == INPUT_BTN_DOWN))
+    {
+        surface_increment_brightness(button_id == INPUT_BTN_UP ? 5 : -5);
+    }
+}
+
 static void main_loop(void *arg)
 {
     event_t e;
@@ -20,14 +54,8 @@ static void main_loop(void *arg)
         switch (e.type)
         {
             case EVENT_BUTTON_CLICKED:
-                surface_next_effect();
-                break;
-
-            case EVENT_BUTTON_LONG_PRESSED:
-                if (surface_is_playing())
-                    surface_stop();
-                else
-                    surface_play();
+            case EVENT_BUTTON_PRESSED_LONG:
+                process_button_event(&e);
                 break;
 
             case EVENT_NETWORK_UP:
@@ -45,7 +73,7 @@ static void main_loop(void *arg)
                 break;
 
             default:
-                ESP_LOGI(TAG, "Event %d", e.type);
+                ESP_LOGI(TAG, "Unprocessed event %d", e.type);
         }
     }
 }

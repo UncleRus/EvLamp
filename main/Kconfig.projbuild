@@ -1,7 +1,7 @@
-menu "EvLamp configuration"
+menu "*** EvLamp configuration ***"
 
 	config EL_EFFECT_DEFAULT
-		int "Default effect number"
+		int "Default effect"
 		default 0
 		
 	config EL_FPS_DEFAULT
@@ -119,35 +119,31 @@ menu "EvLamp configuration"
 	
 		endmenu
 
-		config EL_BUTTON_ENABLE
-			bool "Use hardware button"
-			default y
-
-		menu "Button configuration"
-		depends on EL_BUTTON_ENABLE
-			
-			config EL_BUTTON_GPIO
-				int "GPIO pin"
-				depends on EL_BUTTON_ENABLE
-				range 0 32
-				default 4
+		menu "Buttons configuration"
 			
 			config EL_BUTTON_LEVEL
 				int "Button logic level for 'pressed' state"
-				depends on EL_BUTTON_ENABLE
 				range 0 1
 				default 0
 
 			config EL_BUTTON_PULLUPDOWN
 				bool "Enable internal pullup/pulldown resistor"
-				depends on EL_BUTTON_ENABLE
 				default y
 
-			config EL_BUTTON_LONG_PRESS_TIME
-				int "Long button press time, milliseconds"
-				depends on EL_BUTTON_ENABLE
-				range 500 10000
-				default 1000
+			config EL_BUTTON_MAIN_GPIO
+				int "'Main' button GPIO pin"
+				range 0 32
+				default 25
+			
+			config EL_BUTTON_UP_GPIO
+				int "'Up' button GPIO pin"
+				range 0 32
+				default 26
+
+			config EL_BUTTON_DOWN_GPIO
+				int "'Down' button GPIO pin"
+				range 0 32
+				default 27
 
 		endmenu
 

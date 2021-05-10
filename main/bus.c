@@ -1,4 +1,5 @@
 #include "bus.h"
+#include <string.h>
 
 static QueueHandle_t bus;
 
@@ -16,11 +17,17 @@ esp_err_t bus_init()
 
 esp_err_t bus_send_event(event_type_t type, void *data, size_t size)
 {
-    event_t e = {
-        .type = type,
-        .data = data,
-        .size = size
-    };
+    if (size > BUS_EVENT_DATA_SIZE)
+    {
+        ESP_LOGE(TAG, "Event data size too big: %d", size);
+        return ESP_ERR_NO_MEM;
+    }
+
+    event_t e;
+    e.type = type;
+    if (data && size)
+        memcpy(e.data, data, size);
+
     if (xQueueSend(bus, &e, pdMS_TO_TICKS(BUS_TIMEOUT_MS)) != pdPASS)
     {
         ESP_LOGE(TAG, "Timeout while sending event with type %d", type);

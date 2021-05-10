@@ -1,92 +1,54 @@
 #include "input.h"
-#include <driver/gpio.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/timers.h>
+#include <button.h>
 #include "bus.h"
 
-#if CONFIG_EL_BUTTON_ENABLE
+static const event_type_t event_types[] = {
+    [BUTTON_PRESSED]      = EVENT_BUTTON_PRESSED,
+    [BUTTON_RELEASED]     = EVENT_BUTTON_RELEASED,
+    [BUTTON_CLICKED]      = EVENT_BUTTON_CLICKED,
+    [BUTTON_PRESSED_LONG] = EVENT_BUTTON_PRESSED_LONG,
+};
 
-#define TIMER_INTERVAL_MS 100 // 100ms = 10z
-#define DEAD_TIME_MS 10 // 10ms antijitter
+static button_t buttons[INPUT_BTN_MAX] = { 0 };
 
-typedef enum {
-    BTN_RELEASED = 0,
-    BTN_PRESSED,
-    BTN_LONG_PRESSED,
-    BTN_CLICKED,
-} button_state_t;
-
-static button_state_t btn_state = BTN_RELEASED;
-static uint64_t btn_pressed_time_ms = 0;
-
-static void input_task(void *arg)
+void callback(button_t *btn, button_state_t state)
 {
-    ESP_LOGI(TAG, "Button init, GPIO %d", CONFIG_EL_BUTTON_GPIO);
-
-    gpio_set_direction(CONFIG_EL_BUTTON_GPIO, GPIO_MODE_INPUT);
-#if CONFIG_EL_BUTTON_PULLUPDOWN
-#if CONFIG_EL_BUTTON_LEVEL == 0
-    gpio_set_pull_mode(CONFIG_EL_BUTTON_GPIO, GPIO_PULLUP_ONLY);
-#else
-    gpio_set_pull_mode(CONFIG_EL_BUTTON_GPIO, GPIO_PULLDOWN_ONLY);
-#endif /* CONFIG_EL_BUTTON_LEVEL */
-#endif /* CONFIG_EL_BUTTON_PULLUPDOWN */
-
-    while (1)
-    {
-        if (btn_state == BTN_PRESSED && btn_pressed_time_ms < DEAD_TIME_MS)
+    size_t button_id = INPUT_BTN_MAIN;
+    for (size_t i = 0; i < INPUT_BTN_MAX; i++)
+        if (&buttons[i] == btn)
         {
-            // Dead time
-            btn_pressed_time_ms += DEAD_TIME_MS;
-            goto end;
+            button_id = i;
+            break;
         }
 
-        // read button state
-        if (gpio_get_level(CONFIG_EL_BUTTON_GPIO) == CONFIG_EL_BUTTON_LEVEL)
-        {
-            if (btn_state == BTN_RELEASED)
-            {
-                // first press
-                btn_state = BTN_PRESSED;
-                btn_pressed_time_ms = 0;
-                bus_send_event(EVENT_BUTTON_PRESSED, NULL, 0);
-                goto end;
-            }
-
-            btn_pressed_time_ms += TIMER_INTERVAL_MS;
-
-            if (btn_state == BTN_PRESSED && btn_pressed_time_ms >= CONFIG_EL_BUTTON_LONG_PRESS_TIME)
-            {
-                // Long press
-                btn_state = BTN_LONG_PRESSED;
-                bus_send_event(EVENT_BUTTON_LONG_PRESSED, NULL, 0);
-            }
-        }
-        else if (btn_state != BTN_RELEASED)
-        {
-            bool clicked = btn_state == BTN_PRESSED;
-            // released
-            btn_state = BTN_RELEASED;
-            bus_send_event(EVENT_BUTTON_RELEASED, NULL, 0);
-            if (clicked)
-                bus_send_event(EVENT_BUTTON_CLICKED, NULL, 0);
-        }
-
-end:
-        vTaskDelay(pdMS_TO_TICKS(TIMER_INTERVAL_MS));
-    }
+    bus_send_event(event_types[state], &button_id, sizeof(button_id));
 }
-
-#endif
 
 esp_err_t input_init()
 {
-#if CONFIG_EL_BUTTON_ENABLE
-    if (xTaskCreate(input_task, "input", INPUT_TASK_STACK_SIZE, NULL, INPUT_TASK_PRIORITY, NULL) != pdPASS)
-    {
-        ESP_LOGE(TAG, "Could not create input task");
-        return ESP_FAIL;
-    }
-#endif
+    buttons[INPUT_BTN_MAIN].gpio = CONFIG_EL_BUTTON_MAIN_GPIO;
+    buttons[INPUT_BTN_MAIN].internal_pull = CONFIG_EL_BUTTON_PULLUPDOWN;
+    buttons[INPUT_BTN_MAIN].pressed_level = CONFIG_EL_BUTTON_LEVEL;
+    buttons[INPUT_BTN_MAIN].autorepeat = false;
+    buttons[INPUT_BTN_MAIN].callback = callback;
+    CHECK_LOGE(button_init(&buttons[INPUT_BTN_MAIN]),
+            "Failed init 'Main' button");
+
+    buttons[INPUT_BTN_UP].gpio = CONFIG_EL_BUTTON_UP_GPIO;
+    buttons[INPUT_BTN_UP].internal_pull = CONFIG_EL_BUTTON_PULLUPDOWN;
+    buttons[INPUT_BTN_UP].pressed_level = CONFIG_EL_BUTTON_LEVEL;
+    buttons[INPUT_BTN_UP].autorepeat = true;
+    buttons[INPUT_BTN_UP].callback = callback;
+    CHECK_LOGE(button_init(&buttons[INPUT_BTN_UP]),
+            "Failed init 'Up' button");
+
+    buttons[INPUT_BTN_DOWN].gpio = CONFIG_EL_BUTTON_DOWN_GPIO;
+    buttons[INPUT_BTN_DOWN].internal_pull = CONFIG_EL_BUTTON_PULLUPDOWN;
+    buttons[INPUT_BTN_DOWN].pressed_level = CONFIG_EL_BUTTON_LEVEL;
+    buttons[INPUT_BTN_DOWN].autorepeat = true;
+    buttons[INPUT_BTN_DOWN].callback = callback;
+    CHECK_LOGE(button_init(&buttons[INPUT_BTN_DOWN]),
+            "Failed init 'Down' button");
+
     return ESP_OK;
 }

@@ -7,7 +7,7 @@ typedef enum {
     EVENT_NETWORK_UP = 0,
     EVENT_NETWORK_DOWN,
     EVENT_BUTTON_PRESSED,
-    EVENT_BUTTON_LONG_PRESSED,
+    EVENT_BUTTON_PRESSED_LONG,
     EVENT_BUTTON_RELEASED,
     EVENT_BUTTON_CLICKED,
     EVENT_TIMER
@@ -16,8 +16,7 @@ typedef enum {
 typedef struct
 {
     event_type_t type;
-    void *data;
-    size_t size;
+    uint8_t data[BUS_EVENT_DATA_SIZE];
 } event_t;
 
 esp_err_t bus_init();

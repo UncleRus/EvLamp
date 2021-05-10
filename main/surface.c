@@ -1,15 +1,15 @@
 #include "surface.h"
 #include <framebuffer.h>
-#include <fbanimation.h>
 #include <led_strip.h>
 #include <soc/soc.h>
 #include "settings.h"
 #include "effect.h"
 
+#define BIT_PLAYING (1)
+
 static led_strip_t strip;
 static framebuffer_t framebuffer;
-static fb_animation_t animation;
-static bool playing = false;
+static EventGroupHandle_t state;
 
 // frame renderer, framebuffer -> LED strip
 static esp_err_t render_frame(framebuffer_t *fb, void *arg)
@@ -25,10 +25,9 @@ static esp_err_t render_frame(framebuffer_t *fb, void *arg)
     return led_strip_flush(&strip);
 }
 
-static void init_task(void *arg)
+static void surface_task(void *arg)
 {
     led_strip_install();
-    // LED strip
     memset(&strip, 0, sizeof(led_strip_t));
 
     strip.length = sys_settings.leds.width * sys_settings.leds.height;
@@ -47,23 +46,41 @@ static void init_task(void *arg)
     memset(&framebuffer, 0, sizeof(framebuffer_t));
     ESP_ERROR_CHECK(fb_init(&framebuffer, sys_settings.leds.width, sys_settings.leds.height, render_frame));
 
-    // Animation
-    ESP_ERROR_CHECK(fb_animation_init(&animation, &framebuffer));
-
     ESP_LOGI(TAG, "Surface initialized");
 
-    ESP_ERROR_CHECK(surface_play());
+    while (1)
+    {
+        // wait for playing bit, not clear
+        xEventGroupWaitBits(state, BIT_PLAYING, pdFALSE, pdTRUE, portMAX_DELAY);
 
-    vTaskDelete(NULL);
+        TickType_t last_wake_time = xTaskGetTickCount();
+        if (effects[vol_settings.effect].run(&framebuffer) != ESP_OK)
+            ESP_LOGW(TAG, "Frame draw error");
+        if (fb_render(&framebuffer, NULL) != ESP_OK)
+            ESP_LOGW(TAG, "Frame dropped");
+        vTaskDelayUntil(&last_wake_time, pdMS_TO_TICKS(1000 / vol_settings.fps));
+    }
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 esp_err_t surface_init()
 {
-    if (xTaskCreatePinnedToCore(init_task, "surface_init", 2048, NULL, uxTaskPriorityGet(NULL) + 1, NULL, APP_CPU_NUM) != pdPASS)
+    state = xEventGroupCreate();
+    if (!state)
     {
-        ESP_LOGE(TAG, "Could not create surface init task");
+        ESP_LOGE(TAG, "Could not create surface event group");
+        return ESP_ERR_NO_MEM;
+    }
+
+    if (xTaskCreatePinnedToCore(surface_task, "surface", 8192 * 2, NULL, uxTaskPriorityGet(NULL) + 1, NULL, APP_CPU_NUM) != pdPASS)
+    {
+        ESP_LOGE(TAG, "Could not create surface task");
         return ESP_FAIL;
     }
+
+    vTaskDelay(pdMS_TO_TICKS(10));
+    surface_set_effect(vol_settings.effect);
 
     return ESP_OK;
 }
@@ -76,26 +93,64 @@ esp_err_t surface_prepare_effect(size_t effect)
     return ESP_OK;
 }
 
+bool surface_is_playing()
+{
+    return xEventGroupGetBits(state) & BIT_PLAYING;
+}
+
+esp_err_t surface_pause()
+{
+    if (!surface_is_playing())
+        return ESP_OK;
+
+    xEventGroupClearBits(state, BIT_PLAYING);
+    vTaskDelay(pdMS_TO_TICKS(1000 / vol_settings.fps) + 1);
+
+    return ESP_OK;
+}
+
+esp_err_t surface_stop()
+{
+    CHECK(surface_pause());
+
+    CHECK(fb_begin(&framebuffer));
+    CHECK(fb_clear(&framebuffer));
+    CHECK(fb_end(&framebuffer));
+
+    CHECK(fb_render(&framebuffer, NULL));
+
+    ESP_LOGI(TAG, "Animation stopped");
+
+    return ESP_OK;
+}
+
+esp_err_t surface_play()
+{
+    if (surface_is_playing())
+        return ESP_OK;
+
+    xEventGroupSetBits(state, BIT_PLAYING);
+    //vTaskDelay(pdMS_TO_TICKS(1000 / vol_settings.fps) + 1);
+
+    return ESP_OK;
+}
+
 esp_err_t surface_set_effect(size_t num)
 {
     CHECK_ARG(num < effects_count);
+
+    CHECK(surface_stop());
 
     vol_settings.effect = num;
     if (vol_settings_save() != ESP_OK)
         ESP_LOGW(TAG, "Could not save volatile settings");
 
-    ESP_LOGI(TAG, "Switching to effect '%s' (%d)", effects[num].name, num);
+    CHECK(surface_prepare_effect(num));
+    CHECK(surface_play());
 
-    // stop previous
-    fb_animation_stop(&animation);
-    // clear frambuffer
-    fb_clear(&framebuffer);
-    // prepare
-    if (effects[num].prepare)
-        CHECK(effects[num].prepare(&framebuffer));
-    playing = true;
-    // play new
-    return fb_animation_play(&animation, vol_settings.fps, effects[num].run, NULL);
+    ESP_LOGI(TAG, "Switched to effect '%s' (%d)", effects[num].name, num);
+
+    return ESP_OK;
 }
 
 esp_err_t surface_next_effect()
@@ -109,49 +164,36 @@ esp_err_t surface_set_brightness(uint8_t val)
 {
     CHECK_ARG(val > 0);
 
+    CHECK(surface_pause());
+
     vol_settings.brightness = val;
     if (vol_settings_save() != ESP_OK)
         ESP_LOGW(TAG, "Could not save volatile settings");
 
+    CHECK(surface_play());
+
     return ESP_OK;
+}
+
+esp_err_t surface_increment_brightness(int8_t val)
+{
+    int16_t b = vol_settings.brightness + val;
+    if (b < 0) b = 0;
+    else if (b > 255) b = 255;
+    return surface_set_brightness(b);
 }
 
 esp_err_t surface_set_fps(uint8_t val)
 {
     CHECK_ARG(val > 0 && val <= FPS_MAX);
 
+    CHECK(surface_pause());
+
     vol_settings.fps = val;
-    return surface_set_effect(vol_settings.effect);
-}
+    if (vol_settings_save() != ESP_OK)
+        ESP_LOGW(TAG, "Could not save volatile settings");
 
-esp_err_t surface_play()
-{
-    if (playing) return ESP_OK;
-
-    CHECK(surface_set_effect(vol_settings.effect));
-
-    ESP_LOGI(TAG, "Animation started");
+    CHECK(surface_play());
 
     return ESP_OK;
-}
-
-esp_err_t surface_stop()
-{
-    if (!playing) return ESP_OK;
-
-    fb_animation_stop(&animation);
-
-    fb_clear(&framebuffer);
-    render_frame(&framebuffer, NULL);
-
-    playing = false;
-
-    ESP_LOGI(TAG, "Animation stopped");
-
-    return ESP_OK;
-}
-
-bool surface_is_playing()
-{
-    return playing;
 }
