@@ -60,6 +60,7 @@
 #define RMT_CHANNEL RMT_CHANNEL_0
 #define SINGLE_LED_CURRENT_MA 60.0f
 #define FPS_MAX 120
+#define SURFACE_TASK_STACK_SIZE 4096
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Webserver

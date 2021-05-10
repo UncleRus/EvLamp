@@ -34,6 +34,14 @@ esp_err_t input_init()
     CHECK_LOGE(button_init(&buttons[INPUT_BTN_MAIN]),
             "Failed init 'Main' button");
 
+    buttons[INPUT_BTN_RESET].gpio = CONFIG_EL_BUTTON_RESET_GPIO;
+    buttons[INPUT_BTN_RESET].internal_pull = CONFIG_EL_BUTTON_PULLUPDOWN;
+    buttons[INPUT_BTN_RESET].pressed_level = CONFIG_EL_BUTTON_LEVEL;
+    buttons[INPUT_BTN_RESET].autorepeat = false;
+    buttons[INPUT_BTN_RESET].callback = callback;
+    CHECK_LOGE(button_init(&buttons[INPUT_BTN_RESET]),
+            "Failed init 'Reset' button");
+
     buttons[INPUT_BTN_UP].gpio = CONFIG_EL_BUTTON_UP_GPIO;
     buttons[INPUT_BTN_UP].internal_pull = CONFIG_EL_BUTTON_PULLUPDOWN;
     buttons[INPUT_BTN_UP].pressed_level = CONFIG_EL_BUTTON_LEVEL;

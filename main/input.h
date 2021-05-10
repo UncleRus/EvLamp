@@ -5,6 +5,7 @@
 
 enum {
     INPUT_BTN_MAIN = 0,
+    INPUT_BTN_RESET,
     INPUT_BTN_UP,
     INPUT_BTN_DOWN,
 

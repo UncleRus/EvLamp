@@ -13,6 +13,13 @@ static void process_button_event(event_t *e)
 
     //ESP_LOGI(TAG, "Got button %d event %d", button_id, e->type);
 
+    if (button_id == INPUT_BTN_RESET && e->type == EVENT_BUTTON_PRESSED_LONG)
+    {
+        ESP_ERROR_CHECK(sys_settings_reset());
+        ESP_ERROR_CHECK(vol_settings_reset());
+        esp_restart();
+    }
+
     if (button_id == INPUT_BTN_MAIN)
     {
         switch (e->type)

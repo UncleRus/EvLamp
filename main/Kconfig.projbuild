@@ -85,7 +85,7 @@ menu "*** EvLamp configuration ***"
 	
 			config EL_MATRIX_GPIO
 				int "GPIO output for LED matrix"
-				range 0 32
+				range 0 39
 				default 5
 			
 			config EL_MATRIX_WIDTH
@@ -132,18 +132,23 @@ menu "*** EvLamp configuration ***"
 
 			config EL_BUTTON_MAIN_GPIO
 				int "'Main' button GPIO pin"
-				range 0 32
+				range 0 39
 				default 25
 			
 			config EL_BUTTON_UP_GPIO
 				int "'Up' button GPIO pin"
-				range 0 32
+				range 0 39
 				default 26
 
 			config EL_BUTTON_DOWN_GPIO
 				int "'Down' button GPIO pin"
-				range 0 32
+				range 0 39
 				default 27
+
+			config EL_BUTTON_RESET_GPIO
+				int "'Reset' button GPIO pin"
+				range 0 39
+				default 14
 
 		endmenu
 
@@ -157,31 +162,31 @@ menu "*** EvLamp configuration ***"
 #			config EL_SDCARD_MISO
 #				int "MISO (D0) GPIO pin"
 #				depends on EL_SDCARD_ENABLE
-#				range 0 32
+#				range 0 39
 #				default 19
 #
 #			config EL_SDCARD_MOSI
 #				int "MOSI (CMD) GPIO pin"
 #				depends on EL_SDCARD_ENABLE
-#				range 0 32
+#				range 0 39
 #				default 22
 #				
 #			config EL_SDCARD_SCK
 #				int "SCK (CLK) GPIO pin"
 #				depends on EL_SDCARD_ENABLE
-#				range 0 32
+#				range 0 39
 #				default 18
 #
 #			config EL_SDCARD_CS
 #				int "CS (D3) GPIO pin"
 #				depends on EL_SDCARD_ENABLE
-#				range 0 32
+#				range 0 39
 #				default 21
 #			
 #			config EL_SDCARD_CD
 #				int "CD (Card Detect) GPIO pin"
 #				depends on EL_SDCARD_ENABLE
-#				range 0 32
+#				range 0 39
 #				default 23
 #
 #		endmenu

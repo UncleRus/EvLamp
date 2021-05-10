@@ -35,7 +35,7 @@ static void surface_task(void *arg)
     strip.type = sys_settings.leds.type;
     strip.channel = RMT_CHANNEL;
     // TODO : calculate single LED current based on its type or just move it to config
-    strip.brightness = ((float)sys_settings.leds.current_limit / strip.length) / (SINGLE_LED_CURRENT_MA / 256);
+    strip.brightness = ((float)sys_settings.leds.current_limit / strip.length) / (SINGLE_LED_CURRENT_MA / 256.0f);
 
     ESP_ERROR_CHECK(led_strip_init(&strip));
 
@@ -73,7 +73,8 @@ esp_err_t surface_init()
         return ESP_ERR_NO_MEM;
     }
 
-    if (xTaskCreatePinnedToCore(surface_task, "surface", 8192 * 2, NULL, uxTaskPriorityGet(NULL) + 1, NULL, APP_CPU_NUM) != pdPASS)
+    if (xTaskCreatePinnedToCore(surface_task, "surface", SURFACE_TASK_STACK_SIZE,
+            NULL, uxTaskPriorityGet(NULL) + 1, NULL, APP_CPU_NUM) != pdPASS)
     {
         ESP_LOGE(TAG, "Could not create surface task");
         return ESP_FAIL;
@@ -162,8 +163,6 @@ esp_err_t surface_next_effect()
 
 esp_err_t surface_set_brightness(uint8_t val)
 {
-    CHECK_ARG(val > 0);
-
     CHECK(surface_pause());
 
     vol_settings.brightness = val;
