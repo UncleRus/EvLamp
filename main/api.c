@@ -121,7 +121,10 @@ static const httpd_uri_t route_get_info = {
 
 static esp_err_t get_settings_reset(httpd_req_t *req)
 {
-    return respond_api(req, sys_settings_reset(), NULL);
+    esp_err_t res = sys_settings_reset();
+    if (res == ESP_OK)
+        res = vol_settings_reset();
+    return respond_api(req, res, res == ESP_OK ? "Reboot to apply" : NULL);
 }
 
 static const httpd_uri_t route_get_settings_reset = {
