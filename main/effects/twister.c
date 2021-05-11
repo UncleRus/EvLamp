@@ -23,15 +23,15 @@ EFFECT_PARAMS(twister, 2) = {
 
 static const rgb_t C_BLACK = { .r = 0, .g = 0, .b = 0 };
 
-static void horizontal_line(framebuffer_t *fb, uint8_t x1, uint8_t x2, uint8_t y, hsv_t color, uint8_t numline, uint8_t side,
-        uint8_t sin_offs, uint16_t a)
+static void horizontal_line(framebuffer_t *fb, uint8_t x1, uint8_t x2, uint8_t y, hsv_t color)
 {
     uint8_t steps = abs8(x2 - x1) + 1;
+    rgb_t rgb = hsv2rgb_rainbow(color);
 
-    for (uint8_t i = 1; i <= steps; i++)
+    for (uint16_t i = 1; i <= steps; i++)
     {
         uint8_t dx = lerp8by8(x1, x2, i * 255 / steps);
-        rgb_t pixel = rgb_scale_video(hsv2rgb_rainbow(color), (sin8(numline * 8 + side * 64 + a + sin_offs) + i * 255 / steps) / 2);
+        rgb_t pixel = rgb_scale_video(rgb, (steps - i) * 255 / steps);
         fb_set_pixel_rgb(fb, dx, y, pixel);
     }
 
@@ -66,13 +66,13 @@ esp_err_t effect_twister_run(framebuffer_t *fb)
 
         uint8_t hue = sin8(a / 20);
         if (x1 < x2)
-            horizontal_line(fb, x1, x2, i, hsv_from_values(hue, 255, 255), i, 0, sin_offs, a);
+            horizontal_line(fb, x1, x2, i, hsv_from_values(hue, 255, 255));
         if (x2 < x3)
-            horizontal_line(fb, x2, x3, i, hsv_from_values(hue + 64, 255, 255), i, 1, sin_offs, a);
+            horizontal_line(fb, x2, x3, i, hsv_from_values(hue + 64, 255, 255));
         if (x3 < x4)
-            horizontal_line(fb, x3, x4, i, hsv_from_values(hue + 128, 255, 255), i, 2, sin_offs, a);
+            horizontal_line(fb, x3, x4, i, hsv_from_values(hue + 128, 255, 255));
         if (x4 < x1)
-            horizontal_line(fb, x4, x1, i, hsv_from_values(hue + 192, 255, 255), i, 3, sin_offs, a);
+            horizontal_line(fb, x4, x1, i, hsv_from_values(hue + 192, 255, 255));
     }
 
     return fb_end(fb);
