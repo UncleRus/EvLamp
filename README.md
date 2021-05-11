@@ -7,7 +7,7 @@
 Display beautiful effects on a matrix of NxN WS2812B/SK6812/APA106 LEDs.
 Tested with 16x16 WS21812B.
 
-### Feautures
+### Features
 
 - 16 very beautiful effects from different authors, each with set of parameters
 - WiFi connectivity in station or access point modes (support for DHCP/static IP addressing)
