@@ -8,7 +8,6 @@
 #include "effects/dna.h"
 
 #include <lib8tion.h>
-#include <stdlib.h>
 
 #define P_SPEED  0
 #define P_SIZE   1
@@ -19,8 +18,6 @@ EFFECT_PARAMS(dna, 3) = {
     DECL_PARAM(P_SIZE, "Spiral size", 1, 10, 5),
     DECL_PARAM(P_BORDER, "Add white border", 0, 1, 1),
 };
-
-#define PALETTE_SIZE 16
 
 static uint32_t offset;
 

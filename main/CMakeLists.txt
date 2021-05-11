@@ -28,6 +28,8 @@ idf_component_register(
 		effects/water.c
 		effects/holiday.c
 		effects/hoop.c
+		effects/twister.c
+		
 	EMBED_TXTFILES
 		web/jquery.js
 		web/styles.css
