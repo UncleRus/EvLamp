@@ -37,6 +37,7 @@ idf_component_register(
 		web/jquery-ui.js
 		web/jquery-ui.structure.css
 		web/jquery-ui.theme.css
+		web/index.html
 )
 
 #spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)

@@ -9,5 +9,6 @@ DECLARE_EMBED(jquery_ui_css);
 DECLARE_EMBED(jquery_ui_js);
 DECLARE_EMBED(jquery_ui_structure_css);
 DECLARE_EMBED(jquery_ui_theme_css);
+DECLARE_EMBED(index_html);
 
 #endif /* MAIN_EMBED_H_ */

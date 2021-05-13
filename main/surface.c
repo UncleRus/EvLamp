@@ -81,7 +81,11 @@ esp_err_t surface_init()
     }
 
     vTaskDelay(pdMS_TO_TICKS(10));
-    surface_set_effect(vol_settings.effect);
+
+    if (vol_settings.effect >= effects_count)
+        vol_settings.effect = CONFIG_EL_EFFECT_DEFAULT;
+
+    CHECK(surface_set_effect(vol_settings.effect));
 
     return ESP_OK;
 }

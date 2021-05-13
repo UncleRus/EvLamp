@@ -1,0 +1,262 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>EvLamp</title>
+	<link rel="stylesheet" href="styles.css">
+	<link rel="stylesheet" href="jquery-ui.css">	
+	<link rel="stylesheet" href="jquery-ui.structure.css">	
+	<link rel="stylesheet" href="jquery-ui.theme.css">	
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="jquery-ui.js"></script>
+</head>
+<body>
+	<div id="container" style="display: none;">
+		<!-- Wifi form -->
+		<div class="form" id="f_wifi">
+			<div id="f_wifi_message"></div>
+			<fieldset>
+				<legend>Common settings</legend>
+				<div class="ui-widget">
+					<label for="i_wifi_mode">Mode:</label>
+					<select id="i_wifi_mode">
+						<option id="i_wifi_mode_ap" value="2">Access Point</option>
+						<option id="i_wifi_mode_sta" value="1">Station</option>
+					</select>
+				</div>
+				<div class="ui-widget">
+					<label for="i_wifi_ip_dhcp">Enable DHCP</label>
+					<input type="checkbox" id="i_wifi_ip_dhcp" />
+				</div>
+				<div class="ui-widget">
+					<label for="i_wifi_ip_ip">IP address:</label>
+					<input type="text" id="i_wifi_ip_ip" />
+				</div>
+				<div class="ui-widget">
+					<label for="i_wifi_ip_netmask">Netmask:</label>
+					<input type="text" id="i_wifi_ip_netmask" />
+				</div>
+				<div class="ui-widget">
+					<label for="i_wifi_ip_gateway">Gateway:</label>
+					<input type="text" id="i_wifi_ip_gateway" />
+				</div>
+				<div class="ui-widget">
+					<label for="i_wifi_ip_dns">DNS:</label>
+					<input type="text" id="i_wifi_ip_dns" />
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Access Point settings</legend>
+				<div class="ui-widget">
+					<label for="i_wifi_ap_ssid">SSID:</label>
+					<input type="text" id="i_wifi_ap_ssid" />
+				</div>
+				<div class="ui-widget">
+					<label for="i_wifi_ap_channel">Channel:</label>
+					<input type="number" id="i_wifi_ap_channel" />
+				</div>
+				<div class="ui-widget">
+					<label for="i_wifi_ap_password">Password:</label>
+					<input type="text" id="i_wifi_ap_password" />
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Station settings</legend>
+				<div class="ui-widget">
+					<label for="i_wifi_sta_ssid">SSID:</label>
+					<input type="text" id="i_wifi_sta_ssid" />
+				</div>
+				<div class="ui-widget">
+					<label for="i_wifi_sta_password">Password:</label>
+					<input type="text" id="i_wifi_sta_password" />
+				</div>
+			</fieldset>
+			<div class="buttons">
+				<button id="b_wifi_save" class="ui-button ui-widget ui-corner-all">Save settings</button>
+			</div>
+		</div>
+		<!-- leds form -->
+		<div class="form" id="f_leds">
+			<div id="f_leds_message"></div>
+			<fieldset>
+				<legend>LEDs settings</legend>
+				<div class="ui-widget">
+					<label for="i_leds_width">Matrix width:</label>
+					<input type="number" id="i_leds_width" />
+				</div>
+				<div class="ui-widget">
+					<label for="i_leds_height">Matrix height:</label>
+					<input type="number" id="i_leds_height" />
+				</div>
+				<div class="ui-widget">
+					<label for="i_leds_type">Type of LEDs:</label>
+					<select id="i_leds_type">
+						<option value="0">WS2812</option>
+						<option value="1">SK6812</option>
+						<option value="2">APA106</option>
+					</select>
+				</div>
+				<div class="ui-widget">
+					<label for="i_leds_current_limit">Current limit, mA:</label>
+					<input type="number" id="i_leds_current_limit" />
+				</div>
+			</fieldset>
+			<div class="buttons">
+				<button id="b_leds_save" class="ui-button ui-widget ui-corner-all">Save settings</button>
+			</div>
+		</div>
+		<!-- reset message -->
+		<div id="f_reset_message"></div>
+	</div>
+	<div id="header" class="blue ui-widget">
+		<span id="app_name"></span> version: <span id="app_version"></span>, built at <span id="build_date"></span>
+	</div>
+	<div id="outline">
+		<div id="left">
+			<div id="menu">
+      			<a id="l_control" class="ui-button ui-widget ui-corner-all" style="width: 160px" href="#">Control</a>
+				<a id="l_wifi"    class="ui-button ui-widget ui-corner-all" style="width: 160px" href="#">WiFi settings</a>
+				<a id="l_leds"    class="ui-button ui-widget ui-corner-all" style="width: 160px" href="#">LEDs settings</a>
+				<a id="l_reset"   class="ui-button ui-widget ui-corner-all" style="width: 160px" href="#">Reset to defaults</a>
+				<a id="l_reboot"  class="ui-button ui-widget ui-corner-all" style="width: 160px" href="#">Reboot</a>
+			</div>
+		</div>
+		<div id="content">
+		
+		</div>
+	</div>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		let $content = $('#content');
+		let $container = $('#container');
+
+		// load header
+		$.getJSON('/api/info', function(info) {
+			$('#app_name').html(info.app_name);
+			$('#app_version').html(info.app_version);
+			$('#build_date').html(info.build_date);
+		});
+		
+		$('#l_reboot').click(function() {
+			if (!confirm('Are you sure you want to reboot?'))
+				return;
+			$.getJSON('/api/reboot', function(res) {});
+			setTimeout(window.location.reload.bind(window.location), 3000);
+		});
+		
+		$('#l_reset').click(function() {
+			$content.children().detach().appendTo($container);
+			$('#f_reset_message').detach().appendTo($content);
+			$('#f_reset_message').hide();
+			if (!confirm('Are you sure you want to reset settings to defaults?'))
+				return;
+			$.getJSON('/api/settings/reset', function(res) {
+				console.log(res);
+				$('#f_reset_message').prop('class', res.result !=0 ? 'msg_err' : 'msg_ok')
+					.html('<b>' + res.name + '</b>: ' + res.message);
+				$('#f_reset_message').show();
+			});
+		});
+
+		$('#l_wifi').click(function() {
+			$('#menu ul li a').removeClass('selected');
+			$('#l_wifi').addClass('selected');
+			
+			// move current children from content to container
+			$content.children().detach().appendTo($container);
+			$('#f_wifi').detach().appendTo($content);
+			$('#f_wifi_message').hide();
+			$.getJSON('/api/settings/wifi', function(data) {
+				console.log(data);
+				$('#i_wifi_mode').val(data.mode);
+				$('#i_wifi_ip_dhcp').prop('checked', data.ip.dhcp);
+				$('#i_wifi_ip_ip').val(data.ip.ip);
+				$('#i_wifi_ip_netmask').val(data.ip.netmask);
+				$('#i_wifi_ip_gateway').val(data.ip.gateway);
+				$('#i_wifi_ip_dns').val(data.ip.dns);
+				$('#i_wifi_ap_ssid').val(data.ap.ssid);
+				$('#i_wifi_ap_channel').val(data.ap.channel);
+				$('#i_wifi_ap_password').val(data.ap.password);
+				$('#i_wifi_sta_ssid').val(data.sta.ssid);
+				$('#i_wifi_sta_password').val(data.sta.password);
+				
+				$('#b_wifi_save').off('click').click(function() {
+					let data = {
+						mode: parseInt($('#i_wifi_mode').val()),
+						ip: {
+							dhcp: $('#i_wifi_ip_dhcp').prop('checked'),
+							ip: $('#i_wifi_ip_ip').val(),
+							netmask: $('#i_wifi_ip_netmask').val(),
+							gateway: $('#i_wifi_ip_gateway').val(),
+							dns: $('#i_wifi_ip_dns').val()
+						},
+						ap: {
+							ssid: $('#i_wifi_ap_ssid').val(),
+							channel: parseInt($('#i_wifi_ap_channel').val()),
+							password: $('#i_wifi_ap_password').val(),
+						},
+						sta: {
+							ssid: $('#i_wifi_sta_ssid').val(),
+							password: $('#i_wifi_sta_password').val(),
+						}
+					};
+					console.log(data);
+					$.ajax({
+						type: 'POST',
+						url: '/api/settings/wifi',
+						data: JSON.stringify(data),
+						success: function(res) {
+							console.log(res);
+							$('#f_wifi_message').prop('class', res.result !=0 ? 'msg_err' : 'msg_ok')
+								.html('<b>' + res.name + '</b>: ' + res.message);
+							$('#f_wifi_message').show();
+						},
+						error: function(err) {
+							alert(err);
+						}
+					});
+				});
+			});
+		});
+
+		$('#l_leds').click(function() {
+			$('#menu ul li a').removeClass('selected');
+			$('#l_leds').addClass('selected');
+			$content.children().detach().appendTo($container);
+			$('#f_leds').detach().appendTo($content);
+			$('#f_leds_message').hide();
+			$.getJSON('/api/settings/leds', function(data) {
+				console.log(data);
+				$('#i_leds_width').val(data.width);
+				$('#i_leds_height').val(data.height);
+				$('#i_leds_type').val(data.type);
+				$('#i_leds_current_limit').val(data.current_limit);
+			});
+			
+			$('#b_leds_save').off('click').click(function() {
+				let data = {
+					width: parseInt($('#i_leds_width').val()),
+					height: parseInt($('#i_leds_height').val()),
+					type: parseInt($('#i_leds_type').val()),
+					current_limit: parseInt($('#i_leds_current_limit').val())
+				};
+				console.log(data);
+				$.ajax({
+					type: 'POST',
+					url: '/api/settings/leds',
+					data: JSON.stringify(data),
+					success: function(res) {
+						console.log(res);
+						$('#f_leds_message').prop('class', res.result !=0 ? 'msg_err' : 'msg_ok')
+							.html('<b>' + res.name + '</b>: ' + res.message);
+						$('#f_leds_message').show();
+					},
+					error: function(err) {
+						alert(err);
+					}
+				});
+			});
+		});
+	})
+	</script>
+</body>
+</html>

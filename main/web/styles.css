@@ -3,34 +3,32 @@ body {
 	font-size: 16px;
 }
 
-ul {
+#menu {
     padding: 0;
     margin: 0;
 }
 
-ul li a {
+#menu li a {
     display:block;
     padding: 8px 16px;
-    color: #999;
-    background-color: #e5e5e5;
+	background-color: #008CBA;
+	color: white;
     border-top: 1px solid #999;
     text-decoration: none;
-    
 }
 
-ul li:first-child {
+#menu li:first-child {
     border: none;
 }
 
-ul li a:hover {
+#menu li a:hover {
     background-color: #f2f2f2;
     color: black;
 }
 
-.button {
-	border-radius: 8px;
-	padding: 8px;
-	min-width: 100px;
+#menu li a.selected {
+    background-color: #a0a0a0;
+    color: black;
 }
 
 .black {
@@ -58,13 +56,12 @@ ul li a:hover {
 }
 
 #header {
-	padding-left: 16px;
-	padding-bottom: 16px;
+	padding: 16px;
 }
 
-#header > h1 {
-	padding-top: 16px;
-	margin-bottom: 16px;
+#app_name {
+	font-size: 30px;
+	font-weight: bold;
 }
 
 #outline {
@@ -88,12 +85,36 @@ ul li a:hover {
 	width: 600px;
 }
 
-form th {
-	text-align: left;
+fieldset {
+	margin-bottom: 16px;
+}
+
+.ui-widget {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+label {
+	display: inline-block;
 	width: 200px;
+	min-width: 200px;
 }
 
 .buttons {
-	margin-top: 20px;
-	padding-left: 200px;
+	padding: 0;
+	text-align: right;
+}
+
+.msg_err {
+	background-color: #f44336;
+	color: white;
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.msg_ok {
+	background-color: #00b000;
+	color: white;
+	padding: 16px;
+	margin-bottom: 16px;
 }

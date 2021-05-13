@@ -53,8 +53,10 @@ DECLARE_EMBED_HANDLER(jquery_ui_js, "/jquery-ui.js", "text/javascript");
 DECLARE_EMBED_HANDLER(jquery_ui_css, "/jquery-ui.css", "text/css");
 DECLARE_EMBED_HANDLER(jquery_ui_structure_css, "/jquery-ui.structure.css", "text/css");
 DECLARE_EMBED_HANDLER(jquery_ui_theme_css, "/jquery-ui.theme.css", "text/css");
-
 DECLARE_EMBED_HANDLER(styles_css, "/styles.css", "text/css");
+
+DECLARE_EMBED_HANDLER(index_html, "/index.html", "text/html");
+static const httpd_uri_t route_get_root = { .uri = "/", .method = HTTP_GET, .handler = get_index_html };
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Init
@@ -70,8 +72,10 @@ static esp_err_t init()
     CHECK(httpd_register_uri_handler(server, &route_get_jquery_ui_css));
     CHECK(httpd_register_uri_handler(server, &route_get_jquery_ui_structure_css));
     CHECK(httpd_register_uri_handler(server, &route_get_jquery_ui_theme_css));
-
     CHECK(httpd_register_uri_handler(server, &route_get_styles_css));
+
+    CHECK(httpd_register_uri_handler(server, &route_get_index_html));
+    CHECK(httpd_register_uri_handler(server, &route_get_root));
 
     return ESP_OK;
 }
