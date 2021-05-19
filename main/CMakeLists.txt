@@ -29,6 +29,7 @@ idf_component_register(
 		effects/holiday.c
 		effects/hoop.c
 		effects/twister.c
+		effects/flower.c
 		
 	EMBED_TXTFILES
 		web/jquery.js

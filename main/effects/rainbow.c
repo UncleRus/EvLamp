@@ -13,7 +13,7 @@
 EFFECT_PARAMS(rainbow, 3) = {
     DECL_PARAM(P_DIRECTION, "Direction", 0, 2, 0),
     DECL_PARAM(P_SCALE, "Scale", 10, 50, 20),
-    DECL_PARAM(P_SPEED, "Speed", 1, 50, 5),
+    DECL_PARAM(P_SPEED, "Speed", 0, 50, 5),
 };
 
 enum {
@@ -33,7 +33,7 @@ esp_err_t effect_rainbow_run(framebuffer_t *fb)
             {
                 float twirl = 3.0f * EPARAM(rainbow, P_SCALE) / 100.0f;
                 hsv_t color = {
-                    .hue = fb->frame_num * EPARAM(rainbow, P_SPEED) * 2
+                    .hue = fb->frame_num / 2 * EPARAM(rainbow, P_SPEED)
                         + (fb->width / fb->height * x + y * twirl) * EPARAM(rainbow, P_SCALE),
                     .sat = 255,
                     .val = 255
@@ -49,7 +49,7 @@ esp_err_t effect_rainbow_run(framebuffer_t *fb)
         for (size_t i = 0; i < outer; i++)
         {
             hsv_t color = {
-                .hue = fb->frame_num * EPARAM(rainbow, P_SPEED) + i * EPARAM(rainbow, P_SCALE),
+                .hue = fb->frame_num / 2 * EPARAM(rainbow, P_SPEED) + i * EPARAM(rainbow, P_SCALE),
                 .sat = 255,
                 .val = 255
             };

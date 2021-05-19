@@ -22,6 +22,7 @@
 #include "effects/holiday.h"
 #include "effects/hoop.h"
 #include "effects/twister.h"
+#include "effects/flower.h"
 
 const effect_descriptor_t effects[] = {
     DESCR_EFFECT_LAMP,
@@ -41,6 +42,7 @@ const effect_descriptor_t effects[] = {
     DESCR_EFFECT_HOLIDAY,
     DESCR_EFFECT_HOOP,
     DESCR_EFFECT_TWISTER,
+    DESCR_EFFECT_FLOWER,
 };
 
 const size_t effects_count = sizeof(effects) / sizeof(effect_descriptor_t);

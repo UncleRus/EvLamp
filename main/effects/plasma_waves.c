@@ -10,7 +10,7 @@
 #define P_SPEED 0
 
 EFFECT_PARAMS(plasma_waves, 1) = {
-    DECL_PARAM(P_SPEED, "Speed", 10, 60, 40),
+    DECL_PARAM(P_SPEED, "Speed", 1, 255, 40),
 };
 
 static uint8_t speed;
@@ -38,7 +38,7 @@ static const uint8_t exp_gamma[256] = {
 
 esp_err_t effect_plasma_waves_prepare(framebuffer_t *fb)
 {
-    speed = scale8_video(256 - EPARAM(plasma_waves, P_SPEED), 150);
+    speed = 255 - EPARAM(plasma_waves, P_SPEED) + 1;
 
     return ESP_OK;
 }
