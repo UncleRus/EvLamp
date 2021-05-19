@@ -16,9 +16,9 @@ EFFECT_PARAMS(flower, 2) = {
     DECL_PARAM(P_DIAMETER, "Diameter", 50, 150, 128),
 };
 
-uint32_t last_update_ms = 0;
-float counter = 0;
-float angle = 0;
+static uint32_t last_update_ms = 0;
+static float counter = 0;
+static float angle = 1;
 
 esp_err_t effect_flower_run(framebuffer_t *fb)
 {
@@ -29,8 +29,6 @@ esp_err_t effect_flower_run(framebuffer_t *fb)
     {
         last_update_ms = time_ms;
         angle += 0.1;
-        if (angle < 1)
-            angle = 1;
     }
 
     float n = triwave8(counter) * 2.2;

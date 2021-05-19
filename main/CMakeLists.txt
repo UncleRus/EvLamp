@@ -30,6 +30,7 @@ idf_component_register(
 		effects/hoop.c
 		effects/twister.c
 		effects/flower.c
+		effects/polar_lights.c
 		
 	EMBED_TXTFILES
 		web/jquery.js

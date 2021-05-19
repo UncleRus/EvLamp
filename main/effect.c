@@ -23,6 +23,7 @@
 #include "effects/hoop.h"
 #include "effects/twister.h"
 #include "effects/flower.h"
+#include "effects/polar_lights.h"
 
 const effect_descriptor_t effects[] = {
     DESCR_EFFECT_LAMP,
@@ -43,6 +44,7 @@ const effect_descriptor_t effects[] = {
     DESCR_EFFECT_HOOP,
     DESCR_EFFECT_TWISTER,
     DESCR_EFFECT_FLOWER,
+    DESCR_EFFECT_POLAR_LIGHTS,
 };
 
 const size_t effects_count = sizeof(effects) / sizeof(effect_descriptor_t);
