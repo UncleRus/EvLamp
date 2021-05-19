@@ -194,6 +194,7 @@ legend {
 
 .row {
 	display: flex;
+	margin-bottom: 8px;
 }
 
 .cell-icon {
@@ -227,4 +228,27 @@ legend {
 
 #effect_params {
 	margin-top: 32px;
+}
+
+.message {
+	margin: 16px;
+	padding: 8px;
+	border: 1px solid #00aaff;
+	border-radius: 8px;
+}
+
+.msg_ok {
+	margin: 16px;
+	padding: 8px;
+	border: 1px solid #00aaff;
+	border-radius: 8px;
+	background-color: #aaff7f;
+}
+
+.msg_err {
+	margin: 16px;
+	padding: 8px;
+	border: 1px solid #00aaff;
+	border-radius: 8px;
+	background-color: #ffb4b4;
 }
