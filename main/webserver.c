@@ -1,7 +1,5 @@
 #include "webserver.h"
 #include <esp_http_server.h>
-#include <cJSON.h>
-//#include <mustach-cjson.h>
 #include "api.h"
 #include "embed.h"
 
@@ -9,34 +7,6 @@ static httpd_handle_t server = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Internal
-
-//static int write_cb(void *ctx, const char *buffer, size_t size)
-//{
-//    return httpd_resp_send_chunk((httpd_req_t *)ctx, buffer, size);
-//}
-//
-//
-//static esp_err_t render_part(httpd_req_t *req, const char *tpl)
-//{
-//    cJSON *params = app_info();
-//
-//    CHECK(mustach_cJSON_write(tpl, 0, params, 0, write_cb, req));
-//
-//    cJSON_Delete(params);
-//
-//    return ESP_OK;
-//}
-//
-//static esp_err_t render_template(httpd_req_t *req, const char *tpl, cJSON *params)
-//{
-//    CHECK(render_part(req, template_header));
-//    CHECK(mustach_cJSON_write(tpl, 0, params, 0, write_cb, req));
-//    CHECK(render_part(req, template_footer));
-//    CHECK(httpd_resp_send_chunk(req, NULL, 0));
-//    free(params);
-//
-//    return ESP_OK;
-//}
 
 #define DECLARE_EMBED_HANDLER(NAME, URI, CT) \
     esp_err_t get_##NAME(httpd_req_t *req) { \
@@ -49,12 +19,7 @@ static httpd_handle_t server = NULL;
 /// Handlers
 
 DECLARE_EMBED_HANDLER(jquery_js, "/jquery.js", "text/javascript");
-DECLARE_EMBED_HANDLER(jquery_ui_js, "/jquery-ui.js", "text/javascript");
-DECLARE_EMBED_HANDLER(jquery_ui_css, "/jquery-ui.css", "text/css");
-DECLARE_EMBED_HANDLER(jquery_ui_structure_css, "/jquery-ui.structure.css", "text/css");
-DECLARE_EMBED_HANDLER(jquery_ui_theme_css, "/jquery-ui.theme.css", "text/css");
 DECLARE_EMBED_HANDLER(styles_css, "/styles.css", "text/css");
-
 DECLARE_EMBED_HANDLER(index_html, "/index.html", "text/html");
 static const httpd_uri_t route_get_root = { .uri = "/", .method = HTTP_GET, .handler = get_index_html };
 
@@ -68,12 +33,7 @@ static esp_err_t init()
 
     // Static file handlers
     CHECK(httpd_register_uri_handler(server, &route_get_jquery_js));
-    CHECK(httpd_register_uri_handler(server, &route_get_jquery_ui_js));
-    CHECK(httpd_register_uri_handler(server, &route_get_jquery_ui_css));
-    CHECK(httpd_register_uri_handler(server, &route_get_jquery_ui_structure_css));
-    CHECK(httpd_register_uri_handler(server, &route_get_jquery_ui_theme_css));
     CHECK(httpd_register_uri_handler(server, &route_get_styles_css));
-
     CHECK(httpd_register_uri_handler(server, &route_get_index_html));
     CHECK(httpd_register_uri_handler(server, &route_get_root));
 

@@ -1,120 +1,230 @@
-body {
-	font-family: sans-serif;
+html {
+	font-family: Geneva, Helvetica, sans-serif;
 	font-size: 16px;
 }
 
-#menu {
-    padding: 0;
-    margin: 0;
+body {
+	margin: 0;
+	padding: 0;
 }
 
-#menu li a {
-    display:block;
-    padding: 8px 16px;
-	background-color: #008CBA;
-	color: white;
-    border-top: 1px solid #999;
-    text-decoration: none;
+.icon {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	stroke-width: 0;
+	stroke: currentColor;
+	fill: currentColor;
 }
 
-#menu li:first-child {
-    border: none;
+.icon-wifi {
+	width: 1.25em;
 }
 
-#menu li a:hover {
-    background-color: #f2f2f2;
-    color: black;
+/* The switch - the box around the slider */
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 60px;
+	height: 32px;
 }
 
-#menu li a.selected {
-    background-color: #a0a0a0;
-    color: black;
+/* Hide default HTML checkbox */
+.switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
 }
 
-.black {
-	background-color: black;
-	color: white;
+/* The slider */
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	-webkit-transition: .4s;
+	transition: .4s;
 }
 
-.gray {
-	background-color: #a0a0a0;
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 26px;
+	width: 26px;
+	left: 4px;
+	bottom: 3px;
+	background-color: white;
+	-webkit-transition: .4s;
+	transition: .4s;
+}
+
+input:checked+.slider {
+	background-color: #2196F3;
+}
+
+input:focus+.slider {
+	box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked+.slider:before {
+	-webkit-transform: translateX(26px);
+	-ms-transform: translateX(26px);
+	transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+	border-radius: 32px;
+}
+
+.slider.round:before {
+	border-radius: 50%;
+}
+
+.header {
+	background-color: #ababab;
 	color: black;
+	overflow: hidden;
+	position: relative;
 }
 
-.blue {
-	background-color: #008CBA;
-	color: white;
+.header>.menu {
+	display: none;
 }
 
-.red {
-	background-color: #f44336;
-	color: white;
+.header a.icon {
+	float: right;
+	margin: 10px;
+	margin-top: 20px;
+}
+
+.header>.left {
+	margin: 10px;
+	float: left;
+}
+
+.header #app_name {
+	font-size: 22px;
+	font-weight: bold;
+	padding-left: 8px;
 }
 
 .small {
-	font-size: 12px;
+	font-size: 10px;
+	font-weight: normal;
 }
 
-#header {
-	padding: 16px;
+#menu {
+	display: none;
+	color: white;
+	background-color: black;
 }
 
-#app_name {
-	font-size: 30px;
-	font-weight: bold;
+#menu.visible {
+	display: block;
 }
 
-#outline {
-	display: flex;
-	justify-content: flex-start;
+#menu a {
+	display: block;
+	padding: 12px 16px;
+	color: white;
+	text-decoration: none;
 }
 
-#left {
-	width: 200px;
-	min-width: 200px;
-	max-width: 200px;
-	flex: 200px;
-}
-
-#content {
-	flex: 100%;
-	padding: 16px;
-}
-
-.form {
-	width: 600px;
+#menu a:hover {
+	background-color: white;
+	color: black;
 }
 
 fieldset {
-	margin-bottom: 16px;
+	border: 1px solid #00aaff;
+	border-radius: 8px;
+	margin: 8px;
+}
+
+legend {
+	font-weight: bold;
+	font-size: 1.2em;
 }
 
 .ui-widget {
-	margin-top: 8px;
-	margin-bottom: 8px;
+	display: flex;
+	margin: 4px 4px 4px 4px;
 }
 
-label {
+.ui-widget label:not(.switch) {
 	display: inline-block;
-	width: 200px;
+	width: 150px;
+}
+
+.ui-widget input {
+	font-family: Geneva, Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	flex-grow: 1;
 	min-width: 200px;
 }
 
 .buttons {
-	padding: 0;
-	text-align: right;
+	margin: 16px;
+	text-align: center;
 }
 
-.msg_err {
-	background-color: #f44336;
+.ui-button {
+	font-family: Geneva, Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	background-color: #00aaff;
 	color: white;
-	padding: 16px;
-	margin-bottom: 16px;
+	padding: 8px;
+	border: 1px solid #00aaff;
+	border-radius: 8px;
 }
 
-.msg_ok {
-	background-color: #00b000;
+.ui-button:hover {
+	background-color: white;
+	color: black;
+}
+
+.ui-button:active {
+	background-color: blue;
 	color: white;
-	padding: 16px;
-	margin-bottom: 16px;
+}
+
+.row {
+	display: flex;
+}
+
+.cell-icon {
+	display: inline-block;
+	width: 32px;
+	height: 32px;
+	padding: 8px 0 0 8px;
+}
+
+.cell-name {
+	display: inline-block;
+	height: 32px;
+	width: 80px;
+	padding: 8px 0 0 8px;
+}
+
+.cell-max {
+	display: inline-block;
+	flex-grow: 1;
+}
+
+.cell-val {
+	display: inline-block;
+	width: 30px;
+	padding: 8px;
+}
+
+.fullwidth {
+	width: 100%;
+}
+
+#effect_params {
+	margin-top: 32px;
 }

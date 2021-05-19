@@ -136,6 +136,7 @@ esp_err_t surface_play()
 
     xEventGroupSetBits(state, BIT_PLAYING);
     //vTaskDelay(pdMS_TO_TICKS(1000 / vol_settings.fps) + 1);
+    ESP_LOGI(TAG, "Animation started");
 
     return ESP_OK;
 }

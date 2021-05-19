@@ -8,6 +8,7 @@
 static esp_err_t respond_json(httpd_req_t *req, cJSON *resp)
 {
     httpd_resp_set_type(req, "application/json");
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
 
     char *txt = cJSON_Print(resp);
     esp_err_t res = httpd_resp_sendstr(req, txt);
