@@ -31,11 +31,25 @@ idf_component_register(
 		effects/twister.c
 		effects/flower.c
 		effects/polar_lights.c
+		effects/gif.c
 		
 	EMBED_TXTFILES
 		web/jquery.js
 		web/styles.css
 		web/index.html
+		
+	EMBED_FILES
+		gifs/heart.gif
+		gifs/heart2.gif
+		gifs/boldman.gif
+		gifs/coin.gif
+		gifs/disk.gif
+		gifs/girl.gif
+		gifs/hairyman.gif
+		gifs/hero.gif
+		gifs/disk.gif
+		gifs/torch.gif
+		gifs/zombie.gif
 )
 
 #spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)
