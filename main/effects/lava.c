@@ -32,7 +32,7 @@ esp_err_t effect_lava_run(framebuffer_t *fb)
     for (int x = 0; x < fb->width; x++)
         for (int y = 0; y < fb->height; y++)
         {
-            uint8_t noise = inoise8_3d(x * EPARAM(lava, P_SCALE), y * EPARAM(lava, P_SCALE), z_pos);
+            uint8_t noise = inoise8_3d(x * EPARAM(lava, P_SCALE) + x_offs, y * EPARAM(lava, P_SCALE), z_pos);
             fb_set_pixel_hsv(fb, x, y, hsv_from_values(hue + noise, 255, 255));
         }
 
