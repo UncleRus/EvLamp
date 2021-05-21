@@ -50,6 +50,7 @@ idf_component_register(
 		gifs/disk.gif
 		gifs/torch.gif
 		gifs/zombie.gif
+		gifs/cutebear.gif
 )
 
 #spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)

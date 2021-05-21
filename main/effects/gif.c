@@ -17,6 +17,7 @@ EMBED_GIF(hairyman);
 EMBED_GIF(hero);
 EMBED_GIF(torch);
 EMBED_GIF(zombie);
+EMBED_GIF(cutebear);
 
 typedef struct
 {
@@ -35,6 +36,7 @@ static embed_gif_t gifs[] = {
     USE_EMBED_GIF(hero),
     USE_EMBED_GIF(torch),
     USE_EMBED_GIF(zombie),
+    USE_EMBED_GIF(cutebear),
 };
 
 #define P_FILE 0
