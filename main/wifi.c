@@ -152,9 +152,12 @@ static esp_err_t init_sta()
     wifi_config_t wifi_cfg = { 0 };
     memcpy(wifi_cfg.sta.ssid, sys_settings.wifi.sta.ssid, strlen((char *)sys_settings.wifi.sta.ssid) + 1);
     memcpy(wifi_cfg.sta.password, sys_settings.wifi.sta.password, strlen((char *)sys_settings.wifi.sta.ssid) + 1);
-    ESP_LOGI(TAG, "SSID: %s", (char *)wifi_cfg.sta.ssid);
-    ESP_LOGI(TAG, "PASSWD: %s", (char *)wifi_cfg.sta.password);
     wifi_cfg.sta.threshold.authmode = sys_settings.wifi.sta.threshold.authmode;
+
+    ESP_LOGI(TAG, "WiFi station settings:");
+    ESP_LOGI(TAG, "--------------------------------------------------");
+    ESP_LOGI(TAG, "SSID: %s", wifi_cfg.sta.ssid);
+    ESP_LOGI(TAG, "--------------------------------------------------");
 
     CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_cfg));
