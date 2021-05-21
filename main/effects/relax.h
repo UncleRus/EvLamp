@@ -8,7 +8,7 @@
 
 #include "effect.h"
 
-extern EFFECT_PARAMS(relax, 1);
+extern EFFECT_PARAMS(relax, 4);
 
 esp_err_t effect_relax_prepare(framebuffer_t *fb);
 
