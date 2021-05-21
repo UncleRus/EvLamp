@@ -9,10 +9,10 @@ Tested with 16x16 WS21812B.
 
 ### Features
 
-- 16 very beautiful effects from different authors, each with set of parameters
+- 20 very beautiful effects from different authors, each with set of parameters
 - WiFi connectivity in station or access point modes (support for DHCP/static IP addressing)
 - JSON API for remote controlling (*TODO: describe API*)
-- TODO: Web pages for remote controlling from browser
+- Embedded webserver for remote controlling from browser
 
 ## Hardware
 
@@ -23,12 +23,13 @@ Tested with 16x16 WS21812B.
 	- Up/Down: brightness up/down
 	- Reset: Reset settings to defaults
 	
-TODO: schematic diagram
+*TODO: schematic diagram*
 
 ## How to build
 
 - Setup latest ESP-IDF master
-- `git clone --recursive https://github.com/UncleRus/EvLamp.git`
+- `git clone https://github.com/UncleRus/EvLamp.git`
+- `git submodule init --recursive --remote`
 - `idf.py menuconfig`
 - `idf.py build`
 - `idf.py flash` to upload firmware to ESP
