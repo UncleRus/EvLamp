@@ -5,6 +5,7 @@
 #include "settings.h"
 #include "effect.h"
 
+#define FRAME_TICKS (pdMS_TO_TICKS(1000 / vol_settings.fps))
 #define BIT_PLAYING (1)
 
 static led_strip_t strip;
@@ -58,7 +59,7 @@ static void surface_task(void *arg)
             ESP_LOGW(TAG, "Frame draw error");
         if (fb_render(&framebuffer, NULL) != ESP_OK)
             ESP_LOGW(TAG, "Frame dropped");
-        vTaskDelayUntil(&last_wake_time, pdMS_TO_TICKS(1000 / vol_settings.fps));
+        vTaskDelayUntil(&last_wake_time, FRAME_TICKS);
     }
 }
 
@@ -92,8 +93,12 @@ esp_err_t surface_init()
 
 esp_err_t surface_prepare_effect(size_t effect)
 {
-    if (effects[effect].prepare)
-        return effects[effect].prepare(&framebuffer);
+    if (!effects[effect].prepare)
+        return ESP_OK;
+
+    CHECK(surface_pause());
+    CHECK(effects[effect].prepare(&framebuffer));
+    CHECK(surface_play());
 
     return ESP_OK;
 }
@@ -109,7 +114,7 @@ esp_err_t surface_pause()
         return ESP_OK;
 
     xEventGroupClearBits(state, BIT_PLAYING);
-    vTaskDelay(pdMS_TO_TICKS(1000 / vol_settings.fps) + 1);
+    vTaskDelay(FRAME_TICKS + 1);
 
     return ESP_OK;
 }
@@ -119,7 +124,7 @@ esp_err_t surface_stop()
     CHECK(surface_pause());
 
     CHECK(fb_begin(&framebuffer));
-    CHECK(fb_clear(&framebuffer));
+    fb_clear(&framebuffer);
     CHECK(fb_end(&framebuffer));
 
     CHECK(fb_render(&framebuffer, NULL));
@@ -135,7 +140,6 @@ esp_err_t surface_play()
         return ESP_OK;
 
     xEventGroupSetBits(state, BIT_PLAYING);
-    //vTaskDelay(pdMS_TO_TICKS(1000 / vol_settings.fps) + 1);
     ESP_LOGI(TAG, "Animation started");
 
     return ESP_OK;

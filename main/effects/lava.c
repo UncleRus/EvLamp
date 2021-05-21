@@ -12,8 +12,8 @@
 #define P_SPEED 1
 
 EFFECT_PARAMS(lava, 2) = {
-    DECL_PARAM(P_SCALE, "Scale", 10, 100, 40),
-    DECL_PARAM(P_SPEED, "Speed", 1,  50,  15),
+    DECL_PARAM(P_SCALE, "Scale", 5, 100, 40),
+    DECL_PARAM(P_SPEED, "Speed", 0, 50, 15),
 };
 
 static uint16_t z_pos;
