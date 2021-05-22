@@ -155,7 +155,9 @@ esp_err_t surface_set_effect(size_t num)
     if (vol_settings_save() != ESP_OK)
         ESP_LOGW(TAG, "Could not save volatile settings");
 
-    CHECK(surface_prepare_effect(num));
+    if (effects[num].prepare)
+        CHECK(effects[num].prepare(&framebuffer));
+
     CHECK(surface_play());
 
     ESP_LOGI(TAG, "Switched to effect '%s' (%d)", effects[num].name, num);
