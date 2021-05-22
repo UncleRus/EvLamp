@@ -116,6 +116,8 @@ esp_err_t surface_pause()
     xEventGroupClearBits(state, BIT_PLAYING);
     vTaskDelay(FRAME_TICKS + 1);
 
+    ESP_LOGI(TAG, "Animation paused");
+
     return ESP_OK;
 }
 
