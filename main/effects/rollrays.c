@@ -35,7 +35,7 @@ esp_err_t effect_rollrays_run(framebuffer_t *fb)
     float speed = (float)(EPARAM(rollrays, P_SPEED)) / 20.0f;
 
     float offs_y = sinf(t / 2) * fb->height / 3;
-    float offs_x = sinf(t / 2) * fb->width / 3;
+    float offs_x = sinf(t / 3) * fb->width / 3;
 
     for (int x = 0; x < fb->width; x++)
         for (int y = 0; y < fb->height; y++)
