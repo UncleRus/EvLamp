@@ -26,6 +26,7 @@
 #include "effects/polar_lights.h"
 #include "effects/gif.h"
 #include "effects/relax.h"
+#include "effects/rollrays.h"
 
 const effect_descriptor_t effects[] = {
     DESCR_EFFECT_LAMP,
@@ -49,6 +50,7 @@ const effect_descriptor_t effects[] = {
     DESCR_EFFECT_POLAR_LIGHTS,
     DESCR_EFFECT_GIF,
     DESCR_EFFECT_RELAX,
+    DESCR_EFFECT_ROLLRAYS,
 };
 
 const size_t effects_count = sizeof(effects) / sizeof(effect_descriptor_t);
