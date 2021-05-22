@@ -18,7 +18,7 @@
 EFFECT_PARAMS(lava, 3) = {
     DECL_PARAM(P_SCALE, "Scale", 5, 100, 40),
     DECL_PARAM(P_SPEED, "Speed", 0, 50, 15),
-    DECL_PARAM(P_MODE, "Mode", 0, 1, 0),
+    DECL_PARAM(P_MODE, "Mode", 0, 1, 1),
 };
 
 static const rgb_t palette[] = {

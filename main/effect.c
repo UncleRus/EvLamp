@@ -80,6 +80,9 @@ esp_err_t effect_param_set(size_t effect, size_t param, uint8_t value)
             && value >= PARAM(effect, param).min
             && value <= PARAM(effect, param).max);
 
+    if (PARAM(effect, param).value == value)
+        return ESP_OK;
+
     nvs_handle_t nvs;
     CHECK_LOGE(nvs_open(STORAGE_PARAMS_NAME, NVS_READWRITE, &nvs),
             "Could not open NVS storage '%s'", STORAGE_PARAMS_NAME);
@@ -87,6 +90,8 @@ esp_err_t effect_param_set(size_t effect, size_t param, uint8_t value)
     snprintf(key, sizeof(key), NVS_KEY_FMT, effect, param);
     nvs_set_u8(nvs, key, value);
     nvs_close(nvs);
+
+    ESP_LOGI(TAG, "'%s':'%s' = %d", effects[effect].name, PARAM(effect, param).name, value);
 
     PARAM(effect, param).value = value;
     if (effect == vol_settings.effect)

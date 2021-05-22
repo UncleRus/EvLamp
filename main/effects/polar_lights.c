@@ -32,7 +32,7 @@ static const rgb_t C_BLACK  = { 0 };
 static const rgb_t C_BLUE   = { .r = 0,   .g = 0,   .b = 255 };
 static const rgb_t C_RED    = { .r = 255, .g = 0,   .b = 0 };
 static const rgb_t C_YELLOW = { .r = 255, .g = 255, .b = 0 };
-static const rgb_t C_GREEN  = { .r = 0,   .g = 255, .b = 0 };
+static const rgb_t C_GREEN  = { .r = 0,   .g = 150, .b = 0 };
 
 static float height_adj;
 static uint16_t p_scale;

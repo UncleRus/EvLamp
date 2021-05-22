@@ -16,8 +16,8 @@
 
 EFFECT_PARAMS(rays, 3) = {
     DECL_PARAM(P_SPEED, "Speed", 0, 50, 10),
-    DECL_PARAM(P_MIN_RAYS, "Minimal rays number", 1, 10, 3),
-    DECL_PARAM(P_MAX_RAYS, "Maximal rays number", 1, 20, 6),
+    DECL_PARAM(P_MIN_RAYS, "Min rays", 1, 10, 3),
+    DECL_PARAM(P_MAX_RAYS, "Max rays", 1, 20, 6),
 };
 
 static uint8_t hue;
@@ -60,11 +60,11 @@ esp_err_t effect_rays_run(framebuffer_t *fb)
     for (uint8_t i = 0; i < num_rays; i++)
     {
         uint8_t x1 = beatsin8(4 + EPARAM(rays, P_SPEED), 0, (fb->width - 1), 0, 0);
-        uint8_t x2 = beatsin8(2 + EPARAM(rays, P_SPEED), 0, (fb->width - 1), 0, 0);
-        uint8_t y1 = beatsin8(8 + EPARAM(rays, P_SPEED), 0, (fb->height - 1), 0, i * 24);
+        uint8_t y1 = beatsin8(2 + EPARAM(rays, P_SPEED), 0, (fb->width - 1), 0, 0);
+        uint8_t x2 = beatsin8(8 + EPARAM(rays, P_SPEED), 0, (fb->height - 1), 0, i * 24);
         uint8_t y2 = beatsin8(10 + EPARAM(rays, P_SPEED), 0, (fb->height - 1), 0, i * 48 + 64);
 
-        line(fb, x1, x2, y1, y2, hsv2rgb_rainbow(hsv_from_values(i * 255 / num_rays + hue, 255, 255)));
+        line(fb, x1, y1, x2, y2, hsv2rgb_rainbow(hsv_from_values(i * 255 / num_rays + hue, 255, 255)));
     }
     fb_blur2d(fb, 8);
 

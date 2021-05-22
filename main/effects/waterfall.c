@@ -32,10 +32,17 @@ enum {
     WATERFALL_COLD_FIRE,
 };
 
-#define PALETTE_SIZE 16
+#define PALETTE_SIZE 4
 
 static rgb_t palette[PALETTE_SIZE];
 static uint8_t *map = NULL;
+
+static const rgb_t C_BLACK  = { 0 };
+static const rgb_t C_WHITE  = { .r = 255, .g = 255, .b = 255 };
+static const rgb_t C_RED    = { .r = 255, .g = 0,   .b = 0 };
+static const rgb_t C_YELLOW = { .r = 255, .g = 255, .b = 0 };
+static const rgb_t C_DBLUE  = { .r = 0,   .g = 0,   .b = 100 };
+static const rgb_t C_CYAN   = { .r = 0,   .g = 200, .b = 255 };
 
 esp_err_t effect_waterfall_prepare(framebuffer_t *fb)
 {
@@ -44,29 +51,23 @@ esp_err_t effect_waterfall_prepare(framebuffer_t *fb)
     if (!map) map = calloc(fb->width * fb->height, 1);
     if (!map) return ESP_ERR_NO_MEM;
 
+    palette[0] = C_BLACK;
     switch (EPARAM(waterfall, P_MODE))
     {
         case WATERFALL_COLORS:
-            rgb_fill_gradient4_hsv(palette, PALETTE_SIZE,
-                    hsv_from_values(EPARAM(waterfall, P_HUE), 0, 0),
-                    hsv_from_values(EPARAM(waterfall, P_HUE), 0, 255),
-                    hsv_from_values(EPARAM(waterfall, P_HUE), 128, 255),
-                    hsv_from_values(EPARAM(waterfall, P_HUE), 255, 255),
-                    COLOR_SHORTEST_HUES);
+            palette[1] = C_WHITE;
+            palette[2] = hsv2rgb_rainbow(hsv_from_values(EPARAM(waterfall, P_HUE), 128, 255));
+            palette[3] = hsv2rgb_rainbow(hsv_from_values(EPARAM(waterfall, P_HUE), 255, 255));
             break;
         case WATERFALL_FIRE:
-            rgb_fill_gradient4_rgb(palette, PALETTE_SIZE,
-                    rgb_from_values(0, 0, 0),       // black
-                    rgb_from_values(255, 0, 0),
-                    rgb_from_values(255, 255, 0),
-                    rgb_from_values(255, 255, 255)); // white
+            palette[1] = C_RED;
+            palette[2] = C_YELLOW;
+            palette[3] = C_WHITE;
             break;
         case WATERFALL_COLD_FIRE:
-            rgb_fill_gradient4_rgb(palette, PALETTE_SIZE,
-                    rgb_from_values(0, 0, 0),       // black
-                    rgb_from_values(0, 0, 100),
-                    rgb_from_values(0, 200, 255),
-                    rgb_from_values(255, 255, 255)); // white
+            palette[1] = C_DBLUE;
+            palette[2] = C_CYAN;
+            palette[3] = C_WHITE;
             break;
         default:
             return ESP_ERR_NOT_SUPPORTED;
