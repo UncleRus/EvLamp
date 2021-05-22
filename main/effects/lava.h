@@ -8,7 +8,7 @@
 
 #include "effect.h"
 
-extern EFFECT_PARAMS(lava, 2);
+extern EFFECT_PARAMS(lava, 3);
 
 esp_err_t effect_lava_run(framebuffer_t *fb);
 
