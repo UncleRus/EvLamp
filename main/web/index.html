@@ -232,6 +232,8 @@
 		let $container = $('#container');
 		let $menu = $('#menu');
 		
+		let $mi_main = $('#mi_main');
+		
 		let $main_page = $('#f_main');
 		
 		let $wifi_form = $('#f_wifi'); 
@@ -506,7 +508,10 @@
 			$f_msg.detach().appendTo($content);
 			$f_msg.hide();
 			if (!confirm('Are you sure you want to reset settings to defaults?'))
+			{
+				$mi_main.click();
 				return;
+			}
 			$.getJSON('/api/settings/reset', function(res) {
 				console.log(res);
 				$f_msg.prop('class', res.result !=0 ? 'msg_err' : 'msg_ok')
@@ -521,7 +526,10 @@
 			$f_msg.detach().appendTo($content);
 			$f_msg.hide();
 			if (!confirm('Are you sure you want to reset settings of all effects to defaults?'))
+			{
+				$mi_main.click();
 				return;
+			}
 			$.getJSON('/api/effects/reset', function(res) {
 				console.log(res);
 				$f_msg.prop('class', res.result !=0 ? 'msg_err' : 'msg_ok')
@@ -531,7 +539,7 @@
 		});
 
 		// show main page
-		$('#mi_main').click(function() {
+		$mi_main.click(function() {
 			$content.children().detach().appendTo($container);
 			$main_page.detach().appendTo($content);
 			get_effect_params();
