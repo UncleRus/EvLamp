@@ -182,6 +182,8 @@ esp_err_t surface_set_brightness(uint8_t val)
     if (vol_settings_save() != ESP_OK)
         ESP_LOGW(TAG, "Could not save volatile settings");
 
+    ESP_LOGI(TAG, "Brightness set to %d", val);
+
     CHECK(surface_play());
 
     return ESP_OK;
@@ -204,6 +206,8 @@ esp_err_t surface_set_fps(uint8_t val)
     vol_settings.fps = val;
     if (vol_settings_save() != ESP_OK)
         ESP_LOGW(TAG, "Could not save volatile settings");
+
+    ESP_LOGI(TAG, "FPS set to %d", val);
 
     CHECK(surface_play());
 

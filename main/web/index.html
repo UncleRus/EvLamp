@@ -197,33 +197,35 @@
 		<div id="f_message" class="message"></div>
 	</div>
 	<!-- -------------------------------------------------------------------------- -->
-	<div class="header">
-		<div class="left">
-			<table><tr><td>
-				<label class="switch">
-					<input type="checkbox" class="onoff"><span class="slider round"></span>
-				</label>
-			</td><td>
-				<div class="header-left">
-					<span id="app_name">EvLamp</span>
-					<span class="small">
-						version: <span id="app_version">1.013423</span>,
-						built at <span id="build_date">01 May 2021</span>
-					</span>
-				</div>
-			</td></tr></table>
+	<div id="page">
+		<div class="header">
+			<div class="left">
+				<table><tr><td>
+					<label class="switch">
+						<input type="checkbox" class="onoff"><span class="slider round"></span>
+					</label>
+				</td><td>
+					<div class="header-left">
+						<span id="app_name">EvLamp</span>
+						<span class="small">
+							version: <span id="app_version">1.013423</span>,
+							built at <span id="build_date">01 May 2021</span>
+						</span>
+					</div>
+				</td></tr></table>
+			</div>
+			<a id="btn_menu" class="icon"><svg class="icon icon-menu"><use xlink:href="#icon-menu"></use></svg></a>
 		</div>
-		<a id="btn_menu" class="icon"><svg class="icon icon-menu"><use xlink:href="#icon-menu"></use></svg></a>
-	</div>
-	<div id="menu">
-		<a id="mi_main" href="#"><svg class="icon icon-main"><use xlink:href="#icon-main"></use></svg> Main page</a>
-		<a id="mi_wifi" href="#"><svg class="icon icon-wifi"><use xlink:href="#icon-wifi"></use></svg> WiFi settings</a>
-		<a id="mi_leds" href="#"><svg class="icon icon-leds"><use xlink:href="#icon-leds"></use></svg> LEDs settings</a>
-		<a id="mi_reset_effects" href="#"><svg class="icon icon-reset-effects"><use xlink:href="#icon-reset-effects"></use></svg> Reset effect settings</a>
-		<a id="mi_reset" href="#"><svg class="icon icon-reset"><use xlink:href="#icon-reset"></use></svg> Reset system settings</a>
-		<a id="mi_reboot" href="#"><svg class="icon icon-reboot"><use xlink:href="#icon-reboot"></use></svg> Reboot</a>
-	</div>
-	<div id="content">
+		<div id="menu">
+			<a id="mi_main" href="#"><svg class="icon icon-main"><use xlink:href="#icon-main"></use></svg> Main page</a>
+			<a id="mi_wifi" href="#"><svg class="icon icon-wifi"><use xlink:href="#icon-wifi"></use></svg> WiFi settings</a>
+			<a id="mi_leds" href="#"><svg class="icon icon-leds"><use xlink:href="#icon-leds"></use></svg> LEDs settings</a>
+			<a id="mi_reset_effects" href="#"><svg class="icon icon-reset-effects"><use xlink:href="#icon-reset-effects"></use></svg> Reset effect settings</a>
+			<a id="mi_reset" href="#"><svg class="icon icon-reset"><use xlink:href="#icon-reset"></use></svg> Reset system settings</a>
+			<a id="mi_reboot" href="#"><svg class="icon icon-reboot"><use xlink:href="#icon-reboot"></use></svg> Reboot</a>
+		</div>
+		<div id="content">
+		</div>
 	</div>
 	<!-- -------------------------------------------------------------------------- -->
 	<script>
@@ -273,37 +275,24 @@
 		});
 
 		// bind brightness and fps
-		$brightness.change(function() {
-			let val = parseInt($(this).val());
+		$fps.add($brightness).change(function() {
+			let $this = $(this);
+			let is_fps = $this.prop('id') == 'fps';
+			let val = parseInt($this.val());
 			$.ajax({
 				type: 'POST',
 				url: '/api/lamp/state',
-				data: JSON.stringify({ brightness: val }),
+				data: JSON.stringify(is_fps ? { fps: val } : { brightness: val }),
 				error: function(err) {
 					console.log(err);
 					alert(err.status + ' ' + err.statusText);
 				},
-				success: function(res) {
-					console.log(res);
-					if (res.result == 0) $brightness_val.html(val);
-				},
 			});
-		});
-		$fps.change(function() {
-			let val = parseInt($(this).val());
-			$.ajax({
-				type: 'POST',
-				url: '/api/lamp/state',
-				data: JSON.stringify({ fps: val }),
-				error: function(err) {
-					console.log(err);
-					alert(err.status + ' ' + err.statusText);
-				},
-				success: function(res) {
-					console.log(res);
-					if (res.result == 0) $fps_val.html(val);
-				},
-			});
+		}).on('input', function() {
+			let $this = $(this);
+			let is_fps = $this.prop('id') == 'fps';
+			let val = parseInt($this.val());
+			(is_fps ? $fps_val : $brightness_val).html(val);
 		});
 		
 		// bind effect selector
@@ -346,8 +335,10 @@
 					let $cell_val = $param.find('.cell-val');
 					$cell_val.html(p.value);
 					$input.change(function() {
-						$cell_val.html($input.val());
 						post_effect_params();
+					});
+					$input.on('input', function() {
+						$cell_val.html($input.val());
 					});
 				});
 			});

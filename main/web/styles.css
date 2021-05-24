@@ -209,6 +209,7 @@ legend {
 	height: 32px;
 	width: 80px;
 	padding: 8px 0 0 8px;
+	font-size: 14px;
 }
 
 .cell-max {
@@ -256,3 +257,15 @@ legend {
 #content {
 	margin-top: 24px;
 }
+
+#page {
+	width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+	#page {
+		width: 800px;
+		margin: auto;
+	}
+}
+
