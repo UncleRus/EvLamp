@@ -1,10 +1,9 @@
 /**
- * Rolling rays effect
+ * Radiant wheel effect
  */
-#include "effects/rollrays.h"
-
 #include <lib8tion.h>
 #include <math.h>
+#include "wheel.h"
 
 #define P_SPEED 0
 #define P_HUE1  1
@@ -12,7 +11,7 @@
 #define P_HUE2  3
 #define P_SAT2  4
 
-EFFECT_PARAMS(rollrays, 5) = {
+EFFECT_PARAMS(wheel, 5) = {
     DECL_PARAM(P_SPEED, "Rotation speed", 0, 255, 60),
     DECL_PARAM(P_HUE1, "Hue 1", 0, 255, 0),
     DECL_PARAM(P_SAT1, "Saturation 1", 0, 255, 255),
@@ -24,7 +23,7 @@ EFFECT_PARAMS(rollrays, 5) = {
 #define BLACK_TH 40
 #define BRIGHT_TH 200
 
-esp_err_t effect_rollrays_run(framebuffer_t *fb)
+esp_err_t effect_wheel_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 
@@ -32,7 +31,7 @@ esp_err_t effect_rollrays_run(framebuffer_t *fb)
 
     size_t cx = fb->width / 2;
     size_t cy = fb->height / 2;
-    float speed = (float)(EPARAM(rollrays, P_SPEED)) / 20.0f;
+    float speed = (float)(EPARAM(wheel, P_SPEED)) / 20.0f;
 
     float offs_y = sinf(t / 2) * fb->height / 3;
     float offs_x = sinf(t / 3) * fb->width / 3;
@@ -48,13 +47,13 @@ esp_err_t effect_rollrays_run(framebuffer_t *fb)
             color.val = color.val < BLACK_TH ? 0 : color.val;
             if (v > 0)
             {
-                color.hue = EPARAM(rollrays, P_HUE1);
-                color.sat = EPARAM(rollrays, P_SAT1);
+                color.hue = EPARAM(wheel, P_HUE1);
+                color.sat = EPARAM(wheel, P_SAT1);
             }
             else
             {
-                color.hue = EPARAM(rollrays, P_HUE2);
-                color.sat = EPARAM(rollrays, P_SAT2);
+                color.hue = EPARAM(wheel, P_HUE2);
+                color.sat = EPARAM(wheel, P_SAT2);
             }
             fb_set_pixel_hsv(fb, x, fb->height - 1 - y, color);
         }
