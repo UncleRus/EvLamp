@@ -6,7 +6,7 @@
 
 #include "effect.h"
 
-extern EFFECT_PARAMS(WHEEL, 5);
+extern EFFECT_PARAMS(wheel, 5);
 
 esp_err_t effect_wheel_run(framebuffer_t *fb);
 

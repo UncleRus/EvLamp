@@ -33,7 +33,7 @@ idf_component_register(
 		effects/polar_lights.c
 		effects/gif.c
 		effects/relax.c
-		effects/rollrays.c
+		effects/wheel.c
 		
 	EMBED_TXTFILES
 		web/jquery.js

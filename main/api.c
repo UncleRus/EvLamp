@@ -501,7 +501,9 @@ static const httpd_uri_t route_get_effects = {
 
 static esp_err_t get_effects_reset(httpd_req_t *req)
 {
-    return respond_api(req, effects_reset(), NULL);
+    esp_err_t res = effects_reset();
+    return respond_api(req, res, res == ESP_OK ?
+            "Effect settings reset" : "Error resetting effects");
 }
 
 static const httpd_uri_t route_get_effects_reset = {
