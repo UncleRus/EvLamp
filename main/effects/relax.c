@@ -38,9 +38,8 @@ esp_err_t effect_relax_run(framebuffer_t *fb)
     rgb_t c = hsv2rgb_rainbow(hsv_from_values(hue, EPARAM(relax, P_SAT), 255));
     if (reset)
     {
-        for (size_t x = 0; x < fb->width; x++)
-            for (size_t y = 0; y < fb->height; y++)
-                fb_set_pixel_rgb(fb, x, y, c);
+        for (size_t i = 0; i < fb->width * fb->height; i++)
+            fb->data[i] = c;
         reset = false;
     }
     else
