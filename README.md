@@ -9,7 +9,7 @@ Tested with 16x16 WS21812B.
 
 ### Features
 
-- >20 very beautiful effects from different authors, each with set of parameters
+- More than 20 very beautiful effects from different authors, each with set of parameters
 - WiFi connectivity in station or access point modes (support for DHCP/static IP addressing)
 - JSON API for remote controlling (*TODO: describe API*)
 - Embedded webserver for remote controlling from browser
