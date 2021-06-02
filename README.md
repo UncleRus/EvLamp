@@ -13,6 +13,7 @@ Tested with 16x16 WS21812B.
 - WiFi connectivity in station or access point modes (support for DHCP/static IP addressing)
 - JSON API for remote controlling (*TODO: describe API*)
 - Embedded webserver for remote controlling from browser
+- *TODO: OTA*
 
 ## Hardware
 
