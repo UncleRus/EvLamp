@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <esp_netif.h>
+#include "sdkconfig.h"
 #include "settings.h"
 #include "bus.h"
 
@@ -33,7 +34,7 @@ static void set_ip_info()
 {
     esp_err_t res;
 
-    if (!sys_settings.wifi.ip.dhcp)
+    if (!sys_settings.wifi.ip.dhcp || sys_settings.wifi.mode == WIFI_MODE_AP)
     {
         if (sys_settings.wifi.mode == WIFI_MODE_AP)
             esp_netif_dhcps_stop(iface);
