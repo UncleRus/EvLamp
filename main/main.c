@@ -20,25 +20,28 @@ static void process_button_event(event_t *e)
         esp_restart();
     }
 
+    bool playing = surface_is_playing();
     if (button_id == INPUT_BTN_MAIN)
     {
         switch (e->type)
         {
             case EVENT_BUTTON_CLICKED:
-                surface_next_effect();
+                if (playing)
+                    surface_next_effect();
                 break;
             case EVENT_BUTTON_PRESSED_LONG:
-                if (surface_is_playing())
+                if (playing)
                     surface_stop();
                 else
                     surface_play();
                 break;
             default:
-                //ESP_LOGW(TAG, "Unprocessed 'Main' button event %d", e->type);
                 break;
         }
         return;
     }
+
+    if (!playing) return;
 
     // up/down
     if (e->type == EVENT_BUTTON_CLICKED &&
