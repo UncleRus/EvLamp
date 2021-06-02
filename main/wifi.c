@@ -56,7 +56,11 @@ static void set_ip_info()
     esp_netif_dns_info_t dns;
     dns.ip.type = IPADDR_TYPE_V4;
     dns.ip.u_addr.ip4.addr = ipaddr_addr(sys_settings.wifi.ip.dns);
-    res = esp_netif_set_dns_info(iface, sys_settings.wifi.ip.dhcp ? ESP_NETIF_DNS_FALLBACK : ESP_NETIF_DNS_MAIN, &dns);
+    res = esp_netif_set_dns_info(iface,
+            sys_settings.wifi.mode != WIFI_MODE_AP && sys_settings.wifi.ip.dhcp
+                ? ESP_NETIF_DNS_FALLBACK
+                : ESP_NETIF_DNS_MAIN,
+            &dns);
     if (res != ESP_OK)
         ESP_LOGW(TAG, "Error setting DNS address %d (%s)", res, esp_err_to_name(res));
 }
