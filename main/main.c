@@ -6,6 +6,7 @@
 #include "surface.h"
 #include "input.h"
 #include "webserver.h"
+#include "ota.h"
 
 static void process_button_event(event_t *e)
 {
@@ -43,12 +44,17 @@ static void process_button_event(event_t *e)
 
     if (!playing) return;
 
-    // up/down
     if (e->type == EVENT_BUTTON_CLICKED &&
             (button_id == INPUT_BTN_UP || button_id == INPUT_BTN_DOWN))
     {
-        surface_increment_brightness(button_id == INPUT_BTN_UP ? 5 : -5);
+        ota_get_latest(NULL);
     }
+//    // up/down
+//    if (e->type == EVENT_BUTTON_CLICKED &&
+//            (button_id == INPUT_BTN_UP || button_id == INPUT_BTN_DOWN))
+//    {
+//        surface_increment_brightness(button_id == INPUT_BTN_UP ? 5 : -5);
+//    }
 }
 
 static void main_loop(void *arg)

@@ -1,3 +1,5 @@
+set(EMBED ../files)
+
 idf_component_register(
 	INCLUDE_DIRS .
 	SRCS
@@ -11,6 +13,7 @@ idf_component_register(
 		input.c
 		webserver.c
 		api.c
+		ota.c
 		
 		effects/crazybees.c
 		effects/dna.c
@@ -36,23 +39,25 @@ idf_component_register(
 		effects/wheel.c
 		
 	EMBED_TXTFILES
-		web/jquery.js
-		web/styles.css
-		web/index.html
+		${EMBED}/web/jquery.js
+		${EMBED}/web/styles.css
+		${EMBED}/web/index.html
+		
+		${EMBED}/ota/ota_server_cert.pem
 		
 	EMBED_FILES
-		gifs/heart.gif
-		gifs/heart2.gif
-		gifs/boldman.gif
-		gifs/coin.gif
-		gifs/disk.gif
-		gifs/girl.gif
-		gifs/hairyman.gif
-		gifs/hero.gif
-		gifs/disk.gif
-		gifs/torch.gif
-		gifs/zombie.gif
-		gifs/cutebear.gif
+		${EMBED}/gifs/heart.gif
+		${EMBED}/gifs/heart2.gif
+		${EMBED}/gifs/boldman.gif
+		${EMBED}/gifs/coin.gif
+		${EMBED}/gifs/disk.gif
+		${EMBED}/gifs/girl.gif
+		${EMBED}/gifs/hairyman.gif
+		${EMBED}/gifs/hero.gif
+		${EMBED}/gifs/disk.gif
+		${EMBED}/gifs/torch.gif
+		${EMBED}/gifs/zombie.gif
+		${EMBED}/gifs/cutebear.gif
 )
 
 #spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)

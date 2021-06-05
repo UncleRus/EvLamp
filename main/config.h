@@ -68,4 +68,9 @@
 #define HTTPD_STACK_SIZE 32768
 #define MAX_POST_SIZE 4096
 
+////////////////////////////////////////////////////////////////////////////////
+/// OTA
+
+#define OTA_REPO_URL "https://api.github.com/repos/UncleRus/" APP_NAME "/"
+
 #endif /* MAIN_CONFIG_H_ */
