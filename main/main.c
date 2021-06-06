@@ -44,17 +44,12 @@ static void process_button_event(event_t *e)
 
     if (!playing) return;
 
+    // up/down
     if (e->type == EVENT_BUTTON_CLICKED &&
             (button_id == INPUT_BTN_UP || button_id == INPUT_BTN_DOWN))
     {
-        ota_get_latest(NULL);
+        surface_increment_brightness(button_id == INPUT_BTN_UP ? 5 : -5);
     }
-//    // up/down
-//    if (e->type == EVENT_BUTTON_CLICKED &&
-//            (button_id == INPUT_BTN_UP || button_id == INPUT_BTN_DOWN))
-//    {
-//        surface_increment_brightness(button_id == INPUT_BTN_UP ? 5 : -5);
-//    }
 }
 
 static void main_loop(void *arg)

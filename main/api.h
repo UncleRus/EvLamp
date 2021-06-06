@@ -19,6 +19,8 @@
 // POST /api/lamp/state             -> set current lamp state, effect, brightness and FPS
 // GET  /api/lamp/effect            -> get current effect settings
 // POST /api/lamp/effect            -> set current effect settings
+// GET  /api/ota                    -> get list of available firmware updates
+// POST /api/ota                    -> update firmware or rollback it to the factory state
 
 esp_err_t api_init(httpd_handle_t server);
 

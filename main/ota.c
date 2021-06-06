@@ -1,6 +1,8 @@
 #include "ota.h"
 #include <esp_http_client.h>
+#include <esp_ota_ops.h>
 #include "embed.h"
+#include "surface.h"
 
 static char *http_buf = NULL;
 static size_t http_buf_size = 0;
@@ -91,7 +93,10 @@ static esp_err_t request_github_api(const char *endpoint, cJSON **result)
 cleanup:
     esp_http_client_cleanup(client);
     if (http_buf)
+    {
         free(http_buf);
+        http_buf = NULL;
+    }
     http_status = 0;
     free(url);
 
@@ -103,26 +108,39 @@ cleanup:
 esp_err_t ota_get_available(cJSON **res)
 {
     CHECK_ARG(res);
+    CHECK(surface_pause());
 
     cJSON *api_resp;
     CHECK(request_github_api("releases?page=1&per_page=3", &api_resp));
 
     ESP_LOGI(TAG, "%s", cJSON_Print(api_resp));
 
-    *res = cJSON_CreateArray();
+    *res = cJSON_CreateObject();
+
+    // current app
+    const esp_app_desc_t *app = esp_ota_get_app_description();
+    cJSON *current = cJSON_AddObjectToObject(*res, "current");
+    cJSON_AddStringToObject(current, "version", app->version);
+    cJSON_AddStringToObject(current, "date", app->date);
+
+    // available updates
+    cJSON *updates = cJSON_AddObjectToObject(*res, "updates");
     for (int i = 0; i < cJSON_GetArraySize(api_resp); i++)
     {
         cJSON *release = cJSON_GetArrayItem(api_resp, i);
 
-        cJSON *item = cJSON_CreateObject();
-        cJSON_AddItemToArray(*res, item);
+        char *version = cJSON_GetStringValue(cJSON_GetObjectItem(release, "tag_name"));
 
-        cJSON_AddStringToObject(item, "version", cJSON_GetStringValue(cJSON_GetObjectItem(release, "tag_name")));
-        cJSON_AddStringToObject(item, "description", cJSON_GetStringValue(cJSON_GetObjectItem(release, "body")));
-        //cJSON_AddStringToObject(item, "firmware",
+        cJSON *update = cJSON_AddObjectToObject(updates, version);
+        cJSON_AddStringToObject(update, "version", version);
+        cJSON_AddStringToObject(update, "description", cJSON_GetStringValue(cJSON_GetObjectItem(release, "body")));
+        cJSON_AddStringToObject(update, "date", cJSON_GetStringValue(cJSON_GetObjectItem(release, "created_at")));
+        cJSON_AddStringToObject(update, "url", "");
     }
 
     cJSON_Delete(api_resp);
+
+    CHECK(surface_play());
 
     return ESP_OK;
 }

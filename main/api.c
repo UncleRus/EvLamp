@@ -4,6 +4,7 @@
 #include "settings.h"
 #include "effect.h"
 #include "surface.h"
+#include "ota.h"
 
 static esp_err_t respond_json(httpd_req_t *req, cJSON *resp)
 {
@@ -705,6 +706,30 @@ static const httpd_uri_t route_post_lamp_effect = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static esp_err_t get_ota(httpd_req_t *req)
+{
+    cJSON *res;
+
+    esp_err_t err = ota_get_available(&res);
+    if (err != ESP_OK)
+    {
+        cJSON_Delete(res);
+        return respond_api(req, err, "Error getting update information");
+    }
+
+    return respond_json(req, res);
+}
+
+static const httpd_uri_t route_get_ota = {
+    .uri = "/api/ota",
+    .method = HTTP_GET,
+    .handler = get_ota
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+
 esp_err_t api_init(httpd_handle_t server)
 {
     CHECK(httpd_register_uri_handler(server, &route_get_info));
@@ -720,6 +745,7 @@ esp_err_t api_init(httpd_handle_t server)
     CHECK(httpd_register_uri_handler(server, &route_post_lamp_state));
     CHECK(httpd_register_uri_handler(server, &route_get_lamp_effect));
     CHECK(httpd_register_uri_handler(server, &route_post_lamp_effect));
+    CHECK(httpd_register_uri_handler(server, &route_get_ota));
 
     return ESP_OK;
 }
