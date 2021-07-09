@@ -131,11 +131,21 @@ esp_err_t ota_get_available(cJSON **res)
 
         char *version = cJSON_GetStringValue(cJSON_GetObjectItem(release, "tag_name"));
 
-        cJSON *update = cJSON_AddObjectToObject(updates, version);
-        cJSON_AddStringToObject(update, "version", version);
-        cJSON_AddStringToObject(update, "description", cJSON_GetStringValue(cJSON_GetObjectItem(release, "body")));
-        cJSON_AddStringToObject(update, "date", cJSON_GetStringValue(cJSON_GetObjectItem(release, "created_at")));
-        cJSON_AddStringToObject(update, "url", "");
+        // find asset
+        cJSON *assets = cJSON_GetObjectItem(release, "assets");
+        for (int c = 0; c < cJSON_GetArraySize(assets); c++)
+        {
+            cJSON *asset = cJSON_GetArrayItem(assets, c);
+            char *name = cJSON_GetStringValue(cJSON_GetObjectItem(asset, "name"));
+            if (!strcmp(name, OTA_BINARY_NAME))
+            {
+                cJSON *update = cJSON_AddObjectToObject(updates, version);
+                cJSON_AddStringToObject(update, "version", version);
+                cJSON_AddStringToObject(update, "description", cJSON_GetStringValue(cJSON_GetObjectItem(release, "body")));
+                cJSON_AddStringToObject(update, "date", cJSON_GetStringValue(cJSON_GetObjectItem(release, "created_at")));
+                cJSON_AddStringToObject(update, "url", cJSON_GetStringValue(cJSON_GetObjectItem(asset, "browser_download_url")));
+            }
+        }
     }
 
     cJSON_Delete(api_resp);

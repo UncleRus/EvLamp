@@ -72,5 +72,6 @@
 /// OTA
 
 #define OTA_REPO_URL "https://api.github.com/repos/UncleRus/" APP_NAME "/"
+#define OTA_BINARY_NAME APP_NAME ".bin"
 
 #endif /* MAIN_CONFIG_H_ */
