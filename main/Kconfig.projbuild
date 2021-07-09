@@ -2,12 +2,12 @@ menu "*** EvLamp configuration ***"
 
 	config EL_EFFECT_DEFAULT
 		int "Default effect"
-		default 0
+		default 1
 		
 	config EL_FPS_DEFAULT
 		int "Default FPS"
 		range 1 100
-		default 30
+		default 60
 
 	config EL_BRIGHTNESS_DEFAULT
 		int "Default brightness"
@@ -49,11 +49,11 @@ menu "*** EvLamp configuration ***"
 		
 			config EL_WIFI_STA_SSID
 				string "SSID"
-				default "MYNETWORK"
+				default "MyHomeWIFI"
 				
 			config EL_WIFI_STA_PASSWD
 				string "Password"
-				default ""
+				default "MyPassword"
 	
 		endmenu
 
@@ -124,6 +124,11 @@ menu "*** EvLamp configuration ***"
 			config EL_BUTTON_LEVEL
 				int "Button logic level for 'pressed' state"
 				range 0 1
+				default 1
+
+			config EL_BUTTON_RESET_LEVEL
+				int "Logic level of reset button for 'pressed' state"
+				range 0 1
 				default 0
 
 			config EL_BUTTON_PULLUPDOWN
@@ -148,7 +153,7 @@ menu "*** EvLamp configuration ***"
 			config EL_BUTTON_RESET_GPIO
 				int "'Reset' button GPIO pin"
 				range 0 39
-				default 14
+				default 0
 
 		endmenu
 
