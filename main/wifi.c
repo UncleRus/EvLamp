@@ -67,6 +67,7 @@ static void set_ip_info()
 
 static void wifi_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
+    esp_err_t res = ESP_OK;
     switch (event_id)
     {
         case WIFI_EVENT_AP_START:
@@ -77,11 +78,18 @@ static void wifi_handler(void *arg, esp_event_base_t event_base, int32_t event_i
             break;
         case WIFI_EVENT_STA_START:
             ESP_LOGI(TAG, "WiFi started in station mode, connecting...");
-            esp_wifi_connect();
+            if ( (res = esp_wifi_connect()) != ESP_OK )
+                ESP_LOGE(TAG, "WiFi error %d [%s]", res, esp_err_to_name(res));
             break;
         case WIFI_EVENT_STA_CONNECTED:
             ESP_LOGI(TAG, "WiFi connected to '%s'", sys_settings.wifi.sta.ssid);
             set_ip_info();
+            break;
+        case WIFI_EVENT_STA_DISCONNECTED:
+            ESP_LOGI(TAG, "WiFi disconnected, reconnecting...");
+            bus_send_event(EVENT_NETWORK_DOWN, NULL, 0);
+            if ( (res = esp_wifi_connect()) != ESP_OK )
+                ESP_LOGE(TAG, "WiFi error %d [%s]", res, esp_err_to_name(res));
             break;
         default:
             break;
@@ -90,6 +98,7 @@ static void wifi_handler(void *arg, esp_event_base_t event_base, int32_t event_i
 
 static void ip_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
+    esp_err_t res = ESP_OK;
     switch (event_id)
     {
         case IP_EVENT_STA_GOT_IP:
@@ -100,7 +109,8 @@ static void ip_handler(void *arg, esp_event_base_t event_base, int32_t event_id,
         case IP_EVENT_STA_LOST_IP:
             ESP_LOGI(TAG, "WiFi lost IP address, reconnecting");
             bus_send_event(EVENT_NETWORK_DOWN, NULL, 0);
-            esp_wifi_connect();
+            if ( (res = esp_wifi_connect()) != ESP_OK )
+                ESP_LOGE(TAG, "WiFi error %d [%s]", res, esp_err_to_name(res));
             break;
     }
 }
