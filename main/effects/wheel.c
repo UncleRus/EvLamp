@@ -31,7 +31,7 @@ esp_err_t effect_wheel_run(framebuffer_t *fb)
 
     size_t cx = fb->width / 2;
     size_t cy = fb->height / 2;
-    float speed = (float)(EPARAM(wheel, P_SPEED)) / 20.0f;
+    float speed = (float)(PARAM_VAL(wheel, P_SPEED)) / 20.0f;
 
     float offs_y = sinf(t / 2) * fb->height / 3;
     float offs_x = sinf(t / 3) * fb->width / 3;
@@ -47,13 +47,13 @@ esp_err_t effect_wheel_run(framebuffer_t *fb)
             color.val = color.val < BLACK_TH ? 0 : color.val;
             if (v > 0)
             {
-                color.hue = EPARAM(wheel, P_HUE1);
-                color.sat = EPARAM(wheel, P_SAT1);
+                color.hue = PARAM_VAL(wheel, P_HUE1);
+                color.sat = PARAM_VAL(wheel, P_SAT1);
             }
             else
             {
-                color.hue = EPARAM(wheel, P_HUE2);
-                color.sat = EPARAM(wheel, P_SAT2);
+                color.hue = PARAM_VAL(wheel, P_HUE2);
+                color.sat = PARAM_VAL(wheel, P_SAT2);
             }
             fb_set_pixel_hsv(fb, x, fb->height - 1 - y, color);
         }

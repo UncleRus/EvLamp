@@ -8,7 +8,7 @@
 
 #define DECL_PARAM(ID, NAME, MIN, MAX, DEF) [ID] = { .name = NAME, .min = MIN, .max = MAX, .def = DEF, .value = DEF }
 
-#define EPARAM(name, X) (effect_ ##name## _params[(X)].value)
+#define PARAM_VAL(name, X) (effect_ ##name## _params[(X)].value)
 
 #define DECL_EFFECT_FULL(CODE, NAME) { \
         .name = NAME, \

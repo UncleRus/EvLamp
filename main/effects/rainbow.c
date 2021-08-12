@@ -26,15 +26,15 @@ esp_err_t effect_rainbow_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 
-    if (EPARAM(rainbow, P_DIRECTION) == RAINBOW_DIAGONAL)
+    if (PARAM_VAL(rainbow, P_DIRECTION) == RAINBOW_DIAGONAL)
     {
         for (size_t x = 0; x < fb->width; x++)
             for (size_t y = 0; y < fb->height; y++)
             {
-                float twirl = 3.0f * EPARAM(rainbow, P_SCALE) / 100.0f;
+                float twirl = 3.0f * PARAM_VAL(rainbow, P_SCALE) / 100.0f;
                 hsv_t color = {
-                    .hue = fb->frame_num / 2 * EPARAM(rainbow, P_SPEED)
-                        + (fb->width / fb->height * x + y * twirl) * EPARAM(rainbow, P_SCALE),
+                    .hue = fb->frame_num / 2 * PARAM_VAL(rainbow, P_SPEED)
+                        + (fb->width / fb->height * x + y * twirl) * PARAM_VAL(rainbow, P_SCALE),
                     .sat = 255,
                     .val = 255
                 };
@@ -43,18 +43,18 @@ esp_err_t effect_rainbow_run(framebuffer_t *fb)
     }
     else
     {
-        size_t outer = EPARAM(rainbow, P_DIRECTION) == RAINBOW_HORIZONTAL ? fb->width : fb->height;
-        size_t inner = EPARAM(rainbow, P_DIRECTION) == RAINBOW_HORIZONTAL ? fb->height : fb->width;
+        size_t outer = PARAM_VAL(rainbow, P_DIRECTION) == RAINBOW_HORIZONTAL ? fb->width : fb->height;
+        size_t inner = PARAM_VAL(rainbow, P_DIRECTION) == RAINBOW_HORIZONTAL ? fb->height : fb->width;
 
         for (size_t i = 0; i < outer; i++)
         {
             hsv_t color = {
-                .hue = fb->frame_num / 2 * EPARAM(rainbow, P_SPEED) + i * EPARAM(rainbow, P_SCALE),
+                .hue = fb->frame_num / 2 * PARAM_VAL(rainbow, P_SPEED) + i * PARAM_VAL(rainbow, P_SCALE),
                 .sat = 255,
                 .val = 255
             };
             for (size_t j = 0; j < inner; j++)
-                if (EPARAM(rainbow, P_DIRECTION) == RAINBOW_HORIZONTAL)
+                if (PARAM_VAL(rainbow, P_DIRECTION) == RAINBOW_HORIZONTAL)
                     fb_set_pixel_hsv(fb, i, j, color);
                 else
                     fb_set_pixel_hsv(fb, j, i, color);

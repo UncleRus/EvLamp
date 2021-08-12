@@ -37,7 +37,7 @@ esp_err_t effect_matrix_run(framebuffer_t *fb)
             if (upper_code == MATRIX_START_COLOR && random8_to(7 * fb->height) != 0)
                 fb_set_pixel_rgb(fb, x, y, upper_color);
             // if current pixel is off, light up new tails with some probability
-            else if (cur_code == 0 && random8_to(EPARAM(matrix, P_DENSITY)) == 0)
+            else if (cur_code == 0 && random8_to(PARAM_VAL(matrix, P_DENSITY)) == 0)
                 fb_set_pixel_rgb(fb, x, y, rgb_from_code(MATRIX_START_COLOR));
             // if current pixel is almost off, try to make the fading out slower
             else if (cur_code <= MATRIX_ALMOST_OFF)
@@ -63,7 +63,7 @@ esp_err_t effect_matrix_run(framebuffer_t *fb)
         // if current top pixel is off, fill it with some probability
         if (cur_code == 0)
         {
-            if (random8_to(EPARAM(matrix, P_DENSITY)) == 0)
+            if (random8_to(PARAM_VAL(matrix, P_DENSITY)) == 0)
                 fb_set_pixel_rgb(fb, x, fb->height - 1, rgb_from_code(MATRIX_START_COLOR));
         }
         // if current pixel is almost off, try to make the fading out slower

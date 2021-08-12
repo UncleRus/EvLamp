@@ -23,7 +23,7 @@ static uint8_t density;
 
 esp_err_t effect_rain_prepare(framebuffer_t *fb)
 {
-    density = 255 - qadd8(EPARAM(rain, P_DENSITY), 155);
+    density = 255 - qadd8(PARAM_VAL(rain, P_DENSITY), 155);
     return ESP_OK;
 }
 
@@ -37,10 +37,10 @@ esp_err_t effect_rain_run(framebuffer_t *fb)
         fb_get_pixel_rgb(fb, x, fb->height - 1, &c);
         if (!rgb_luma(c) && random8_to(density) == 0)
             fb_set_pixel_hsv(fb, x, fb->height - 1,
-                    hsv_from_values(EPARAM(rain, P_MODE) == MODE_SINGLE_COLOR ? EPARAM(rain, P_HUE) : random8(), 255, 255));
+                    hsv_from_values(PARAM_VAL(rain, P_MODE) == MODE_SINGLE_COLOR ? PARAM_VAL(rain, P_HUE) : random8(), 255, 255));
         else
         {
-            c = rgb_scale(c, EPARAM(rain, P_TAIL) + random8_to(100) - 50);
+            c = rgb_scale(c, PARAM_VAL(rain, P_TAIL) + random8_to(100) - 50);
             fb_set_pixel_rgb(fb, x, fb->height - 1, rgb_luma(c) < 3 ? rgb_from_values(0, 0, 0) : c);
         }
     }

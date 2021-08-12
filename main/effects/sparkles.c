@@ -18,7 +18,7 @@ esp_err_t effect_sparkles_run(framebuffer_t *fb)
     CHECK(fb_begin(fb));
 
     fb_blur2d(fb, 8);
-    for (uint8_t i = 0; i < EPARAM(sparkles, P_COUNT); i++)
+    for (uint8_t i = 0; i < PARAM_VAL(sparkles, P_COUNT); i++)
     {
         uint16_t x = random16_to(fb->width);
         uint16_t y = random16_to(fb->height);
@@ -28,7 +28,7 @@ esp_err_t effect_sparkles_run(framebuffer_t *fb)
         if (rgb_luma(c) < 5)
             fb_set_pixel_hsv(fb, x, y, hsv_from_values(random8(), 255, 255));
     }
-    fb_fade(fb, EPARAM(sparkles, P_FADEOUT));
+    fb_fade(fb, PARAM_VAL(sparkles, P_FADEOUT));
 
     return fb_end(fb);
 }

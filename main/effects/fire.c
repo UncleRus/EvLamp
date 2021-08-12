@@ -39,7 +39,7 @@ esp_err_t effect_fire_prepare(framebuffer_t *fb)
 {
     palette[0] = C_BLACK;
     palette[3] = C_WHITE;
-    switch (EPARAM(fire, P_PALETTE))
+    switch (PARAM_VAL(fire, P_PALETTE))
     {
         case PALETTE_BLUE:
             palette[1] = C_DBLUE;

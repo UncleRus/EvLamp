@@ -38,7 +38,7 @@ static const uint8_t exp_gamma[256] = {
 
 esp_err_t effect_plasma_waves_prepare(framebuffer_t *fb)
 {
-    speed = 255 - EPARAM(plasma_waves, P_SPEED) + 1;
+    speed = 255 - PARAM_VAL(plasma_waves, P_SPEED) + 1;
 
     return ESP_OK;
 }

@@ -57,7 +57,7 @@ esp_err_t effect_metaballs_prepare(framebuffer_t *fb)
     palette[0] = C_BLACK;
     palette[1] = C_BLACK;
     palette[5] = C_WHITE;
-    switch (EPARAM(metaballs, P_PALETTE))
+    switch (PARAM_VAL(metaballs, P_PALETTE))
     {
         case PALETTE_BLUE:
             palette[2] = C_DBLUE;
@@ -75,7 +75,7 @@ esp_err_t effect_metaballs_prepare(framebuffer_t *fb)
             palette[4] = C_YELLOW;
     }
 
-    for (size_t i = 0; i < EPARAM(metaballs, P_COUNT); i++)
+    for (size_t i = 0; i < PARAM_VAL(metaballs, P_COUNT); i++)
     {
         balls[i].bpm_x = random8_between(10, 40);
         balls[i].bpm_y = random8_between(10, 40);
@@ -89,7 +89,7 @@ esp_err_t effect_metaballs_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 
-    for (size_t i = 0; i < EPARAM(metaballs, P_COUNT); i++)
+    for (size_t i = 0; i < PARAM_VAL(metaballs, P_COUNT); i++)
     {
         balls[i].x = beatsin8(balls[i].bpm_x, 0, fb->width - 1, 0, balls[i].phase);
         balls[i].y = beatsin8(balls[i].bpm_y, 0, fb->height - 1, 0, balls[i].phase);
@@ -100,7 +100,7 @@ esp_err_t effect_metaballs_run(framebuffer_t *fb)
         for (int j = 0; j < fb->height; j++)
         {
             uint8_t sum = 0;
-            for (size_t b = 0; b < EPARAM(metaballs, P_COUNT); b++)
+            for (size_t b = 0; b < PARAM_VAL(metaballs, P_COUNT); b++)
                 sum = qadd8(sum, dist(i, j, balls[b].x, balls[b].y));
 
             //fb_set_pixel_rgb(fb, i, j, rgb_from_values(sum, sum, sum));

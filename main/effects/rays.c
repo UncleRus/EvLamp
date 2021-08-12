@@ -45,24 +45,24 @@ esp_err_t effect_rays_run(framebuffer_t *fb)
     CHECK(fb_begin(fb));
 
     // change number of rays
-    if (EPARAM(rays, P_MAX_RAYS) > EPARAM(rays, P_MIN_RAYS) && !(fb->frame_num % 10))
+    if (PARAM_VAL(rays, P_MAX_RAYS) > PARAM_VAL(rays, P_MIN_RAYS) && !(fb->frame_num % 10))
     {
         if (random8_to(2))
             num_rays++;
         else
             num_rays--;
     }
-    if (num_rays < EPARAM(rays, P_MIN_RAYS)) num_rays = EPARAM(rays, P_MIN_RAYS);
-    if (num_rays > EPARAM(rays, P_MAX_RAYS)) num_rays = EPARAM(rays, P_MAX_RAYS);
+    if (num_rays < PARAM_VAL(rays, P_MIN_RAYS)) num_rays = PARAM_VAL(rays, P_MIN_RAYS);
+    if (num_rays > PARAM_VAL(rays, P_MAX_RAYS)) num_rays = PARAM_VAL(rays, P_MAX_RAYS);
 
     hue += 5;
     fb_fade(fb, 40);
     for (uint8_t i = 0; i < num_rays; i++)
     {
-        uint8_t x1 = beatsin8(4 + EPARAM(rays, P_SPEED), 0, (fb->width - 1), 0, 0);
-        uint8_t y1 = beatsin8(2 + EPARAM(rays, P_SPEED), 0, (fb->width - 1), 0, 0);
-        uint8_t x2 = beatsin8(8 + EPARAM(rays, P_SPEED), 0, (fb->height - 1), 0, i * 24);
-        uint8_t y2 = beatsin8(10 + EPARAM(rays, P_SPEED), 0, (fb->height - 1), 0, i * 48 + 64);
+        uint8_t x1 = beatsin8(4 + PARAM_VAL(rays, P_SPEED), 0, (fb->width - 1), 0, 0);
+        uint8_t y1 = beatsin8(2 + PARAM_VAL(rays, P_SPEED), 0, (fb->width - 1), 0, 0);
+        uint8_t x2 = beatsin8(8 + PARAM_VAL(rays, P_SPEED), 0, (fb->height - 1), 0, i * 24);
+        uint8_t y2 = beatsin8(10 + PARAM_VAL(rays, P_SPEED), 0, (fb->height - 1), 0, i * 48 + 64);
 
         line(fb, x1, y1, x2, y2, hsv2rgb_rainbow(hsv_from_values(i * 255 / num_rays + hue, 255, 255)));
     }

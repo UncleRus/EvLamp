@@ -25,9 +25,9 @@ static bool reset = false;
 
 esp_err_t effect_relax_prepare(framebuffer_t *fb)
 {
-    step = 1200 - 10 * EPARAM(relax, P_SPEED);
+    step = 1200 - 10 * PARAM_VAL(relax, P_SPEED);
     reset = true;
-    hue = EPARAM(relax, P_HUE);
+    hue = PARAM_VAL(relax, P_HUE);
     return ESP_OK;
 }
 
@@ -35,7 +35,7 @@ esp_err_t effect_relax_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 
-    rgb_t c = hsv2rgb_rainbow(hsv_from_values(hue, EPARAM(relax, P_SAT), 255));
+    rgb_t c = hsv2rgb_rainbow(hsv_from_values(hue, PARAM_VAL(relax, P_SAT), 255));
     if (reset)
     {
         for (size_t i = 0; i < fb->width * fb->height; i++)
@@ -46,7 +46,7 @@ esp_err_t effect_relax_run(framebuffer_t *fb)
     {
         if (!(fb->frame_num % step)) hue++;
 
-        for (uint8_t i = 0; i < EPARAM(relax, P_PIXELS); i++)
+        for (uint8_t i = 0; i < PARAM_VAL(relax, P_PIXELS); i++)
         {
             uint16_t x = random16_to(fb->width);
             uint16_t y = random16_to(fb->height);
