@@ -35,7 +35,7 @@ static void horizontal_line(framebuffer_t *fb, uint8_t x1, uint8_t x2, uint8_t y
         fb_set_pixel_rgb(fb, dx, y, pixel);
     }
 
-    if (EPARAM(twister, P_BORDER))
+    if (PARAM_VAL(twister, P_BORDER))
     {
         //add black points at the ends of line
         fb_set_pixel_rgb(fb, x1, y, C_BLACK);
@@ -49,7 +49,7 @@ esp_err_t effect_twister_run(framebuffer_t *fb)
 
     fb_clear(fb);
 
-    uint16_t a = esp_timer_get_time() / 1000 / (41 - EPARAM(twister, P_SPEED));
+    uint16_t a = esp_timer_get_time() / 1000 / (41 - PARAM_VAL(twister, P_SPEED));
 
     for (size_t i = 0; i < fb->height; i++)
     {

@@ -54,7 +54,7 @@ esp_err_t effect_polar_lights_prepare(framebuffer_t *fb)
     palette[0] = C_BLACK;
     palette[2] = C_YELLOW;
     palette[3] = C_RED;
-    switch (EPARAM(polar_lights, P_PALETTE))
+    switch (PARAM_VAL(polar_lights, P_PALETTE))
     {
         case PALETTE_BLUE:
             palette[1] = C_BLUE;
@@ -64,8 +64,8 @@ esp_err_t effect_polar_lights_prepare(framebuffer_t *fb)
     }
 
     height_adj = mapf(fb->height, 8, 64, 28, 6);
-    p_scale = map(EPARAM(polar_lights, P_SCALE), 1, 255, 30, map(fb->width, 8, 64, 310, 63));
-    p_speed = map(EPARAM(polar_lights, P_SPEED), 1, 255, 128, 16);
+    p_scale = map(PARAM_VAL(polar_lights, P_SCALE), 1, 255, 30, map(fb->width, 8, 64, 310, 63));
+    p_speed = map(PARAM_VAL(polar_lights, P_SPEED), 1, 255, 128, 16);
     return ESP_OK;
 }
 

@@ -60,3 +60,5 @@ sdkconfig
 /.settings/
 /.pydevproject
 /__garbage__
+/sdkconfig.unclerus
+/.vscode/

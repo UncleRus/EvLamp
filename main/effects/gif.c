@@ -96,8 +96,8 @@ esp_err_t effect_gif_prepare(framebuffer_t *fb)
     gif_result res;
     do
     {
-        size_t size = gifs[EPARAM(gif, P_FILE)].end - gifs[EPARAM(gif, P_FILE)].start;
-        res = gif_initialise(gif, size, (uint8_t *)gifs[EPARAM(gif, P_FILE)].start);
+        size_t size = gifs[PARAM_VAL(gif, P_FILE)].end - gifs[PARAM_VAL(gif, P_FILE)].start;
+        res = gif_initialise(gif, size, (uint8_t *)gifs[PARAM_VAL(gif, P_FILE)].start);
     } while (res == GIF_WORKING);
 
     if (res != GIF_OK)

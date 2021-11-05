@@ -52,12 +52,12 @@ esp_err_t effect_waterfall_prepare(framebuffer_t *fb)
     if (!map) return ESP_ERR_NO_MEM;
 
     palette[0] = C_BLACK;
-    switch (EPARAM(waterfall, P_MODE))
+    switch (PARAM_VAL(waterfall, P_MODE))
     {
         case WATERFALL_COLORS:
             palette[1] = C_WHITE;
-            palette[2] = hsv2rgb_rainbow(hsv_from_values(EPARAM(waterfall, P_HUE), 128, 255));
-            palette[3] = hsv2rgb_rainbow(hsv_from_values(EPARAM(waterfall, P_HUE), 255, 255));
+            palette[2] = hsv2rgb_rainbow(hsv_from_values(PARAM_VAL(waterfall, P_HUE), 128, 255));
+            palette[3] = hsv2rgb_rainbow(hsv_from_values(PARAM_VAL(waterfall, P_HUE), 255, 255));
             break;
         case WATERFALL_FIRE:
             palette[1] = C_RED;
@@ -88,7 +88,7 @@ esp_err_t effect_waterfall_run(framebuffer_t *fb)
 
         // Step 1.  Cool down every cell a little
         for (y = 0; y < fb->height; y++)
-            map[MAP_XY(x, y)] = qsub8(map[MAP_XY(x, y)], random8_to((EPARAM(waterfall, P_COOLING) * 10 / fb->height) + 2));
+            map[MAP_XY(x, y)] = qsub8(map[MAP_XY(x, y)], random8_to((PARAM_VAL(waterfall, P_COOLING) * 10 / fb->height) + 2));
 
         // Step 2.  Heat from each cell drifts 'up' and diffuses a little
         for (y = fb->height - 1; y >= 2; y--)
@@ -96,7 +96,7 @@ esp_err_t effect_waterfall_run(framebuffer_t *fb)
                     (map[MAP_XY(x, y - 1)] + map[MAP_XY(x, y - 2)] + map[MAP_XY(x, y - 2)]) / 3;
 
         // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
-        if (random8() < EPARAM(waterfall, P_SPARKING))
+        if (random8() < PARAM_VAL(waterfall, P_SPARKING))
         {
             y = random8_to(2);
             map[MAP_XY(x, y)] = qadd8(map[MAP_XY(x, y)], random8_between(160, 255));
@@ -108,7 +108,7 @@ esp_err_t effect_waterfall_run(framebuffer_t *fb)
             // Scale the heat value from 0-255 down to 0-240
             // for best results with color palettes.
             uint8_t color_idx = scale8(map[MAP_XY(x, y)], 240);
-            bool is_fire = (EPARAM(waterfall, P_MODE) == WATERFALL_FIRE || EPARAM(waterfall, P_MODE) == WATERFALL_COLD_FIRE);
+            bool is_fire = (PARAM_VAL(waterfall, P_MODE) == WATERFALL_FIRE || PARAM_VAL(waterfall, P_MODE) == WATERFALL_COLD_FIRE);
             fb_set_pixel_rgb(fb, x, is_fire ? y : fb->height - 1 - y,
                     color_from_palette_rgb(palette, PALETTE_SIZE, color_idx, 255, true));
         }

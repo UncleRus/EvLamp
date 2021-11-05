@@ -34,7 +34,7 @@ static void change_flower(framebuffer_t *fb, uint8_t bee)
 
 esp_err_t effect_crazybees_prepare(framebuffer_t *fb)
 {
-    for (uint8_t i = 0; i < EPARAM(crazybees, P_NUM_BEES); i++)
+    for (uint8_t i = 0; i < PARAM_VAL(crazybees, P_NUM_BEES); i++)
     {
         // set bee
         bees[i].x = random8_to(fb->width);
@@ -50,7 +50,7 @@ esp_err_t effect_crazybees_run(framebuffer_t *fb)
     CHECK(fb_begin(fb));
 
     fb_fade(fb, 8);
-    for (uint8_t i = 0; i < EPARAM(crazybees, P_NUM_BEES); i++)
+    for (uint8_t i = 0; i < PARAM_VAL(crazybees, P_NUM_BEES); i++)
     {
         // move bee
         if (bees[i].x > bees[i].flower_x) bees[i].x--;

@@ -51,21 +51,21 @@ esp_err_t effect_dna_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 
-    offset += EPARAM(dna, P_SPEED) / 10;
+    offset += PARAM_VAL(dna, P_SPEED) / 10;
 
     fb_fade(fb, 130);
 
     for (uint8_t i = 0; i < fb->height; i++)
     {
-        uint16_t x1 = beatsin8(EPARAM(dna, P_SPEED), 0, fb->width - 1, 0, i * EPARAM(dna, P_SIZE))
-                + beatsin8(EPARAM(dna, P_SPEED) - 7, 0, fb->width - 1, 0, i * EPARAM(dna, P_SIZE) + 128);
-        uint16_t x2 = beatsin8(EPARAM(dna, P_SPEED), 0, fb->width - 1, 0, 128 + i * EPARAM(dna, P_SIZE))
-                + beatsin8(EPARAM(dna, P_SPEED) - 7, 0, fb->width - 1, 0, 128 + 64 + i * EPARAM(dna, P_SIZE));
+        uint16_t x1 = beatsin8(PARAM_VAL(dna, P_SPEED), 0, fb->width - 1, 0, i * PARAM_VAL(dna, P_SIZE))
+                + beatsin8(PARAM_VAL(dna, P_SPEED) - 7, 0, fb->width - 1, 0, i * PARAM_VAL(dna, P_SIZE) + 128);
+        uint16_t x2 = beatsin8(PARAM_VAL(dna, P_SPEED), 0, fb->width - 1, 0, 128 + i * PARAM_VAL(dna, P_SIZE))
+                + beatsin8(PARAM_VAL(dna, P_SPEED) - 7, 0, fb->width - 1, 0, 128 + 64 + i * PARAM_VAL(dna, P_SIZE));
 
         rgb_t color = hsv2rgb_rainbow(hsv_from_values(i * 128 / (fb->height - 1) + offset, 255, 255));
 
         if ((i + offset / 8) & 3)
-            horizontal_line(fb, x1 / 2, x2 / 2, i, color, EPARAM(dna, P_BORDER));
+            horizontal_line(fb, x1 / 2, x2 / 2, i, color, PARAM_VAL(dna, P_BORDER));
     }
 
     return fb_end(fb);

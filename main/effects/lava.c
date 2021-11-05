@@ -42,15 +42,15 @@ esp_err_t effect_lava_run(framebuffer_t *fb)
 
     if (!(fb->frame_num % 30)) x_offs++;
 
-    z_pos += EPARAM(lava, P_SPEED);
+    z_pos += PARAM_VAL(lava, P_SPEED);
     hue++;
 
     for (int x = 0; x < fb->width; x++)
         for (int y = 0; y < fb->height; y++)
         {
-            uint8_t noise = inoise8_3d(x * EPARAM(lava, P_SCALE) + x_offs, y * EPARAM(lava, P_SCALE), z_pos);
+            uint8_t noise = inoise8_3d(x * PARAM_VAL(lava, P_SCALE) + x_offs, y * PARAM_VAL(lava, P_SCALE), z_pos);
 
-            if (EPARAM(lava, P_MODE) == MODE_RAINBOW)
+            if (PARAM_VAL(lava, P_MODE) == MODE_RAINBOW)
                 fb_set_pixel_hsv(fb, x, y, hsv_from_values(hue + noise, 255, 255));
             else
                 fb_set_pixel_rgb(fb, x, y, color_from_palette_rgb((rgb_t *)palette, PALETTE_SIZE, noise, 255, true));

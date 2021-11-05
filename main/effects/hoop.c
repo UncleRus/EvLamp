@@ -20,7 +20,7 @@ esp_err_t effect_hoop_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 
-    m += EPARAM(hoop, P_SPEED);
+    m += PARAM_VAL(hoop, P_SPEED);
     uint8_t t = m / 15;
     uint8_t u = t * 2;
 

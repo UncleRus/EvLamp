@@ -24,10 +24,10 @@ static rgb_t palette[PALETTE_SIZE];
 
 esp_err_t effect_water_prepare(framebuffer_t *fb)
 {
-    rgb_fill_solid_hsv(palette, hsv_from_values(EPARAM(water, P_HUE), EPARAM(water, P_SAT), 230), PALETTE_SIZE);
+    rgb_fill_solid_hsv(palette, hsv_from_values(PARAM_VAL(water, P_HUE), PARAM_VAL(water, P_SAT), 230), PALETTE_SIZE);
 
-    rgb_t c1 = hsv2rgb_rainbow(hsv_from_values(EPARAM(water, P_HUE), EPARAM(water, P_SAT) - 60, 255));
-    rgb_t c2 = hsv2rgb_rainbow(hsv_from_values(EPARAM(water, P_HUE), 255 - EPARAM(water, P_SAT), 210));
+    rgb_t c1 = hsv2rgb_rainbow(hsv_from_values(PARAM_VAL(water, P_HUE), PARAM_VAL(water, P_SAT) - 60, 255));
+    rgb_t c2 = hsv2rgb_rainbow(hsv_from_values(PARAM_VAL(water, P_HUE), 255 - PARAM_VAL(water, P_SAT), 210));
     palette[7] = c1;
     palette[8] = c2;
     palette[9] = c2;
@@ -45,7 +45,7 @@ esp_err_t effect_water_run(framebuffer_t *fb)
     for (size_t y = 0; y < fb->height; y++)
         for (size_t x = 0; x < fb->width; x++)
         {
-            uint8_t idx = inoise8_3d(x * 30, y * 30, time_ms / (255 - (EPARAM(water, P_SPEED) + 200)));
+            uint8_t idx = inoise8_3d(x * 30, y * 30, time_ms / (255 - (PARAM_VAL(water, P_SPEED) + 200)));
             fb_set_pixel_rgb(fb, x, y, color_from_palette_rgb(palette, PALETTE_SIZE, idx, 255, true));
         }
     fb_blur2d(fb, 32);

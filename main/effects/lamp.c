@@ -15,7 +15,7 @@ esp_err_t effect_lamp_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 
-    rgb_t color = { .r = EPARAM(lamp, P_RED), .g = EPARAM(lamp, P_GREEN), .b = EPARAM(lamp, P_BLUE) };
+    rgb_t color = { .r = PARAM_VAL(lamp, P_RED), .g = PARAM_VAL(lamp, P_GREEN), .b = PARAM_VAL(lamp, P_BLUE) };
 
     for (size_t i = 0; i < fb->height * fb->width; i++)
         fb->data[i] = color;

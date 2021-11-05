@@ -37,6 +37,7 @@ idf_component_register(
 		effects/gif.c
 		effects/relax.c
 		effects/wheel.c
+		effects/peacock.c
 		
 	EMBED_TXTFILES
 		${EMBED}/web/jquery.js

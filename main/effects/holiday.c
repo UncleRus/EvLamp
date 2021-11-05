@@ -25,7 +25,7 @@ static void wave(framebuffer_t *fb)
     uint8_t scale = beatsin8(1, 1, 255, 0, 0);
     for (int i = 0; i < fb->width - 1; i++)
     {
-        uint16_t fx = beatsin16(i * EPARAM(holiday, P_SPEED), i * 5, ((fb->width - 1) * 10 - 2) - (i * 5 + 2), 0, 0);
+        uint16_t fx = beatsin16(i * PARAM_VAL(holiday, P_SPEED), i * 5, ((fb->width - 1) * 10 - 2) - (i * 5 + 2), 0, 0);
         fb_set_pixelf_hsv(fb, (float)fx / 10, i, hsv_from_values(hue + i * scale, 255, 100));
     }
 }
@@ -37,7 +37,7 @@ static void radar(framebuffer_t *fb)
     uint8_t scale = beatsin8(1, 1, 255, 0, 0);
     for (int i = 0; i < fb->width - 1; i++)
     {
-        uint16_t fx = beatsin16(EPARAM(holiday, P_SPEED) * 5, i * 2.5, (fb->width - 1) * 5 - i * 2.5, 0, 0);
+        uint16_t fx = beatsin16(PARAM_VAL(holiday, P_SPEED) * 5, i * 2.5, (fb->width - 1) * 5 - i * 2.5, 0, 0);
         fb_set_pixelf_hsv(fb, (float)fx / 5, i, hsv_from_values(hue + i * scale, 255, 255));
     }
 }
@@ -63,7 +63,7 @@ static void tree(framebuffer_t *fb)
 
     for (int i = 0; i < fb->width - 1; i++)
     {
-        uint16_t fx = beatsin16(i * EPARAM(holiday, P_SPEED), i * 2, ((fb->width - 1) * 4 - 2) - (i * 2 + 2), 0, 0);
+        uint16_t fx = beatsin16(i * PARAM_VAL(holiday, P_SPEED), i * 2, ((fb->width - 1) * 4 - 2) - (i * 2 + 2), 0, 0);
         fb_set_pixelf_hsv(fb, (float)fx / 4, i, random8_to(10) == 0
                 ? hsv_from_values(random8(), random8_between(32, 255), 255)
                 : hsv_from_values(100, 255, 100));
@@ -75,7 +75,7 @@ esp_err_t effect_holiday_run(framebuffer_t *fb)
     CHECK(fb_begin(fb));
 
     hue++;
-    switch (EPARAM(holiday, P_MODE))
+    switch (PARAM_VAL(holiday, P_MODE))
     {
         case HOLIDAY_RADAR:
             radar(fb);
