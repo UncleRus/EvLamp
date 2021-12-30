@@ -36,7 +36,7 @@ static void surface_task(void *arg)
     strip.type = sys_settings.leds.type;
     strip.channel = RMT_CHANNEL;
     // TODO : calculate single LED current based on its type or just move it to config
-    strip.brightness = ((float)sys_settings.leds.current_limit / strip.length) / (SINGLE_LED_CURRENT_MA / 256.0f);
+    strip.brightness = (uint8_t)(((float)sys_settings.leds.current_limit / strip.length) / ((float)CONFIG_EL_SINGLE_LED_CURRENT_MA / 256.0f));
 
     ESP_ERROR_CHECK(led_strip_init(&strip));
 
@@ -126,7 +126,7 @@ esp_err_t surface_stop()
     CHECK(surface_pause());
 
     CHECK(fb_begin(&framebuffer));
-    fb_clear(&framebuffer);
+    CHECK(fb_clear(&framebuffer));
     CHECK(fb_end(&framebuffer));
 
     CHECK(fb_render(&framebuffer, NULL));
@@ -191,7 +191,7 @@ esp_err_t surface_set_brightness(uint8_t val)
 
 esp_err_t surface_increment_brightness(int8_t val)
 {
-    int16_t b = vol_settings.brightness + val;
+    int16_t b = (int16_t)vol_settings.brightness + val;
     if (b < 0) b = 0;
     else if (b > 255) b = 255;
     return surface_set_brightness(b);

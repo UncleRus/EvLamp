@@ -706,7 +706,7 @@ static const httpd_uri_t route_post_lamp_effect = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static esp_err_t get_ota(httpd_req_t *req)
+static esp_err_t get_ota_list(httpd_req_t *req)
 {
     cJSON *res;
 
@@ -720,13 +720,38 @@ static esp_err_t get_ota(httpd_req_t *req)
     return respond_json(req, res);
 }
 
-static const httpd_uri_t route_get_ota = {
-    .uri = "/api/ota",
+static const httpd_uri_t route_get_ota_list = {
+    .uri = "/api/ota/list",
     .method = HTTP_GET,
-    .handler = get_ota
+    .handler = get_ota_list
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+
+static esp_err_t post_ota_update(httpd_req_t *req)
+{
+    const char *msg = NULL;
+    cJSON *json = NULL;
+
+    esp_err_t err = parse_post_json(req, &msg, &json);
+    if (err != ESP_OK)
+        goto exit;
+
+    const char *version = cJSON_GetStringValue(cJSON_GetObjectItem(json, "version"));
+    err = ota_run(version);
+    if (err != ESP_OK)
+        msg = "Update failed";
+
+exit:
+    if (json) cJSON_Delete(json);
+    return respond_api(req, err, msg);
+}
+
+static const httpd_uri_t route_post_ota_update = {
+    .uri = "/api/ota/update",
+    .method = HTTP_POST,
+    .handler = post_ota_update
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -745,7 +770,8 @@ esp_err_t api_init(httpd_handle_t server)
     CHECK(httpd_register_uri_handler(server, &route_post_lamp_state));
     CHECK(httpd_register_uri_handler(server, &route_get_lamp_effect));
     CHECK(httpd_register_uri_handler(server, &route_post_lamp_effect));
-    CHECK(httpd_register_uri_handler(server, &route_get_ota));
+    CHECK(httpd_register_uri_handler(server, &route_get_ota_list));
+    CHECK(httpd_register_uri_handler(server, &route_post_ota_update));
 
     return ESP_OK;
 }

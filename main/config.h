@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// Settings
 
-#define SETTINGS_MAGIC 0xbeef0003 // TODO project version to magic
+#define SETTINGS_MAGIC 0xbeef0004 // TODO project version to magic
 
 #ifdef CONFIG_EL_WIFI_MODE_AP
     #define DEFAULT_WIFI_MODE WIFI_MODE_AP
@@ -58,7 +58,6 @@
 /// Surface
 
 #define RMT_CHANNEL RMT_CHANNEL_0
-#define SINGLE_LED_CURRENT_MA 60.0f
 #define FPS_MAX 120
 #define SURFACE_TASK_STACK_SIZE 4096
 
@@ -71,7 +70,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// OTA
 
-#define OTA_REPO_URL "https://api.github.com/repos/UncleRus/" APP_NAME "/"
 #define OTA_BINARY_NAME APP_NAME ".bin"
+#define OTA_CHUNK_SIZE 512
 
 #endif /* MAIN_CONFIG_H_ */

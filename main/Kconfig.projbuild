@@ -113,6 +113,10 @@ menu "*** EvLamp configuration ***"
 			
 			endchoice
 				
+            config EL_SINGLE_LED_CURRENT_MA
+				int "Maximal current consuming by single LED, mA"
+				default 60
+
 			config EL_MATRIX_MAX_CURRENT
 				int "Maximal current consuming by LEDs, mA"
 				default 5000
@@ -156,7 +160,7 @@ menu "*** EvLamp configuration ***"
 				default 0
 
 		endmenu
-
+		
 #		config EL_SDCARD_ENABLE
 #			bool "Use SD card connected to SPI"
 #			default y
@@ -197,6 +201,18 @@ menu "*** EvLamp configuration ***"
 #		endmenu
 
 
+	endmenu
+	
+	menu "OTA configuration"
+	
+		config OTA_GITHUB_REPO
+			string "Github repository (user/repo)"
+			default "UncleRus/EvLamp"
+		
+		config OTA_DOWNGRADE
+			bool "Allow downgrade"
+			default y
+	
 	endmenu
 
 endmenu

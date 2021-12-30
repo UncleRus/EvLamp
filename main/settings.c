@@ -128,9 +128,9 @@ esp_err_t settings_init()
 
 esp_err_t sys_settings_reset()
 {
-    if (!sys_defaults.wifi.ap.password || !strlen((const char *)sys_defaults.wifi.ap.password))
+    if (!strlen((const char *) sys_defaults.wifi.ap.password))
         sys_defaults.wifi.ap.authmode = WIFI_AUTH_OPEN;
-    if (!sys_defaults.wifi.sta.password || !strlen((const char *)sys_defaults.wifi.sta.password))
+    if (!strlen((const char *)sys_defaults.wifi.sta.password))
         sys_defaults.wifi.sta.threshold.authmode = WIFI_AUTH_OPEN;
 
     memcpy(&sys_settings, &sys_defaults, sizeof(system_settings_t));
