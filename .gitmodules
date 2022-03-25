@@ -4,6 +4,3 @@
 [submodule "components/libnsgif"]
 	path = components/libnsgif
 	url = https://github.com/UncleRus/esp-idf-libnsgif.git
-[submodule "components/libcurl/curl"]
-	path = components/libcurl/curl
-	url = https://github.com/curl/curl.git

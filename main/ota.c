@@ -3,6 +3,7 @@
 #include <esp_ota_ops.h>
 #include "embed.h"
 #include "surface.h"
+#include "freertos/task.h"
 
 typedef esp_err_t (*http_data_cb_t)(void *ctx, esp_http_client_handle_t client, size_t len);
 
