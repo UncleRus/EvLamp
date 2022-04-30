@@ -64,3 +64,5 @@ sdkconfig
 /.vscode/
 /.idea/
 cmake-build-debug/
+
+files/ota/~ota_server_cert.pem

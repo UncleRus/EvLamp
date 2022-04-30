@@ -388,6 +388,7 @@ esp_err_t ota_run(const char *version)
         goto exit;
     }
 
+    /*
     char *cur_version = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetObjectItem(avail, "current"), "version"));
     int cmp = version_cmp(cur_version, version);
 //    if (!cmp)
@@ -404,6 +405,7 @@ esp_err_t ota_run(const char *version)
         goto exit;
     }
 #endif
+     */
     res = ota_update(version, avail, part);
     if (res != ESP_OK)
     {

@@ -283,7 +283,7 @@ static esp_err_t post_settings_wifi(httpd_req_t *req)
         goto exit;
     }
 
-    uint8_t mode = cJSON_GetNumberValue(mode_item);
+    uint8_t mode = (uint8_t)cJSON_GetNumberValue(mode_item);
     if (mode != WIFI_MODE_AP && mode != WIFI_MODE_STA)
     {
         msg = "Invalid mode value";
@@ -298,7 +298,7 @@ static esp_err_t post_settings_wifi(httpd_req_t *req)
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
-    uint8_t ap_channel = cJSON_GetNumberValue(ap_channel_item);
+    uint8_t ap_channel = (uint8_t)cJSON_GetNumberValue(ap_channel_item);
     if (ap_channel > 32)
     {
         msg = "Invalid ap.channel";
@@ -417,22 +417,22 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
         goto exit;
     }
 
-    size_t width = cJSON_GetNumberValue(width_item);
-    size_t height = cJSON_GetNumberValue(height_item);
+    size_t width = (size_t)cJSON_GetNumberValue(width_item);
+    size_t height = (size_t)cJSON_GetNumberValue(height_item);
     if (width < 2 || width > 256 || height < 2 || height > 256)
     {
         msg = "Invalid matrix dimensions";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
-    uint8_t type = cJSON_GetNumberValue(type_item);
+    uint8_t type = (uint8_t)cJSON_GetNumberValue(type_item);
     if (type > LED_STRIP_APA106)
     {
         msg = "Invalid LED type";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
-    uint32_t limit = cJSON_GetNumberValue(limit_item);
+    uint32_t limit = (uint32_t)cJSON_GetNumberValue(limit_item);
     if (limit < MIN_LED_CURRENT_LIMIT)
     {
         msg = "Current limit too low";
@@ -574,7 +574,7 @@ static esp_err_t post_lamp_state(httpd_req_t *req)
 
     if (effect_item)
     {
-        err = surface_set_effect(cJSON_GetNumberValue(effect_item));
+        err = surface_set_effect((size_t)cJSON_GetNumberValue(effect_item));
         if (err != ESP_OK)
         {
             msg = "Effect setting error";
@@ -592,7 +592,7 @@ static esp_err_t post_lamp_state(httpd_req_t *req)
     }
     if (brightness_item)
     {
-        err = surface_set_brightness(cJSON_GetNumberValue(brightness_item));
+        err = surface_set_brightness((uint8_t)cJSON_GetNumberValue(brightness_item));
         if (err != ESP_OK)
         {
             msg = "Brightness setting error";
@@ -601,7 +601,7 @@ static esp_err_t post_lamp_state(httpd_req_t *req)
     }
     if (fps_item)
     {
-        err = surface_set_fps(cJSON_GetNumberValue(fps_item));
+        err = surface_set_fps((uint8_t)cJSON_GetNumberValue(fps_item));
         if (err != ESP_OK)
         {
             msg = "FPS setting error";
@@ -652,7 +652,7 @@ static esp_err_t post_lamp_effect(httpd_req_t *req)
     cJSON *effect_item = cJSON_GetObjectItem(json, "effect");
     if (cJSON_IsNumber(effect_item))
     {
-        effect = cJSON_GetNumberValue(effect_item);
+        effect = (size_t)cJSON_GetNumberValue(effect_item);
         if (effect >= effects_count)
         {
             err = ESP_ERR_INVALID_ARG;
@@ -685,7 +685,7 @@ static esp_err_t post_lamp_effect(httpd_req_t *req)
             msg = "Invalid JSON, parameter value must be numeric";
             goto exit;
         }
-        err = effect_param_set(effect, p, cJSON_GetNumberValue(item));
+        err = effect_param_set(effect, p, (uint8_t)cJSON_GetNumberValue(item));
         if (err != ESP_OK)
         {
             msg = "Error set parameter";

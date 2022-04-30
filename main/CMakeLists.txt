@@ -14,7 +14,7 @@ idf_component_register(
 		webserver.c
 		api.c
 		ota.c
-		
+
 		effects/crazybees.c
 		effects/dna.c
 		effects/fire.c

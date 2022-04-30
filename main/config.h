@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// Settings
 
-#define SETTINGS_MAGIC 0xbeef0004 // TODO project version to magic
+#define SETTINGS_MAGIC 0xbeef0005 // TODO project version to magic
 
 #ifdef CONFIG_EL_WIFI_MODE_AP
     #define DEFAULT_WIFI_MODE WIFI_MODE_AP
