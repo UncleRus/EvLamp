@@ -62,3 +62,5 @@ sdkconfig
 /__garbage__
 /sdkconfig.unclerus
 /.vscode/
+/.idea/
+/cmake-build-debug/

@@ -112,7 +112,10 @@ menu "*** EvLamp configuration ***"
 					bool "APA106"
 			
 			endchoice
-				
+			config EL_SINGLE_LED_CURRENT_MA
+				int "Maximal current consuming by single LED, mA"
+				default 60
+
 			config EL_MATRIX_MAX_CURRENT
 				int "Maximal current consuming by LEDs, mA"
 				default 5000
