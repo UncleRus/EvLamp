@@ -38,7 +38,8 @@ idf_component_register(
 		effects/wheel.c
 		effects/peacock.c
 		effects/colors.c
-		
+		effects/diagonals.c
+
 	EMBED_TXTFILES
 		${EMBED}/web/jquery.js
 		${EMBED}/web/styles.css

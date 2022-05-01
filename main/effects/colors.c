@@ -10,7 +10,7 @@
 #define P_MAX_SAT 2
 
 EFFECT_PARAMS(colors, 3) = {
-    DECL_PARAM(P_SPEED, "Speed", 128, 254, 10),
+    DECL_PARAM(P_SPEED, "Speed", 128, 254, 192),
     DECL_PARAM(P_MIN_SAT, "Minimal saturation", 1, 255, 128),
     DECL_PARAM(P_MAX_SAT, "Maximal saturation", 1, 255, 255),
 };

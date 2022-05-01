@@ -29,6 +29,7 @@
 #include "effects/wheel.h"
 #include "effects/peacock.h"
 #include "effects/colors.h"
+#include "effects/diagonals.h"
 
 const effect_descriptor_t effects[] = {
     DESCR_EFFECT_LAMP,
@@ -55,6 +56,7 @@ const effect_descriptor_t effects[] = {
     DESCR_EFFECT_WHEEL,
     DESCR_EFFECT_PEACOCK,
     DESCR_EFFECT_COLORS,
+    DESCR_EFFECT_DIAGONALS,
 };
 
 const size_t effects_count = sizeof(effects) / sizeof(effect_descriptor_t);

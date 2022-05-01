@@ -10,7 +10,7 @@
 
 #include "effect.h"
 
-extern EFFECT_PARAMS(fire, 1);
+extern EFFECT_PARAMS(fire, 2);
 
 esp_err_t effect_fire_prepare(framebuffer_t *fb);
 
