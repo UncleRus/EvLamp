@@ -31,6 +31,7 @@
 #include "effects/colors.h"
 #include "effects/diagonals.h"
 #include "effects/whirls.h"
+#include "effects/sun.h"
 
 const effect_descriptor_t effects[] = {
     DESCR_EFFECT_LAMP,
@@ -59,6 +60,7 @@ const effect_descriptor_t effects[] = {
     DESCR_EFFECT_COLORS,
     DESCR_EFFECT_DIAGONALS,
     DESCR_EFFECT_WHIRLS,
+    DESCR_EFFECT_SUN,
 };
 
 const size_t effects_count = sizeof(effects) / sizeof(effect_descriptor_t);

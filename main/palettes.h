@@ -15,9 +15,9 @@ enum {
 
     PALETTE_CLOUD,
     PALETTE_LAVA,
+    PALETTE_HEAT,
 //    PALETTE_FOREST,
 //    PALETTE_RAINBOW,
-//    PALETTE_HEAT,
 
     PALETTE_MAX
 };
@@ -56,4 +56,4 @@ typedef struct
 
 extern const palette_def_t palettes[PALETTE_MAX];
 
-#endif //EVLAMP_PALETTES_H
+#endif /* EVLAMP_PALETTES_H */

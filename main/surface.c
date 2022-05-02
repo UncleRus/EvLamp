@@ -24,8 +24,7 @@ static esp_err_t render_frame(framebuffer_t *fb, void *arg)
         for (size_t x = 0; x < fb->width; x++)
         {
             size_t strip_idx = y * fb->width + (y % 2 ? fb->width - x - 1 : x);
-            rgb_t color = rgb_scale_video(get_fb_pixel(fb, x, y), vol_settings.brightness);
-            CHECK(led_strip_set_pixel(&strip, strip_idx, color));
+            CHECK(led_strip_set_pixel(&strip, strip_idx, rgb_scale_video(get_fb_pixel(fb, x, y), vol_settings.brightness)));
         }
 
     return led_strip_flush(&strip);

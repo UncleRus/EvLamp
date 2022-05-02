@@ -41,6 +41,7 @@ idf_component_register(
 		effects/colors.c
 		effects/diagonals.c
 		effects/whirls.c
+		effects/sun.c
 
 	EMBED_TXTFILES
 		${EMBED}/web/jquery.js

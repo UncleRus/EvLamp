@@ -23,6 +23,12 @@ static const rgb_t p_lava[] = {
     C_DARK_RED, C_DARK_RED, C_RED, C_ORANGE,
     C_WHITE, C_ORANGE, C_RED, C_DARK_RED
 };
+static const rgb_t p_heat[] = {
+    C_BLACK,
+    { .r = 0x33, .g = 0, .b = 0 }, { .r = 0x66, .g = 0, .b = 0 }, { .r = 0x99, .g = 0, .b = 0 }, C_RED,
+    { .r = 0xff, .g = 0x33, .b = 0 }, { .r = 0xff, .g = 0x66, .b = 0 }, { .r = 0xff, .g = 0x99, .b = 0 }, C_YELLOW,
+    { .r = 0xff, .g = 0xff, .b = 0x33 }, { .r = 0xff, .g = 0xff, .b = 0x66 }, { .r = 0xff, .g = 0xff, .b = 0x99 }, C_WHITE
+};
 
 const palette_def_t palettes[PALETTE_MAX] = {
     [PALETTE_FIRE]           = DECL_PALETTE(p_fire),
@@ -35,4 +41,5 @@ const palette_def_t palettes[PALETTE_MAX] = {
     [PALETTE_LITHIUM_FIRE]   = DECL_PALETTE(p_lithium_fire),
     [PALETTE_CLOUD]          = DECL_PALETTE(p_cloud),
     [PALETTE_LAVA]           = DECL_PALETTE(p_lava),
+    [PALETTE_HEAT]           = DECL_PALETTE(p_heat),
 };
