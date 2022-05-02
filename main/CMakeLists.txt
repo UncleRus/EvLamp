@@ -42,6 +42,8 @@ idf_component_register(
 		effects/diagonals.c
 		effects/whirls.c
 		effects/sun.c
+		effects/spaceships.c
+		effects/fireflies.c
 
 	EMBED_TXTFILES
 		${EMBED}/web/jquery.js

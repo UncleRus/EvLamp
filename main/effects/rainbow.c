@@ -4,7 +4,6 @@
 #include "effects/rainbow.h"
 
 #include <lib8tion.h>
-#include "lava.h"
 
 #define P_DIRECTION 0
 #define P_SCALE     1
