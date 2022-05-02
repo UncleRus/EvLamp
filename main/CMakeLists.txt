@@ -13,6 +13,7 @@ idf_component_register(
 		input.c
 		webserver.c
 		api.c
+		palettes.c
 		
 		effects/crazybees.c
 		effects/dna.c
@@ -39,6 +40,7 @@ idf_component_register(
 		effects/peacock.c
 		effects/colors.c
 		effects/diagonals.c
+		effects/whirls.c
 
 	EMBED_TXTFILES
 		${EMBED}/web/jquery.js

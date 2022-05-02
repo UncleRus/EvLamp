@@ -25,9 +25,9 @@ static uint8_t num_rays;
 
 static void line(framebuffer_t *fb, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, rgb_t color)
 {
-    uint8_t xsteps = abs8(x1 - x2) + 1;
-    uint8_t ysteps = abs8(y1 - y2) + 1;
-    uint8_t steps = xsteps >= ysteps ? xsteps : ysteps;
+    uint8_t x_steps = abs8((int8_t)(x1 - x2)) + 1;
+    uint8_t y_steps = abs8((int8_t)(y1 - y2)) + 1;
+    uint8_t steps = x_steps >= y_steps ? x_steps : y_steps;
 
     for (uint8_t i = 1; i <= steps; i++)
     {
