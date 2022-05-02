@@ -13,13 +13,18 @@ static framebuffer_t framebuffer;
 static EventGroupHandle_t state;
 
 // frame renderer, framebuffer -> LED strip
+static inline rgb_t get_fb_pixel(framebuffer_t *fb, size_t x, size_t y)
+{
+    return fb->data[FB_OFFSET(fb, sys_settings.leds.h_mirror ? fb->width - x - 1 : x, sys_settings.leds.v_mirror ? fb->height - y - 1 : y)];
+}
+
 static esp_err_t render_frame(framebuffer_t *fb, void *arg)
 {
     for (size_t y = 0; y < fb->height; y++)
         for (size_t x = 0; x < fb->width; x++)
         {
             size_t strip_idx = y * fb->width + (y % 2 ? fb->width - x - 1 : x);
-            rgb_t color = rgb_scale_video(fb->data[FB_OFFSET(fb, x, y)], vol_settings.brightness);
+            rgb_t color = rgb_scale_video(get_fb_pixel(fb, x, y), vol_settings.brightness);
             CHECK(led_strip_set_pixel(&strip, strip_idx, color));
         }
 

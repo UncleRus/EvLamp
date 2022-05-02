@@ -185,6 +185,14 @@
 					<label for="i_leds_current_limit">Current limit, mA:</label>
 					<input type="number" id="i_leds_current_limit" />
 				</div>
+				<div class="ui-widget">
+					<label for="i_leds_v_mirror">Mirror vertically</label>
+					<div><input type="checkbox" id="i_leds_v_mirror" style="min-width: auto;"></div>
+				</div>
+				<div class="ui-widget">
+					<label for="i_leds_h_mirror">Mirror horizontally</label>
+					<div><input type="checkbox" id="i_leds_h_mirror" style="min-width: auto;"></div>
+				</div>
 			</fieldset>
 			<div class="buttons">
 				<button id="b_leds_save" class="ui-button">Save settings</button>
@@ -418,7 +426,9 @@
 				width: parseInt($('#i_leds_width').val()),
 				height: parseInt($('#i_leds_height').val()),
 				type: parseInt($('#i_leds_type').val()),
-				current_limit: parseInt($('#i_leds_current_limit').val())
+				current_limit: parseInt($('#i_leds_current_limit').val()),
+				v_mirror: $('#i_leds_v_mirror').prop('checked'),
+				h_mirror: $('#i_leds_h_mirror').prop('checked'),
 			};
 			console.log(data);
 			$.ajax({
@@ -479,6 +489,8 @@
 				$('#i_leds_height').val(data.height);
 				$('#i_leds_type').val(data.type);
 				$('#i_leds_current_limit').val(data.current_limit);
+				$('#i_leds_v_mirror').prop('checked', data.v_mirror);
+				$('#i_leds_h_mirror').prop('checked', data.h_mirror);
 			});
 		});
 

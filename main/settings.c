@@ -41,6 +41,8 @@ static system_settings_t sys_defaults = {
         .height        = CONFIG_EL_MATRIX_HEIGHT,
         .type          = DEFAULT_LED_TYPE,
         .current_limit = CONFIG_EL_MATRIX_MAX_CURRENT,
+        .v_mirror      = false,
+        .h_mirror      = false,
     },
 };
 

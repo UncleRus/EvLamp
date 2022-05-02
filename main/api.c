@@ -366,6 +366,8 @@ static esp_err_t get_settings_leds(httpd_req_t *req)
     cJSON_AddNumberToObject(res, "height", sys_settings.leds.height);
     cJSON_AddNumberToObject(res, "type", sys_settings.leds.type);
     cJSON_AddNumberToObject(res, "current_limit", sys_settings.leds.current_limit);
+    cJSON_AddBoolToObject(res, "v_mirror", sys_settings.leds.v_mirror);
+    cJSON_AddBoolToObject(res, "h_mirror", sys_settings.leds.h_mirror);
 
     return respond_json(req, res);
 }
@@ -415,6 +417,20 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
+    cJSON *v_mirror_item = cJSON_GetObjectItem(json, "v_mirror");
+    if (!cJSON_IsBool(v_mirror_item))
+    {
+        msg = "Object `v_mirror` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *h_mirror_item = cJSON_GetObjectItem(json, "h_mirror");
+    if (!cJSON_IsBool(h_mirror_item))
+    {
+        msg = "Object `h_mirror` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
 
     size_t width = (size_t)cJSON_GetNumberValue(width_item);
     size_t height = (size_t)cJSON_GetNumberValue(height_item);
@@ -443,6 +459,8 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
     sys_settings.leds.height = height;
     sys_settings.leds.type = type;
     sys_settings.leds.current_limit = limit;
+    sys_settings.leds.v_mirror = cJSON_IsTrue(v_mirror_item);
+    sys_settings.leds.h_mirror = cJSON_IsTrue(h_mirror_item);
 
     err = sys_settings_save();
     msg = err != ESP_OK

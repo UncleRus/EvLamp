@@ -23,6 +23,8 @@ typedef struct
         uint8_t height;
         uint8_t type;
         uint32_t current_limit;
+        bool v_mirror;
+        bool h_mirror;
     } leds;
 } system_settings_t;
 
