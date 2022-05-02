@@ -23,8 +23,8 @@ Tested with 16x16 WS21812B.
 	- Main: long press - On/Off, click - next effect
 	- Up/Down: brightness up/down
 	- Reset: Reset settings to defaults
-	
-*TODO: schematic diagram*
+
+[Schematics in PDF format](hardware/plot/evlamp.pdf)
 
 ## How to build
 
