@@ -1,6 +1,26 @@
 # API
 
-EvLamp provides a simple API based on HTTP GET and POST requests containing JSON data. 
+EvLamp provides a simple API based on HTTP GET and POST requests containing JSON data.
+
+---
+
+## Contents
+
+- [Get firmware information](#get-firmware-information)
+- [Get current WiFi settings](#get-current-wifi-settings)
+- [Set WiFi settings](#set-wifi-settings)
+- [Get current LED settings](#get-current-led-settings)
+- [Set LED settings](#set-led-settings)
+- [Reset system settings](#reset-system-settings)
+- [Reboot device](#reboot-device)
+- [Get current lamp state](#get-current-lamp-state)
+- [Set lamp state](#set-lamp-state)
+- [Get full list of effects and its parameters](#get-full-list-of-effects-and-its-parameters)
+- [Reset parameters of all effects](#reset-parameters-of-all-effects)
+- [Get current effect parameters](#get-current-effect-parameters)
+- [Set effect parameters](#set-effect-parameters)
+
+---
 
 ## Get firmware information
 
@@ -10,7 +30,7 @@ EvLamp provides a simple API based on HTTP GET and POST requests containing JSON
 
 ### Response
 
-```json
+```jsonc
 {
   "app_name": <String, Application name, usually "EvLamp">,
   "app_version": <String, Application version>,
@@ -30,6 +50,8 @@ EvLamp provides a simple API based on HTTP GET and POST requests containing JSON
 }
 ```
 
+---
+
 ## Get current WiFi settings
 
 ### Request
@@ -38,7 +60,7 @@ EvLamp provides a simple API based on HTTP GET and POST requests containing JSON
 
 ### Response
 
-```json
+```jsonc
 {
   "mode": <Integer, WiFi mode. 1 - Station, 2 - Access point>,
   "ip": {
@@ -88,13 +110,15 @@ EvLamp provides a simple API based on HTTP GET and POST requests containing JSON
 }
 ```
 
+---
+
 ## Set WiFi settings
 
 ### Request
 
 **POST** `/api/settings/wifi`
 
-```json
+```jsonc
 {
   "mode": <Integer, WiFi mode. 1 - Station, 2 - Access point>,
   "ip": {
@@ -122,13 +146,15 @@ EvLamp provides a simple API based on HTTP GET and POST requests containing JSON
 
 ### Response
 
-```json
+```jsonc
 {
   "result": <Integer, Result code. 0 - no errors>,
   "name": <String, Name of the result code, "ESP_OK" for result code 0>,
   "message": <String, Error message if result code != 0>
 }
 ```
+
+---
 
 ## Get current LED settings
 
@@ -138,7 +164,7 @@ EvLamp provides a simple API based on HTTP GET and POST requests containing JSON
 
 ### Response
 
-```json
+```jsonc
 {
   "width": <Integer, LED matrix width (number of columns)>,
   "height": <Integer, LED matrix height (number of rows)>,
@@ -163,13 +189,15 @@ EvLamp provides a simple API based on HTTP GET and POST requests containing JSON
 }
 ```
 
+---
+
 ## Set LED settings
 
 ### Request
 
 **POST** `/api/settings/leds`
 
-```json
+```jsonc
 {
   "width": <Integer, LED matrix width (number of columns)>,
   "height": <Integer, LED matrix height (number of rows)>,
@@ -183,13 +211,15 @@ EvLamp provides a simple API based on HTTP GET and POST requests containing JSON
 
 ### Response
 
-```json
+```jsonc
 {
   "result": <Integer, Result code. 0 - no errors>,
   "name": <String, Name of the result code, "ESP_OK" for result code 0>,
   "message": <String, Error message if result code != 0>
 }
 ```
+
+---
 
 ## Reset system settings
 
@@ -202,13 +232,15 @@ After resetting device must be rebooted.
 
 ### Response
 
-```json
+```jsonc
 {
   "result": <Integer, Result code. 0 - no errors>,
   "name": <String, Name of the result code, "ESP_OK" for result code 0>,
   "message": <String, Error message if result code != 0>
 }
 ```
+
+---
 
 ## Reboot device
 
@@ -220,6 +252,8 @@ After resetting device must be rebooted.
 
 No response, device just reboots.
 
+---
+
 ## Get current lamp state
 
 ### Request
@@ -228,7 +262,7 @@ No response, device just reboots.
 
 ### Response
 
-```json
+```jsonc
 {
   "on": <Boolean, true - Lamp is on, false - Lamp is off>,
   "effect": <Integer, Current effect ID, 0-based>,
@@ -236,6 +270,8 @@ No response, device just reboots.
   "fps": <Integer, Frames per seconds, 0..120>
 }
 ```
+
+---
 
 ## Set lamp state
 
@@ -245,7 +281,7 @@ With this function you can switch LEDs on and off, change current effect, bright
 
 **POST** `/api/lamp/state`
 
-```json
+```jsonc
 {
   "on": <Boolean, true - Lamp is on, false - Lamp is off>,
   "effect": <Integer, Selected effect ID, 0-based>,
@@ -265,13 +301,15 @@ or change effect to "Fire" (id = 1) and set brightness:
 
 ### Response
 
-```json
+```jsonc
 {
   "result": <Integer, Result code. 0 - no errors>,
   "name": <String, Name of the result code, "ESP_OK" for result code 0>,
   "message": <String, Error message if result code != 0>
 }
 ```
+
+---
 
 ## Get full list of effects and its parameters
 
@@ -281,7 +319,7 @@ or change effect to "Fire" (id = 1) and set brightness:
 
 ### Response
 
-```json
+```jsonc
 [
   {
     "name": <String, Effect name>,
@@ -375,6 +413,8 @@ The parameter's index in the effect's parameter list is the parameter ID.
   }]
 ```
 
+---
+
 ## Reset parameters of all effects
 
 ### Request
@@ -383,13 +423,15 @@ The parameter's index in the effect's parameter list is the parameter ID.
 
 ### Response
 
-```json
+```jsonc
 {
   "result": <Integer, Result code. 0 - no errors>,
   "name": <String, Name of the result code, "ESP_OK" for result code 0>,
   "message": <String, Error message if result code != 0>
 }
 ```
+
+---
 
 ## Get current effect parameters
 
@@ -399,7 +441,7 @@ The parameter's index in the effect's parameter list is the parameter ID.
 
 ### Response
 
-```json
+```jsonc
 {
   "effect": <Integer, Current effect ID, 0-based>,
   "params": [
@@ -439,13 +481,15 @@ The parameter's index in the effect's parameter list is the parameter ID.
 }
 ```
 
+---
+
 ## Set effect parameters
 
 ### Request
 
 **POST** `/api/lamp/effect`
 
-```json
+```jsonc
 {
   "effect": <Integer, Effect ID, 0-based>,
   "params": [
@@ -469,7 +513,7 @@ Set Palette = 1 and Scale = 60 for the "Fire" effect.
 
 ### Response
 
-```json
+```jsonc
 {
   "result": <Integer, Result code. 0 - no errors>,
   "name": <String, Name of the result code, "ESP_OK" for result code 0>,
