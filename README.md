@@ -11,7 +11,7 @@ Tested with 16x16 WS21812B.
 
 - More than 20 very beautiful effects from different authors, each with set of parameters
 - WiFi connectivity in station or access point modes (support for DHCP/static IP addressing)
-- JSON API for remote controlling (*TODO: describe API*)
+- [JSON HTTP API for remote controlling](API.md)
 - Embedded webserver for remote controlling from browser
 - *TODO: OTA*
 
