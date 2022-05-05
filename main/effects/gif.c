@@ -1,5 +1,5 @@
 #include "effects/gif.h"
-#include <libnsgif.h>
+#include <nsgif.h>
 
 #define EMBED_GIF(name) \
     extern const uint8_t embed_##name##_start[] asm("_binary_"#name"_gif_start"); \
@@ -45,22 +45,23 @@ EFFECT_PARAMS(gif, 1) = {
     DECL_PARAM(P_FILE, "File", 0, sizeof(gifs) / sizeof(embed_gif_t) - 1, 0),
 };
 
-static int frame = -1;
-gif_animation *gif = NULL;
+nsgif_t *gif = NULL;
+const nsgif_info_t *gif_info;
+uint32_t next_frame_time = 0;
 
-static void* bitmap_create(int width, int height)
+static nsgif_bitmap_t *bitmap_create(int width, int height)
 {
     return calloc(width * height, 4);
 }
 
-static void bitmap_destroy(void *bitmap)
+static void bitmap_destroy(nsgif_bitmap_t *bitmap)
 {
     free(bitmap);
 }
 
-static unsigned char* bitmap_get_buffer(void *bitmap)
+static uint8_t *bitmap_get_buffer(nsgif_bitmap_t *bitmap)
 {
-    return bitmap;
+    return (uint8_t *)bitmap;
 }
 
 static void bitmap_set_opaque(void *bitmap, bool opaque) {}
@@ -72,44 +73,43 @@ static bool bitmap_test_opaque(void *bitmap)
 
 static void bitmap_mark_modified(void *bitmap) {}
 
-static gif_bitmap_callback_vt bitmap_callbacks = {
-    bitmap_create,
-    bitmap_destroy,
-    bitmap_get_buffer,
-    bitmap_set_opaque,
-    bitmap_test_opaque,
-    bitmap_mark_modified
+static nsgif_bitmap_cb_vt bitmap_callbacks = {
+    .create = bitmap_create,
+    .destroy = bitmap_destroy,
+    .get_buffer = bitmap_get_buffer,
+    .set_opaque = bitmap_set_opaque,
+    .test_opaque = bitmap_test_opaque,
+    .modified = bitmap_mark_modified,
+    .get_rowspan = NULL
 };
 
 esp_err_t effect_gif_prepare(framebuffer_t *fb)
 {
     if (gif)
+        nsgif_destroy(gif);
+
+    nsgif_error res = nsgif_create(&bitmap_callbacks, NSGIF_BITMAP_FMT_ABGR8888, &gif);
+    if (res != NSGIF_OK)
     {
-        gif_finalise(gif);
-        free(gif);
+        ESP_LOGE(TAG, "Error creating GIF handler: %d (%s)", res, nsgif_strerror(res));
+        return ESP_FAIL;
     }
-    gif = calloc(1, sizeof(gif_animation));
-    if (!gif)
-        return ESP_ERR_NO_MEM;
-    gif_create(gif, &bitmap_callbacks);
 
-    gif_result res;
-    do
-    {
-        size_t size = gifs[PARAM_VAL(gif, P_FILE)].end - gifs[PARAM_VAL(gif, P_FILE)].start;
-        res = gif_initialise(gif, size, (uint8_t *)gifs[PARAM_VAL(gif, P_FILE)].start);
-    } while (res == GIF_WORKING);
+    size_t size = gifs[PARAM_VAL(gif, P_FILE)].end - gifs[PARAM_VAL(gif, P_FILE)].start;
+    res = nsgif_data_scan(gif, size, (uint8_t *)gifs[PARAM_VAL(gif, P_FILE)].start);
 
-    if (res != GIF_OK)
+    if (res != NSGIF_OK)
     {
-        gif_finalise(gif);
-        free(gif);
+        nsgif_destroy(gif);
         gif = NULL;
-        ESP_LOGE(TAG, "Unsupported GIF");
+        ESP_LOGE(TAG, "Error loading GIF: %d (%s)", res, nsgif_strerror(res));
+        return ESP_FAIL;
     }
 
-    frame = -1;
-    ESP_LOGI(TAG, "GIF frame_count=%d, width=%d, height=%d", gif->frame_count, gif->width, gif->height);
+    gif_info = nsgif_get_info(gif);
+    ESP_LOGI(TAG, "GIF frame_count=%d, width=%d, height=%d", gif_info->frame_count, gif_info->width, gif_info->height);
+
+    next_frame_time = 0;
 
     return ESP_OK;
 }
@@ -118,36 +118,49 @@ esp_err_t effect_gif_prepare(framebuffer_t *fb)
 
 esp_err_t effect_gif_run(framebuffer_t *fb)
 {
-    if (frame >= 0)
+    if (!gif)
+        return ESP_OK;
+
+    uint32_t time_cs = esp_timer_get_time() / 10000;
+    if (time_cs < next_frame_time)
+        return ESP_OK;
+    
+    nsgif_rect_t frame_rect;
+    uint32_t delay_cs;
+    uint32_t frame;
+    nsgif_error res = nsgif_frame_prepare(gif, &frame_rect, &delay_cs, &frame);
+    if (res == NSGIF_ERR_ANIMATION_END)
+        return ESP_OK;
+    if (res != NSGIF_OK)
     {
-        uint32_t t = (esp_timer_get_time() - fb->last_frame_us) / 10000; // cs
-        if (t < gif->frames[frame].frame_delay)
-            return ESP_OK;
+        ESP_LOGW(TAG, "Error preparing GIF frame: %d (%s)", res, nsgif_strerror(res));
+        return ESP_OK;
     }
+    next_frame_time = delay_cs == NSGIF_INFINITE ? UINT32_MAX : time_cs + delay_cs - 1;
+
     CHECK(fb_begin(fb));
 
-    frame++;
-    frame %= gif->frame_count;
-
-    gif_result res = gif_decode_frame(gif, frame);
-    if (res == GIF_OK)
+    nsgif_bitmap_t *bitmap;
+    res = nsgif_frame_decode(gif, frame, &bitmap);
+    if (res != NSGIF_OK)
     {
-        size_t width = MIN(fb->width, gif->width);
-        size_t height = MIN(fb->height, gif->height);
-        uint32_t *frame_image = (uint32_t *)gif->frame_image;
-        for (size_t x = 0; x < width; x++)
-            for (size_t y = 0; y < height; y++)
-            {
-                size_t offs = y * gif->width + x;
-                rgb_t c = {
-                    .r = frame_image[offs] & 0xff,
-                    .g = (frame_image[offs] >> 8) & 0xff,
-                    .b = (frame_image[offs] >> 16) & 0xff,
-                };
-                fb_set_pixel_rgb(fb, x, height - y - 1, c);
-            }
+        ESP_LOGW(TAG, "Error decoding GIF frame: %d (%s)", res, nsgif_strerror(res));
+        return ESP_OK;
     }
-    else ESP_LOGW(TAG, "gif: failed to decode frame %d", frame);
+
+    uint32_t *frame_image = (uint32_t *)bitmap;
+
+    for (size_t x = frame_rect.x0; x < MIN(fb->width, frame_rect.x1 + 1); x++)
+        for (size_t y = frame_rect.y0; y < MIN(fb->height, frame_rect.y1 + 1); y++)
+        {
+            size_t offs = y * gif_info->width + x;
+            rgb_t c = {
+                .r = frame_image[offs] & 0xff,
+                .g = (frame_image[offs] >> 8) & 0xff,
+                .b = (frame_image[offs] >> 16) & 0xff,
+            };
+            fb_set_pixel_rgb(fb, x, fb->height - y - 1, c);
+        }
 
     return fb_end(fb);
 }
