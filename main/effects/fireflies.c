@@ -48,11 +48,6 @@ esp_err_t effect_fireflies_prepare(framebuffer_t *fb)
     return ESP_OK;
 }
 
-//static int map(int x, int in_min, int in_max, int out_min, int out_max)
-//{
-//    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-//}
-
 esp_err_t effect_fireflies_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));

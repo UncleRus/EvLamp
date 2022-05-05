@@ -31,16 +31,16 @@ esp_err_t effect_flower_run(framebuffer_t *fb)
         angle += 0.1;
     }
 
-    float n = triwave8(counter) * 2.2;
+    float n = triwave8(counter) * 2.2f;
     float a = n * angle;
-    float r = PARAM_VAL(flower, P_DIAMETER) / 255.0 * sqrt16(n);
-    float x = r * cosf(a) + (float)fb->width / 2.0;
-    float y = r * sinf(a) + (float)fb->height / 2.0;
+    float r = PARAM_VAL(flower, P_DIAMETER) / 255.0f * sqrt16(n);
+    float x = r * cosf(a) + (float)fb->width / 2.0f;
+    float y = r * sinf(a) + (float)fb->height / 2.0f;
 
     fb_set_pixelf_hsv(fb, x, y, hsv_from_values(time_ms >> 1, 250, 255));
 
     fb_fade(fb, PARAM_VAL(flower, P_SPEED) / 10);
-    counter += PARAM_VAL(flower, P_SPEED) / 100.0;
+    counter += PARAM_VAL(flower, P_SPEED) / 100.0f;
 
     return fb_end(fb);
 }

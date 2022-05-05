@@ -50,8 +50,6 @@ extern const size_t effects_count;
 
 esp_err_t effects_reset();
 
-esp_err_t effects_load();
-
 esp_err_t effect_param_set(size_t effect, size_t param, uint8_t value);
 
 esp_err_t effects_init();

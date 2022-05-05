@@ -13,11 +13,16 @@ static void process_button_event(event_t *e)
 
     //ESP_LOGI(TAG, "Got button %d event %d", button_id, e->type);
 
-    if (button_id == INPUT_BTN_RESET && e->type == EVENT_BUTTON_PRESSED_LONG)
+    if (button_id == INPUT_BTN_RESET)
     {
-        ESP_ERROR_CHECK(sys_settings_reset());
-        ESP_ERROR_CHECK(vol_settings_reset());
-        esp_restart();
+        if (e->type == EVENT_BUTTON_PRESSED_LONG)
+        {
+            ESP_ERROR_CHECK(effects_reset());
+            ESP_ERROR_CHECK(sys_settings_reset());
+            ESP_ERROR_CHECK(vol_settings_reset());
+            esp_restart();
+        }
+        return;
     }
 
     bool playing = surface_is_playing();
@@ -91,6 +96,7 @@ static void main_loop(void *arg)
 void app_main()
 {
     ESP_LOGI(TAG, "Starting " APP_NAME);
+    ESP_LOGI(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
 
     // Initialize NVS
     ESP_ERROR_CHECK(settings_init());
@@ -121,4 +127,3 @@ void app_main()
         ESP_ERROR_CHECK(ESP_FAIL);
     }
 }
-

@@ -116,7 +116,7 @@ esp_err_t effect_param_set(size_t effect, size_t param, uint8_t value)
     return ESP_OK;
 }
 
-esp_err_t effect_params_load()
+static esp_err_t effect_params_load()
 {
     char key[NVS_KEY_NAME_MAX_SIZE];
     uint8_t val;

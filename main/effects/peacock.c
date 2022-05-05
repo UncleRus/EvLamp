@@ -22,7 +22,7 @@ esp_err_t effect_peacock_run(framebuffer_t *fb)
     CHECK(fb_begin(fb));
 
     uint32_t time_ms = esp_timer_get_time() / 1000;
-    float t = time_ms / (1000.0 - PARAM_VAL(peacock, P_SPEED) * 4);
+    float t = time_ms / (1000.0f - PARAM_VAL(peacock, P_SPEED) * 4);
 
     for (size_t x = 0; x < fb->width; x++)
         for (size_t y = 0; y < fb->height; y++)
