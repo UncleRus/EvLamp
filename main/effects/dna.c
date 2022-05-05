@@ -8,6 +8,7 @@
 #include "effects/dna.h"
 
 #include <lib8tion.h>
+#include "palettes.h"
 
 #define P_SPEED  0
 #define P_SIZE   1
@@ -21,8 +22,8 @@ EFFECT_PARAMS(dna, 3) = {
 
 static uint32_t offset;
 
-static const rgb_t dark_slate_gray = { .r = 0x2f, .g = 0x4f, .b = 0x4f };
-static const rgb_t white = { .r = 0xff, .g = 0xff, .b = 0xff };
+static const rgb_t dark_slate_gray = C_DARK_SLATE_GRAY;
+static const rgb_t white = C_WHITE;
 
 static void horizontal_line(framebuffer_t *fb, uint8_t x1, uint8_t x2, uint8_t y, rgb_t color, bool dot)
 {

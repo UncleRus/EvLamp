@@ -103,7 +103,6 @@ esp_err_t effect_metaballs_run(framebuffer_t *fb)
             for (size_t b = 0; b < PARAM_VAL(metaballs, P_COUNT); b++)
                 sum = qadd8(sum, dist(i, j, balls[b].x, balls[b].y));
 
-            //fb_set_pixel_rgb(fb, i, j, rgb_from_values(sum, sum, sum));
             fb_set_pixel_rgb(fb, i, j, color_from_palette_rgb(palette, PALETTE_SIZE, qsub8(sum, 32), 255, true));
         }
     }
