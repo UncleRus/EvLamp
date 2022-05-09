@@ -1,6 +1,8 @@
 #include "effects/gif.h"
 #include <nsgif.h>
 
+// TODO upload custom gif files in web browser, store in NVS
+
 #define EMBED_GIF(name) \
     extern const uint8_t embed_##name##_start[] asm("_binary_"#name"_gif_start"); \
     extern const uint8_t embed_##name##_end[] asm("_binary_"#name"_gif_end")
@@ -134,7 +136,7 @@ esp_err_t effect_gif_run(framebuffer_t *fb)
     if (res != NSGIF_OK)
     {
         ESP_LOGW(TAG, "Error preparing GIF frame: %d (%s)", res, nsgif_strerror(res));
-        return ESP_OK;
+        return ESP_FAIL;
     }
     next_frame_time = delay_cs == NSGIF_INFINITE ? UINT32_MAX : time_cs + delay_cs - 1;
 
@@ -145,7 +147,7 @@ esp_err_t effect_gif_run(framebuffer_t *fb)
     if (res != NSGIF_OK)
     {
         ESP_LOGW(TAG, "Error decoding GIF frame: %d (%s)", res, nsgif_strerror(res));
-        return ESP_OK;
+        return ESP_FAIL;
     }
 
     uint32_t *frame_image = (uint32_t *)bitmap;
@@ -155,9 +157,9 @@ esp_err_t effect_gif_run(framebuffer_t *fb)
         {
             size_t offs = y * gif_info->width + x;
             rgb_t c = {
-                .r = frame_image[offs] & 0xff,
-                .g = (frame_image[offs] >> 8) & 0xff,
-                .b = (frame_image[offs] >> 16) & 0xff,
+                .r = frame_image[offs],
+                .g = frame_image[offs] >> 8,
+                .b = frame_image[offs] >> 16,
             };
             fb_set_pixel_rgb(fb, x, fb->height - y - 1, c);
         }

@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <esp_netif.h>
+#include <lwip/ip_addr.h>
 #include "sdkconfig.h"
 #include "settings.h"
 #include "bus.h"

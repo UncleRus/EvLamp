@@ -1,5 +1,5 @@
-#ifndef EVLAMP_PALETTES_H
-#define EVLAMP_PALETTES_H
+#ifndef EVLAMP_PALETTES_H_
+#define EVLAMP_PALETTES_H_
 
 #include <color.h>
 
@@ -57,4 +57,4 @@ typedef struct
 
 extern const palette_def_t palettes[PALETTE_MAX];
 
-#endif /* EVLAMP_PALETTES_H */
+#endif /* EVLAMP_PALETTES_H_ */

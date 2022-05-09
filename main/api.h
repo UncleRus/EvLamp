@@ -1,5 +1,5 @@
-#ifndef MAIN_API_H_
-#define MAIN_API_H_
+#ifndef EVLAMP_API_H_
+#define EVLAMP_API_H_
 
 #include "common.h"
 #include <esp_http_server.h>
@@ -22,4 +22,4 @@
 
 esp_err_t api_init(httpd_handle_t server);
 
-#endif /* MAIN_API_H_ */
+#endif /* EVLAMP_API_H_ */

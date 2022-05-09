@@ -1,5 +1,5 @@
-#ifndef MAIN_COMMON_H_
-#define MAIN_COMMON_H_
+#ifndef EVLAMP_COMMON_H_
+#define EVLAMP_COMMON_H_
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -38,4 +38,4 @@ extern const char *TAG;
         } \
     } while (0)
 
-#endif /* MAIN_COMMON_H_ */
+#endif /* EVLAMP_COMMON_H_ */

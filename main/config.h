@@ -1,5 +1,5 @@
-#ifndef MAIN_CONFIG_H_
-#define MAIN_CONFIG_H_
+#ifndef EVLAMP_CONFIG_H_
+#define EVLAMP_CONFIG_H_
 
 ////////////////////////////////////////////////////////////////////////////////
 /// System
@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// Settings
 
-#define SETTINGS_MAGIC 0xbeef0005 // TODO project version to magic
+#define SETTINGS_MAGIC 0xbeef0005
 
 #ifdef CONFIG_EL_WIFI_MODE_AP
     #define DEFAULT_WIFI_MODE WIFI_MODE_AP
@@ -61,4 +61,4 @@
 #define HTTPD_STACK_SIZE 32768
 #define MAX_POST_SIZE 4096
 
-#endif /* MAIN_CONFIG_H_ */
+#endif /* EVLAMP_CONFIG_H_ */

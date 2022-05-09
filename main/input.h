@@ -1,5 +1,5 @@
-#ifndef MAIN_INPUT_H_
-#define MAIN_INPUT_H_
+#ifndef EVLAMP_INPUT_H_
+#define EVLAMP_INPUT_H_
 
 #include "common.h"
 
@@ -14,4 +14,4 @@ enum {
 
 esp_err_t input_init();
 
-#endif /* MAIN_INPUT_H_ */
+#endif /* EVLAMP_INPUT_H_ */

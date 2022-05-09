@@ -1,5 +1,5 @@
-#ifndef _MAIN_EFFECT_H_
-#define _MAIN_EFFECT_H_
+#ifndef EVLAMP_EFFECT_H_
+#define EVLAMP_EFFECT_H_
 
 #include "common.h"
 #include <framebuffer.h>
@@ -54,4 +54,4 @@ esp_err_t effect_param_set(size_t effect, size_t param, uint8_t value);
 
 esp_err_t effects_init();
 
-#endif /* _MAIN_EFFECT_H_ */
+#endif /* EVLAMP_EFFECT_H_ */

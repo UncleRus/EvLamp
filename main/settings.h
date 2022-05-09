@@ -1,5 +1,5 @@
-#ifndef MAIN_SETTINGS_H_
-#define MAIN_SETTINGS_H_
+#ifndef EVLAMP_SETTINGS_H_
+#define EVLAMP_SETTINGS_H_
 
 #include "common.h"
 #include <cJSON.h>
@@ -53,4 +53,4 @@ esp_err_t vol_settings_load();
 
 esp_err_t vol_settings_save();
 
-#endif /* MAIN_SETTINGS_H_ */
+#endif /* EVLAMP_SETTINGS_H_ */

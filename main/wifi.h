@@ -1,9 +1,9 @@
-#ifndef MAIN_WIFI_H_
-#define MAIN_WIFI_H_
+#ifndef EVLAMP_WIFI_H_
+#define EVLAMP_WIFI_H_
 
 #include "common.h"
 #include <esp_wifi.h>
 
 esp_err_t wifi_init();
 
-#endif /* MAIN_WIFI_H_ */
+#endif /* EVLAMP_WIFI_H_ */

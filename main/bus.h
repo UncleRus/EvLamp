@@ -1,5 +1,5 @@
-#ifndef MAIN_BUS_H_
-#define MAIN_BUS_H_
+#ifndef EVLAMP_BUS_H_
+#define EVLAMP_BUS_H_
 
 #include "common.h"
 
@@ -25,4 +25,4 @@ esp_err_t bus_send_event(event_type_t type, void *data, size_t size);
 
 esp_err_t bus_receive_event(event_t *e, size_t timeout_ms);
 
-#endif /* MAIN_BUS_H_ */
+#endif /* EVLAMP_BUS_H_ */
