@@ -37,12 +37,24 @@ static system_settings_t sys_defaults = {
         },
     },
     .leds = {
-        .width         = CONFIG_EL_MATRIX_WIDTH,
-        .height        = CONFIG_EL_MATRIX_HEIGHT,
+        .block_width   = CONFIG_EL_MATRIX_WIDTH,
+        .block_height  = CONFIG_EL_MATRIX_HEIGHT,
+        .h_blocks      = CONFIG_EL_MATRIX_H_BLOCKS,
+        .v_blocks      = CONFIG_EL_MATRIX_V_BLOCKS,
         .type          = DEFAULT_LED_TYPE,
         .current_limit = CONFIG_EL_MATRIX_MAX_CURRENT,
-        .v_mirror      = false,
-        .h_mirror      = false,
+        .gpio          = {
+            [RMT_CHANNEL_0] = CONFIG_EL_MATRIX_GPIO_0,
+            [RMT_CHANNEL_1] = CONFIG_EL_MATRIX_GPIO_1,
+            [RMT_CHANNEL_2] = CONFIG_EL_MATRIX_GPIO_2,
+            [RMT_CHANNEL_3] = CONFIG_EL_MATRIX_GPIO_3,
+#if SOC_RMT_CHANNELS_PER_GROUP > 4
+            [RMT_CHANNEL_4] = CONFIG_EL_MATRIX_GPIO_4,
+            [RMT_CHANNEL_5] = CONFIG_EL_MATRIX_GPIO_5,
+            [RMT_CHANNEL_6] = CONFIG_EL_MATRIX_GPIO_6,
+            [RMT_CHANNEL_7] = CONFIG_EL_MATRIX_GPIO_7,
+#endif
+        },
     },
 };
 

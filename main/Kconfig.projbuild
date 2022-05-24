@@ -83,21 +83,70 @@ menu "*** EvLamp configuration ***"
 	
 		menu "LED matrix"
 	
-			config EL_MATRIX_GPIO
-				int "GPIO output for LED matrix"
-				range 0 39
-				default 5
-			
 			config EL_MATRIX_WIDTH
-				int "LED matrix width"
-				range 8 64
+				int "Width of single LED matrix block"
+				range 8 128
 				default 16
 		
 			config EL_MATRIX_HEIGHT
-				int "LED matrix height"
-				range 8 64
+				int "Height of single LED matrix block"
+				range 8 128
 				default 16
-				
+
+			config EL_MATRIX_H_BLOCKS
+				int "Number of blocks (LED matrices) horizontally"
+				range 1 8
+				default 1
+
+			config EL_MATRIX_V_BLOCKS
+				int "Number of blocks (LED matrices) vertically"
+				range 1 8
+				default 1
+
+			menu "GPIO for blocks"
+
+                config EL_MATRIX_GPIO_0
+                    int "GPIO output for block (LED matrix) 0"
+                    range 0 39
+                    default 5
+
+                config EL_MATRIX_GPIO_1
+                    int "GPIO output for block (LED matrix) 1"
+                    range 0 39
+                    default 17
+
+                config EL_MATRIX_GPIO_2
+                    int "GPIO output for block (LED matrix) 2"
+                    range 0 39
+                    default 16
+
+                config EL_MATRIX_GPIO_3
+                    int "GPIO output for block (LED matrix) 3"
+                    range 0 39
+                    default 4
+
+                config EL_MATRIX_GPIO_4
+                    int "GPIO output for block (LED matrix) 4"
+                    range 0 39
+                    default 2
+
+                config EL_MATRIX_GPIO_5
+                    int "GPIO output for block (LED matrix) 5"
+                    range 0 39
+                    default 15
+
+                config EL_MATRIX_GPIO_6
+                    int "GPIO output for block (LED matrix) 6"
+                    range 0 39
+                    default 8
+
+                config EL_MATRIX_GPIO_7
+                    int "GPIO output for block (LED matrix) 7"
+                    range 0 39
+                    default 7
+
+			endmenu
+
 			choice EL_LED_TYPE_C
 				prompt "LED type"
 				default EL_LED_TYPE_WS2812
@@ -110,10 +159,10 @@ menu "*** EvLamp configuration ***"
 	
 				config EL_LED_TYPE_APA106
 					bool "APA106"
-			
 			endchoice
+
 			config EL_SINGLE_LED_CURRENT_MA
-				int "Maximal current consuming by single LED, mA"
+				int "Maximal current consuming by single pixel, mA"
 				default 60
 
 			config EL_MATRIX_MAX_CURRENT

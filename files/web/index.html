@@ -166,12 +166,20 @@
 			<fieldset>
 				<legend>LEDs settings</legend>
 				<div class="ui-widget">
-					<label for="i_leds_width">Matrix width:</label>
-					<input type="number" id="i_leds_width" />
+					<label for="i_leds_block_width">Block width:</label>
+					<input type="number" id="i_leds_block_width"/>
 				</div>
 				<div class="ui-widget">
-					<label for="i_leds_height">Matrix height:</label>
-					<input type="number" id="i_leds_height" />
+					<label for="i_leds_block_height">Block height:</label>
+					<input type="number" id="i_leds_block_height"/>
+				</div>
+				<div class="ui-widget">
+					<label for="i_leds_h_blocks">Number of blocks horizontally:</label>
+					<input type="number" id="i_leds_h_blocks"/>
+				</div>
+				<div class="ui-widget">
+					<label for="i_leds_v_blocks">Number of blocks vertically:</label>
+					<input type="number" id="i_leds_v_blocks"/>
 				</div>
 				<div class="ui-widget">
 					<label for="i_leds_type">Type of LEDs:</label>
@@ -185,13 +193,16 @@
 					<label for="i_leds_current_limit">Current limit, mA:</label>
 					<input type="number" id="i_leds_current_limit" />
 				</div>
+			</fieldset>
+			<fieldset>
+				<legend>GPIO mapping</legend>
 				<div class="ui-widget">
-					<label for="i_leds_v_mirror">Mirror vertically</label>
-					<div><input type="checkbox" id="i_leds_v_mirror" style="min-width: auto;"></div>
+					<label for="i_leds_gpio_0">Block 0 GPIO:</label>
+					<input type="number" id="i_leds_gpio_0"/>
 				</div>
 				<div class="ui-widget">
-					<label for="i_leds_h_mirror">Mirror horizontally</label>
-					<div><input type="checkbox" id="i_leds_h_mirror" style="min-width: auto;"></div>
+					<label for="i_leds_gpio_0">Block 1 GPIO:</label>
+					<input type="number" id="i_leds_gpio_0"/>
 				</div>
 			</fieldset>
 			<div class="buttons">
@@ -423,12 +434,12 @@
 		// post leds
 		$('#b_leds_save').click(function() {
 			let data = {
-				width: parseInt($('#i_leds_width').val()),
-				height: parseInt($('#i_leds_height').val()),
+				block_width: parseInt($('#i_leds_block_width').val()),
+				block_height: parseInt($('#i_leds_block_height').val()),
+				h_blocks: parseInt($('#i_leds_h_blocks').val()),
+				v_blocks: parseInt($('#i_leds_v_blocks').val()),
 				type: parseInt($('#i_leds_type').val()),
 				current_limit: parseInt($('#i_leds_current_limit').val()),
-				v_mirror: $('#i_leds_v_mirror').prop('checked'),
-				h_mirror: $('#i_leds_h_mirror').prop('checked'),
 			};
 			console.log(data);
 			$.ajax({
@@ -485,12 +496,12 @@
 			$leds_msg.hide();
 			$.getJSON('/api/settings/leds', function(data) {
 				console.log(data);
-				$('#i_leds_width').val(data.width);
-				$('#i_leds_height').val(data.height);
+				$('#i_leds_block_width').val(data.block_width);
+				$('#i_leds_block_height').val(data.block_height);
+				$('#i_leds_h_blocks').val(data.h_blocks);
+				$('#i_leds_v_blocks').val(data.v_blocks);
 				$('#i_leds_type').val(data.type);
 				$('#i_leds_current_limit').val(data.current_limit);
-				$('#i_leds_v_mirror').prop('checked', data.v_mirror);
-				$('#i_leds_h_mirror').prop('checked', data.h_mirror);
 			});
 		});
 

@@ -116,8 +116,6 @@ esp_err_t effect_gif_prepare(framebuffer_t *fb)
     return ESP_OK;
 }
 
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
-
 esp_err_t effect_gif_run(framebuffer_t *fb)
 {
     if (!gif)

@@ -19,12 +19,13 @@ typedef struct
         wifi_sta_config_t sta;
     } wifi;
     struct {
-        uint8_t width;
-        uint8_t height;
+        uint8_t block_width;
+        uint8_t block_height;
+        uint8_t h_blocks;
+        uint8_t v_blocks;
         uint8_t type;
         uint32_t current_limit;
-        bool v_mirror;
-        bool h_mirror;
+        int gpio[MAX_SURFACE_BLOCKS];
     } leds;
 } system_settings_t;
 

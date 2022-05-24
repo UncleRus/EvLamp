@@ -8,48 +8,63 @@
 #define FRAME_TICKS (pdMS_TO_TICKS(1000 / vol_settings.fps))
 #define BIT_PLAYING (1)
 
-static led_strip_t strip;
+typedef struct {
+    size_t x, y;
+    led_strip_t strip;
+} surface_block_t;
+
+static surface_block_t blocks[RMT_CHANNEL_MAX];
+static size_t num_blocks = 0;
 static framebuffer_t framebuffer;
 static EventGroupHandle_t state;
 
 // frame renderer, framebuffer -> LED strip
 static inline rgb_t get_fb_pixel(framebuffer_t *fb, size_t x, size_t y)
 {
-    return fb->data[FB_OFFSET(fb, sys_settings.leds.h_mirror ? fb->width - x - 1 : x, sys_settings.leds.v_mirror ? fb->height - y - 1 : y)];
+    return fb->data[FB_OFFSET(fb, x, y)];
+}
+
+static inline esp_err_t set_strip_pixel(framebuffer_t *fb, size_t x, size_t y, rgb_t c)
+{
+    // TODO: support block layouts
+    size_t b = y / sys_settings.leds.block_height * sys_settings.leds.h_blocks + x / sys_settings.leds.block_width;
+
+    size_t ox = x % sys_settings.leds.block_width;
+    size_t oy = y % sys_settings.leds.block_height;
+    size_t strip_idx = oy * sys_settings.leds.block_width + (oy % 2 ? sys_settings.leds.block_width - ox - 1 : ox);
+
+    return led_strip_set_pixel(&blocks[b].strip, strip_idx, c);
+}
+
+static inline esp_err_t flush_strips()
+{
+    for (size_t i = 0; i < num_blocks; i++)
+        CHECK(led_strip_flush(&blocks[i].strip));
+
+    return ESP_OK;
 }
 
 static esp_err_t render_frame(framebuffer_t *fb, void *arg)
 {
     for (size_t y = 0; y < fb->height; y++)
         for (size_t x = 0; x < fb->width; x++)
-        {
-            size_t strip_idx = y * fb->width + (y % 2 ? fb->width - x - 1 : x);
-            CHECK(led_strip_set_pixel(&strip, strip_idx, rgb_scale_video(get_fb_pixel(fb, x, y), vol_settings.brightness)));
-        }
+            set_strip_pixel(fb, x, y, rgb_scale_video(get_fb_pixel(fb, x, y), vol_settings.brightness));
 
-    return led_strip_flush(&strip);
+    return flush_strips();
 }
 
 static void surface_task(void *arg)
 {
-    led_strip_install();
-    memset(&strip, 0, sizeof(led_strip_t));
-
-    strip.length = sys_settings.leds.width * sys_settings.leds.height;
-    strip.gpio = CONFIG_EL_MATRIX_GPIO;
-    strip.type = sys_settings.leds.type;
-    strip.channel = RMT_CHANNEL;
-    // TODO : calculate single LED current based on its type or just move it to config
-    strip.brightness = (uint8_t)(((float)sys_settings.leds.current_limit / strip.length) / (CONFIG_EL_SINGLE_LED_CURRENT_MA / 256.0f));
-
-    ESP_ERROR_CHECK(led_strip_init(&strip));
-
-    ESP_LOGI(TAG, "LED strip config: %dx%d, GPIO = %d, type = %d",
-            sys_settings.leds.width, sys_settings.leds.height, strip.gpio, strip.type);
+    for (size_t i = 0; i < num_blocks; i++)
+    {
+        ESP_LOGI(TAG, "Block %i LED strip config: %dx%d, GPIO = %d, type = %d", i,
+            sys_settings.leds.block_width, sys_settings.leds.block_height, blocks[i].strip.gpio, blocks[i].strip.type);
+        ESP_ERROR_CHECK(led_strip_init(&blocks[i].strip));
+    }
 
     // Framebuffer
     memset(&framebuffer, 0, sizeof(framebuffer_t));
-    ESP_ERROR_CHECK(fb_init(&framebuffer, sys_settings.leds.width, sys_settings.leds.height, render_frame));
+    ESP_ERROR_CHECK(fb_init(&framebuffer, sys_settings.leds.block_width, sys_settings.leds.block_height, render_frame));
 
     ESP_LOGI(TAG, "Surface initialized");
 
@@ -77,6 +92,41 @@ esp_err_t surface_init()
         ESP_LOGE(TAG, "Could not create surface event group");
         return ESP_ERR_NO_MEM;
     }
+    num_blocks = sys_settings.leds.v_blocks * sys_settings.leds.h_blocks;
+    if (num_blocks > RMT_CHANNEL_MAX)
+    {
+        ESP_LOGE(TAG, "Too much blocks (%d), max %d", num_blocks, RMT_CHANNEL_MAX);
+        return ESP_FAIL;
+    }
+
+    // init framebuffer
+    memset(&framebuffer, 0, sizeof(framebuffer_t));
+    CHECK(fb_init(&framebuffer, sys_settings.leds.block_width * sys_settings.leds.h_blocks,
+        sys_settings.leds.block_height * sys_settings.leds.v_blocks, render_frame));
+
+    // prepare led_strip
+    led_strip_install();
+
+    size_t strip_len = sys_settings.leds.block_width * sys_settings.leds.block_height;
+    uint8_t brightness = (uint8_t)(((float)sys_settings.leds.current_limit / strip_len) / (CONFIG_EL_SINGLE_LED_CURRENT_MA / 256.0f));
+
+    // init blocks
+    for (uint8_t y = 0; y < sys_settings.leds.v_blocks; y++)
+        for (uint8_t x = 0; x < sys_settings.leds.h_blocks; x++)
+        {
+            size_t i = y * sys_settings.leds.h_blocks + x;
+
+            blocks[i].x = x * sys_settings.leds.block_width;
+            blocks[i].y = y * sys_settings.leds.block_height;
+
+            // prepare strip descriptor for block
+            memset(&blocks[i].strip, 0, sizeof(led_strip_t));
+            blocks[i].strip.gpio = sys_settings.leds.gpio[i];
+            blocks[i].strip.channel = i;
+            blocks[i].strip.type = sys_settings.leds.type;
+            blocks[i].strip.length = strip_len;
+            blocks[i].strip.brightness = brightness;
+        }
 
     if (xTaskCreatePinnedToCore(surface_task, "surface", SURFACE_TASK_STACK_SIZE,
             NULL, uxTaskPriorityGet(NULL) + 1, NULL, APP_CPU_NUM) != pdPASS)

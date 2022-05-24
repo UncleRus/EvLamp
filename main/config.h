@@ -1,6 +1,8 @@
 #ifndef EVLAMP_CONFIG_H_
 #define EVLAMP_CONFIG_H_
 
+#include <driver/rmt.h>
+
 ////////////////////////////////////////////////////////////////////////////////
 /// System
 
@@ -9,7 +11,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// Settings
 
-#define SETTINGS_MAGIC 0xbeef0005
+#define SETTINGS_MAGIC 0xbeef0010
 
 #ifdef CONFIG_EL_WIFI_MODE_AP
     #define DEFAULT_WIFI_MODE WIFI_MODE_AP
@@ -33,7 +35,7 @@
     #define DEFAULT_LED_TYPE LED_STRIP_WS2812
 #endif
 
-#define MIN_LED_CURRENT_LIMIT 100
+//#define MIN_LED_CURRENT_LIMIT 100
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Bus
@@ -51,9 +53,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// Surface
 
-#define RMT_CHANNEL RMT_CHANNEL_0
 #define FPS_MAX 120
-#define SURFACE_TASK_STACK_SIZE 4096
+#define SURFACE_TASK_STACK_SIZE 8192
+#define MAX_SURFACE_BLOCKS RMT_CHANNEL_MAX
+#define MAX_BLOCK_LEDS 512
+#define MIN_BLOCK_SIZE 8
+#define MAX_BLOCK_SIZE 64
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Webserver
