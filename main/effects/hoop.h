@@ -2,6 +2,8 @@
  * Color hoop
  *
  * https://wokwi.com/arduino/projects/297414039372300810
+ *
+ * max framebuffer size 256x256
  */
 #ifndef __EFFECTS_HOOP_H__
 #define __EFFECTS_HOOP_H__

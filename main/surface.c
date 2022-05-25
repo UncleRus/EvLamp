@@ -7,6 +7,7 @@
 
 #define FRAME_TICKS (pdMS_TO_TICKS(1000 / vol_settings.fps))
 #define BIT_PLAYING (1)
+#define BIT_READY (2)
 
 typedef struct {
     size_t x, y;
@@ -62,11 +63,14 @@ static void surface_task(void *arg)
         ESP_ERROR_CHECK(led_strip_init(&blocks[i].strip));
     }
 
-    // Framebuffer
+    // init framebuffer
     memset(&framebuffer, 0, sizeof(framebuffer_t));
-    ESP_ERROR_CHECK(fb_init(&framebuffer, sys_settings.leds.block_width, sys_settings.leds.block_height, render_frame));
+    ESP_ERROR_CHECK(fb_init(&framebuffer, sys_settings.leds.block_width * sys_settings.leds.h_blocks,
+        sys_settings.leds.block_height * sys_settings.leds.v_blocks, render_frame));
 
-    ESP_LOGI(TAG, "Surface initialized");
+    ESP_LOGI(TAG, "Surface ready");
+
+    xEventGroupSetBits(state, BIT_READY);
 
     while (1)
     {
@@ -99,18 +103,19 @@ esp_err_t surface_init()
         return ESP_FAIL;
     }
 
-    // init framebuffer
-    memset(&framebuffer, 0, sizeof(framebuffer_t));
-    CHECK(fb_init(&framebuffer, sys_settings.leds.block_width * sys_settings.leds.h_blocks,
-        sys_settings.leds.block_height * sys_settings.leds.v_blocks, render_frame));
-
     // prepare led_strip
     led_strip_install();
 
     size_t strip_len = sys_settings.leds.block_width * sys_settings.leds.block_height;
     uint8_t brightness = (uint8_t)(((float)sys_settings.leds.current_limit / strip_len) / (CONFIG_EL_SINGLE_LED_CURRENT_MA / 256.0f));
 
+    ESP_LOGI(TAG, "Surface configuration: %dx%d LEDs (%dx%d blocks, %d total)",
+        sys_settings.leds.h_blocks * sys_settings.leds.block_width,
+        sys_settings.leds.v_blocks * sys_settings.leds.block_height,
+        sys_settings.leds.h_blocks, sys_settings.leds.v_blocks, num_blocks);
+
     // init blocks
+    memset(blocks, 0, sizeof(blocks));
     for (uint8_t y = 0; y < sys_settings.leds.v_blocks; y++)
         for (uint8_t x = 0; x < sys_settings.leds.h_blocks; x++)
         {
@@ -120,13 +125,14 @@ esp_err_t surface_init()
             blocks[i].y = y * sys_settings.leds.block_height;
 
             // prepare strip descriptor for block
-            memset(&blocks[i].strip, 0, sizeof(led_strip_t));
             blocks[i].strip.gpio = sys_settings.leds.gpio[i];
             blocks[i].strip.channel = i;
             blocks[i].strip.type = sys_settings.leds.type;
             blocks[i].strip.length = strip_len;
             blocks[i].strip.brightness = brightness;
         }
+
+    xEventGroupClearBits(state, BIT_READY);
 
     if (xTaskCreatePinnedToCore(surface_task, "surface", SURFACE_TASK_STACK_SIZE,
             NULL, uxTaskPriorityGet(NULL) + 1, NULL, APP_CPU_NUM) != pdPASS)
@@ -135,7 +141,8 @@ esp_err_t surface_init()
         return ESP_FAIL;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(10));
+    ESP_LOGI(TAG, "Waiting for surface task to be ready...");
+    xEventGroupWaitBits(state, BIT_READY, pdFALSE, pdTRUE, portMAX_DELAY);
 
     if (vol_settings.effect >= effects_count)
         vol_settings.effect = CONFIG_EL_EFFECT_DEFAULT;
@@ -143,6 +150,11 @@ esp_err_t surface_init()
     CHECK(surface_set_effect(vol_settings.effect));
 
     return ESP_OK;
+}
+
+bool surface_is_playing()
+{
+    return xEventGroupGetBits(state) & BIT_PLAYING;
 }
 
 esp_err_t surface_prepare_effect(size_t effect)
@@ -155,11 +167,6 @@ esp_err_t surface_prepare_effect(size_t effect)
     CHECK(surface_play());
 
     return ESP_OK;
-}
-
-bool surface_is_playing()
-{
-    return xEventGroupGetBits(state) & BIT_PLAYING;
 }
 
 esp_err_t surface_pause()

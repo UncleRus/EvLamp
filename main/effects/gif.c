@@ -50,6 +50,7 @@ EFFECT_PARAMS(gif, 1) = {
 nsgif_t *gif = NULL;
 const nsgif_info_t *gif_info;
 uint32_t next_frame_time = 0;
+size_t pos_x = 0, pos_y = 0;
 
 static nsgif_bitmap_t *bitmap_create(int width, int height)
 {
@@ -111,6 +112,9 @@ esp_err_t effect_gif_prepare(framebuffer_t *fb)
     gif_info = nsgif_get_info(gif);
     ESP_LOGI(TAG, "GIF frame_count=%d, width=%d, height=%d", gif_info->frame_count, gif_info->width, gif_info->height);
 
+    pos_x = fb->width / 2 - gif_info->width / 2;
+    pos_y = fb->height / 2 - gif_info->height / 2;
+
     next_frame_time = 0;
 
     return ESP_OK;
@@ -150,8 +154,8 @@ esp_err_t effect_gif_run(framebuffer_t *fb)
 
     uint32_t *frame_image = (uint32_t *)bitmap;
 
-    for (size_t x = frame_rect.x0; x < MIN(fb->width, frame_rect.x1 + 1); x++)
-        for (size_t y = frame_rect.y0; y < MIN(fb->height, frame_rect.y1 + 1); y++)
+    for (size_t x = frame_rect.x0; x < MIN(fb->width, frame_rect.x1); x++)
+        for (size_t y = frame_rect.y0; y < MIN(fb->height, frame_rect.y1); y++)
         {
             size_t offs = y * gif_info->width + x;
             rgb_t c = {
@@ -159,7 +163,7 @@ esp_err_t effect_gif_run(framebuffer_t *fb)
                 .g = frame_image[offs] >> 8,
                 .b = frame_image[offs] >> 16,
             };
-            fb_set_pixel_rgb(fb, x, fb->height - y - 1, c);
+            fb_set_pixel_rgb(fb, pos_x + x, pos_y + fb->height - y - 1, c);
         }
 
     return fb_end(fb);
