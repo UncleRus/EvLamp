@@ -166,26 +166,30 @@ EvLamp provides a simple API based on HTTP GET and POST requests containing JSON
 
 ```jsonc
 {
-  "width": <Integer, LED matrix width (number of columns)>,
-  "height": <Integer, LED matrix height (number of rows)>,
+  "block_width": <Integer, single block (LED matrix) width (number of columns), 8..128>,
+  "block_height": <Integer, single block (LED matrix) height (number of rows), 8..128>,
+  "h_blocks": <Integer, number of blocks horizontally>,
+  "v_blocks": <Integer, number of blocks vertically>,
   "type": <Integer, Type of LEDs. 0 - WS2812, 1 - SK6812, 2 - APA106>,
-  "current_limit": <Integer, Approximate limit of current consumed by the LED matrix in milliamps.
+  "current_limit": <Integer, Approximate limit of current consumed by the single block (LED matrix) in milliamps.
                    The larger this value, the higher the maximum brightness.>,
-  "v_mirror": <Boolean, Enable vertical mirroring of LED matrix>,
-  "h_mirror": <Boolean, Enable horizontal mirroring of LED matrix>
 }
 ```
 
+*Note: The total number of blocks (h_blocks * v_blocks) should not be more than 8*
+
 **Example**
+
+Single 16x16 WS2812B matrix:
 
 ```json
 {
-  "width": 16,
-  "height": 16,
+  "block_width": 16,
+  "block_height": 16,
+  "h_blocks": 1,
+  "v_blocks": 1,
   "type": 0,
-  "current_limit": 5000,
-  "v_mirror": false,
-  "h_mirror": false
+  "current_limit": 5000
 }
 ```
 
@@ -199,13 +203,13 @@ EvLamp provides a simple API based on HTTP GET and POST requests containing JSON
 
 ```jsonc
 {
-  "width": <Integer, LED matrix width (number of columns)>,
-  "height": <Integer, LED matrix height (number of rows)>,
+  "block_width": <Integer, single block (LED matrix) width (number of columns), 8..128>,
+  "block_height": <Integer, single block (LED matrix) height (number of rows), 8..128>,
+  "h_blocks": <Integer, number of blocks horizontally>,
+  "v_blocks": <Integer, number of blocks vertically>,
   "type": <Integer, Type of LEDs. 0 - WS2812, 1 - SK6812, 2 - APA106>,
-  "current_limit": <Integer, Approximate limit of current consumed by the LED matrix in milliamps.
+  "current_limit": <Integer, Approximate limit of current consumed by the single block (LED matrix) in milliamps.
                    The larger this value, the higher the maximum brightness.>,
-  "v_mirror": <Boolean, Enable vertical mirroring of LED matrix>,
-  "h_mirror": <Boolean, Enable horizontal mirroring of LED matrix>
 }
 ```
 

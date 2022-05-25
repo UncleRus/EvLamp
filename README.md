@@ -53,7 +53,12 @@ rendering of the effect. For example:
 
 ### Changing LED layout
 
-Configure your LED layout at runtime in browser ("Menu -> LEDs Settings"):
+Configure your LED layout at runtime by API or in browser ("Menu -> LEDs Settings"):
+
+## Changing default settings 
+
+You can select GPIOs, set default WiFi config, LED layout and more in `idf.py menuconfig`
+(`*** EvLamp configuration ***`). 
 
 ![LED layout configuration](hardware/led_config.png)
 
