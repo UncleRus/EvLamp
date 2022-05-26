@@ -8,6 +8,26 @@
 	<script type="text/javascript" src="jquery.js"></script>
 </head>
 <body>
+	<script>
+		String.prototype.format = String.prototype.format ||
+				function () {
+					"use strict";
+					let str = this.toString();
+					if (arguments.length) {
+						let t = typeof arguments[0];
+						let key;
+						let args = ("string" === t || "number" === t) ?
+								Array.prototype.slice.call(arguments)
+								: arguments[0];
+
+						for (key in args) {
+							str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), args[key]);
+						}
+					}
+
+					return str;
+				};
+	</script>
 	<!-- -------------------------------------------------------------------------- -->
 	<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 		<defs>
@@ -130,7 +150,7 @@
 					<input type="text" id="i_wifi_ip_dns" />
 				</div>
 			</fieldset>
-			<fieldset>
+			<fieldset id="wifi_ap">
 				<legend>Access Point settings</legend>
 				<div class="ui-widget">
 					<label for="i_wifi_ap_ssid">SSID:</label>
@@ -145,7 +165,7 @@
 					<input type="text" id="i_wifi_ap_password" />
 				</div>
 			</fieldset>
-			<fieldset>
+			<fieldset id="wifi_station">
 				<legend>Station settings</legend>
 				<div class="ui-widget">
 					<label for="i_wifi_sta_ssid">SSID:</label>
@@ -158,7 +178,23 @@
 			</fieldset>
 			<div class="buttons">
 				<button id="b_wifi_save" class="ui-button">Save settings</button>
+				<button id="b_wifi_cancel" class="ui-button cancel">Cancel</button>
 			</div>
+			<script>
+				$(document).ready(function () {
+					let $i_wifi_mode = $('#i_wifi_mode');
+					$i_wifi_mode.change(function () {
+						let sta = parseInt($i_wifi_mode.val()) == 1;
+						$("#wifi_ap").prop("disabled", sta);
+						$("#wifi_station").prop("disabled", !sta);
+					});
+					let $i_wifi_ip_dhcp = $('#i_wifi_ip_dhcp');
+					$i_wifi_ip_dhcp.change(function () {
+						$('#i_wifi_ip_ip, #i_wifi_ip_netmask, #i_wifi_ip_gateway, #i_wifi_ip_dns')
+								.prop('enabled', !$i_wifi_ip_dhcp.prop('checked'));
+					});
+				});
+			</script>
 		</div>
 		<!-- leds form -->
 		<div class="form" id="f_leds">
@@ -182,6 +218,10 @@
 					<input type="number" id="i_leds_v_blocks"/>
 				</div>
 				<div class="ui-widget">
+					<label>&nbsp;</label>
+					<i class="ui-text" id="t_leds_layout"></i>
+				</div>
+				<div class="ui-widget">
 					<label for="i_leds_type">Type of LEDs:</label>
 					<select id="i_leds_type">
 						<option value="0">WS2812</option>
@@ -196,7 +236,28 @@
 			</fieldset>
 			<div class="buttons">
 				<button id="b_leds_save" class="ui-button">Save settings</button>
+				<button id="b_leds_cancel" class="ui-button cancel">Cancel</button>
 			</div>
+			<script>
+				$(document).ready(function () {
+					$('#i_leds_v_blocks, #i_leds_h_blocks').change(function () {
+						let h_blocks = parseInt($('#i_leds_h_blocks').val());
+						let v_blocks = parseInt($('#i_leds_v_blocks').val());
+						let h_leds = h_blocks * parseInt($('#i_leds_block_width').val())
+						let v_leds = v_blocks * parseInt($('#i_leds_block_height').val())
+						$('#t_leds_layout').html(
+							'Blocks: {blocks} ({h_blocks}x{v_blocks}), LEDs: {leds} ({h_leds}x{v_leds})'.format({
+								blocks: h_blocks * v_blocks,
+								h_blocks: h_blocks,
+								v_blocks: v_blocks,
+								leds: h_leds * v_leds,
+								h_leds: h_leds,
+								v_leds: v_leds
+							})
+						);
+					});
+				});
+			</script>
 		</div>
 		<!-- message -->
 		<div id="f_message" class="message"></div>
@@ -219,7 +280,7 @@
 					</div>
 				</td></tr></table>
 			</div>
-			<a id="btn_menu" class="icon"><svg class="icon icon-menu"><use xlink:href="#icon-menu"></use></svg></a>
+			<a id="btn_menu" class="icon" style="cursor: pointer"><svg class="icon icon-menu"><use xlink:href="#icon-menu"></use></svg></a>
 		</div>
 		<div id="menu">
 			<a id="mi_main" href="#"><svg class="icon icon-main"><use xlink:href="#icon-main"></use></svg> Main page</a>
@@ -475,6 +536,9 @@
 				$('#i_wifi_ap_password').val(data.ap.password);
 				$('#i_wifi_sta_ssid').val(data.sta.ssid);
 				$('#i_wifi_sta_password').val(data.sta.password);
+
+				$('#i_wifi_mode').change();
+				$('#i_wifi_ip_dhcp').change();
 			});
 		});
 		
@@ -491,6 +555,8 @@
 				$('#i_leds_v_blocks').val(data.v_blocks);
 				$('#i_leds_type').val(data.type);
 				$('#i_leds_current_limit').val(data.current_limit);
+
+				$('#i_leds_v_blocks').change();
 			});
 		});
 
@@ -539,11 +605,12 @@
 		});
 
 		// show main page
-		$mi_main.click(function() {
+		$('#mi_main, .cancel').click(function() {
 			$content.children().detach().appendTo($container);
 			$main_page.detach().appendTo($content);
 			get_effect_params();
-		}).click();
+		});
+		$mi_main.click();
 	});
 	</script>
 </body>

@@ -167,6 +167,15 @@ legend {
 	min-width: 200px;
 }
 
+.ui-widget .ui-text {
+	font-family: Geneva, Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	flex-grow: 1;
+	min-width: 200px;
+	color: darkgray;
+	font-style: normal;
+}
+
 .buttons {
 	margin: 16px;
 	text-align: center;
@@ -180,6 +189,11 @@ legend {
 	padding: 8px;
 	border: 1px solid #00aaff;
 	border-radius: 8px;
+}
+
+.ui-button.cancel {
+	background-color: white;
+	color: blue;
 }
 
 .ui-button:hover {
@@ -268,4 +282,3 @@ legend {
 		margin: auto;
 	}
 }
-
