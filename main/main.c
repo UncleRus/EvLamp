@@ -74,17 +74,14 @@ static void main_loop(void *arg)
                 break;
 
             case EVENT_NETWORK_UP:
-                ESP_LOGI(TAG, "Network is up, starting HTTPD...");
-                err = webserver_start();
+                ESP_LOGI(TAG, "Network is up, restarting HTTPD...");
+                err = webserver_restart();
                 if (err != ESP_OK)
                     ESP_LOGW(TAG, "Error starting HTTPD: %d (%s)", err, esp_err_to_name(err));
                 break;
 
             case EVENT_NETWORK_DOWN:
-                ESP_LOGI(TAG, "Network is down, stopping HTTPD...");
-                err = webserver_stop();
-                if (err != ESP_OK)
-                    ESP_LOGW(TAG, "Error stopping HTTPD: %d (%s)", err, esp_err_to_name(err));
+                ESP_LOGI(TAG, "Network is down");
                 break;
 
             default:

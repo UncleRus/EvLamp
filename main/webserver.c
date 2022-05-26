@@ -43,12 +43,12 @@ static esp_err_t init()
 ////////////////////////////////////////////////////////////////////////////////
 /// Public
 
-esp_err_t webserver_start()
+esp_err_t webserver_restart()
 {
     if (server)
     {
-        ESP_LOGE(TAG, "HTTPD already started");
-        return ESP_ERR_INVALID_STATE;
+        ESP_LOGI(TAG, "HTTPD started, trying to stop...");
+        httpd_stop(server);
     }
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -61,21 +61,6 @@ esp_err_t webserver_start()
     CHECK(init());
 
     ESP_LOGI(TAG, "HTTPD started on port %d, free mem: %d bytes", config.server_port, esp_get_free_heap_size());
-
-    return ESP_OK;
-}
-
-esp_err_t webserver_stop()
-{
-    if (!server)
-    {
-        ESP_LOGE(TAG, "HTTPD is not running");
-        return ESP_ERR_INVALID_STATE;
-    }
-
-    CHECK(httpd_stop(server));
-
-    ESP_LOGI(TAG, "HTTPD stopped");
 
     return ESP_OK;
 }

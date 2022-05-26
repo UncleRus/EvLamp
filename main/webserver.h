@@ -4,7 +4,6 @@
 #include "common.h"
 #include <esp_http_server.h>
 
-esp_err_t webserver_start();
-esp_err_t webserver_stop();
+esp_err_t webserver_restart();
 
 #endif /* EVLAMP_WEBSERVER_H_ */
