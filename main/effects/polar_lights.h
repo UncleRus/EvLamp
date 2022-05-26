@@ -10,7 +10,7 @@
 
 #include "effect.h"
 
-extern EFFECT_PARAMS(polar_lights, 3);
+extern EFFECT_PARAMS(polar_lights, 4);
 
 esp_err_t effect_polar_lights_prepare(framebuffer_t *fb);
 
