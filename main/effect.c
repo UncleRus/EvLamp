@@ -34,6 +34,7 @@
 #include "effects/sun.h"
 #include "effects/spaceships.h"
 #include "effects/fireflies.h"
+#include "effects/tunnel.h"
 
 const effect_descriptor_t effects[] = {
     DESCR_EFFECT_LAMP,
@@ -65,6 +66,7 @@ const effect_descriptor_t effects[] = {
     DESCR_EFFECT_SUN,
     DESCR_EFFECT_SPACESHIPS,
     DESCR_EFFECT_FIREFLIES,
+    DESCR_EFFECT_TUNNEL,
 };
 
 const size_t effects_count = sizeof(effects) / sizeof(effect_descriptor_t);

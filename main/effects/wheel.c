@@ -21,7 +21,6 @@ EFFECT_PARAMS(wheel, 6) = {
     DECL_PARAM(P_RAYS, "Number of rays", 2, 6, 3),
 };
 
-//#define NUM_RAYS 3
 #define BLACK_TH 40
 #define BRIGHT_TH 200
 

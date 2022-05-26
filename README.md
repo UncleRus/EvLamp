@@ -33,8 +33,13 @@ The LEDs in the matrix are connected in series like a snake, starting from the b
 
 The sizes of the most common matrices:
 - 8x8
-- 8x32
+- 32x8
 - 16x16
+
+You can build your own matrix with widely available WS2812B/SK6812/APA106 LED strips.
+
+The dimensions of the matrix side are limited to the range 8..128 and
+number of pixels in matrix cannot be more than 512.
 
 ### Single matrix configuration
 
@@ -42,8 +47,7 @@ To control one matrix, only one GPIO pin of the microcontroller is needed:
 
 ![Single matrix](images/single_block.png)
 
-This configuration is the simplest supported. The dimensions of the matrix side are limited to the range 8..128 and
-number of pixels in matrix cannot be more than 512. 
+This configuration is the simplest supported.  
 
 ### Multiple LED matrices (blocks) configuration
 
