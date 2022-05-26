@@ -45,6 +45,7 @@ idf_component_register(
 		effects/spaceships.c
 		effects/fireflies.c
 		effects/tunnel.c
+		effects/dunes.c
 
 	EMBED_TXTFILES
 		${EMBED}/web/jquery.js
