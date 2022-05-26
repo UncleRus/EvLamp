@@ -1,6 +1,6 @@
 # EvLamp
 
-"Clean" implementation of Alex Guyver's FireLamp analogue in pure C for ESP32.
+Clean implementation of Alex Guyver's FireLamp analogue in pure C for ESP32.
 
 ## What it does
 
@@ -27,9 +27,9 @@ You will need:
 
 ### LED matrix
 
-The LEDs in the matrix are connected in series like a "snake", starting from the bottom row:
+The LEDs in the matrix are connected in series like a snake, starting from the bottom row:
 
-![8x8 matrix](hardware/8x8_matrix.png)
+![8x8 matrix](images/8x8_matrix.png)
 
 The sizes of the most common matrices:
 - 8x8
@@ -40,22 +40,23 @@ The sizes of the most common matrices:
 
 To control one matrix, only one GPIO pin of the microcontroller is needed:
 
-![Single matrix](hardware/single_block.png)
+![Single matrix](images/single_block.png)
 
-This configuration is the simplest supported. The dimensions of the matrix side are limited to the range 8..128.
+This configuration is the simplest supported. The dimensions of the matrix side are limited to the range 8..128 and
+number of pixels in matrix cannot be more than 512. 
 
 ### Multiple LED matrices (blocks) configuration
 
 You can connect up to 8 LED matrices of the same size to different GPIO pins and achieve high resolution
 rendering of the effect. For example:
 
-![4 blocks configuration example](hardware/2x2_blocks.png)
+![4 blocks configuration example](images/2x2_blocks.png)
 
 ### Changing LED layout
 
 Configure your LED layout at runtime by API or in browser ("Menu -> LEDs Settings"):
 
-![LED layout configuration](hardware/led_config.png)
+![LED layout configuration](images/led_config.png)
 
 ## Changing default settings 
 

@@ -12,16 +12,19 @@
 #include <lib8tion.h>
 #include <esp_timer.h>
 #include <math.h>
+#include "palettes.h"
 
-#define P_SPEED  0
-#define P_BORDER 1
+#define P_SPEED      0
+#define P_BORDER     1
+#define P_IRIDESCENT 2
 
-EFFECT_PARAMS(twister, 2) = {
+EFFECT_PARAMS(twister, 3) = {
     DECL_PARAM(P_SPEED, "Speed", 0, 40, 30),
     DECL_PARAM(P_BORDER, "Add black border", 0, 1, 1),
+    DECL_PARAM(P_IRIDESCENT, "Iridescent colors", 0, 1, 0),
 };
 
-static const rgb_t C_BLACK = { .r = 0, .g = 0, .b = 0 };
+static const rgb_t c_black = C_BLACK;
 
 static void horizontal_line(framebuffer_t *fb, uint8_t x1, uint8_t x2, uint8_t y, hsv_t color)
 {
@@ -37,9 +40,9 @@ static void horizontal_line(framebuffer_t *fb, uint8_t x1, uint8_t x2, uint8_t y
 
     if (PARAM_VAL(twister, P_BORDER))
     {
-        //add black points at the ends of line
-        fb_set_pixel_rgb(fb, x1, y, C_BLACK);
-        fb_set_pixel_rgb(fb, x2, y, C_BLACK);
+        // add black points at the ends of line
+        fb_set_pixel_rgb(fb, x1, y, c_black);
+        fb_set_pixel_rgb(fb, x2, y, c_black);
     }
 }
 
@@ -64,7 +67,7 @@ esp_err_t effect_twister_run(framebuffer_t *fb)
         x3 = x3 >= fb->width ? fb->width - 1 : x3;
         x4 = x4 >= fb->width ? fb->width - 1 : x4;
 
-        uint8_t hue = sin8(a / 20);
+        uint8_t hue = sin8(PARAM_VAL(twister, P_IRIDESCENT) ? a : a / 20);
         if (x1 < x2)
             horizontal_line(fb, x1, x2, i, hsv_from_values(hue, 255, 255));
         if (x2 < x3)

@@ -10,16 +10,18 @@
 #define P_SAT1  2
 #define P_HUE2  3
 #define P_SAT2  4
+#define P_RAYS  5
 
-EFFECT_PARAMS(wheel, 5) = {
+EFFECT_PARAMS(wheel, 6) = {
     DECL_PARAM(P_SPEED, "Rotation speed", 0, 255, 60),
     DECL_PARAM(P_HUE1, "Hue 1", 0, 255, 0),
     DECL_PARAM(P_SAT1, "Saturation 1", 0, 255, 255),
     DECL_PARAM(P_HUE2, "Hue 2", 0, 255, 150),
     DECL_PARAM(P_SAT2, "Saturation 2", 0, 255, 0),
+    DECL_PARAM(P_RAYS, "Number of rays", 2, 6, 3),
 };
 
-#define NUM_RAYS 3
+//#define NUM_RAYS 3
 #define BLACK_TH 40
 #define BRIGHT_TH 200
 
@@ -39,7 +41,7 @@ esp_err_t effect_wheel_run(framebuffer_t *fb)
     for (int x = 0; x < fb->width; x++)
         for (int y = 0; y < fb->height; y++)
         {
-            int16_t v = sinf(NUM_RAYS * atan2f((float)x - cx + offs_x, (float)y - cy + offs_y) + t * speed) * 255;
+            int16_t v = (int16_t)(sinf(PARAM_VAL(wheel, P_RAYS) * atan2f((float)x - cx + offs_x, (float)y - cy + offs_y) + t * speed) * 255);
 
             hsv_t color;
             color.val = abs(v);
