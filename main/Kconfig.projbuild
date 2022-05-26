@@ -162,13 +162,13 @@ menu "*** EvLamp configuration ***"
 			endchoice
 
 			config EL_SINGLE_LED_CURRENT_MA
-				int "Maximal current consuming by single pixel, mA"
-				default 60
+				int "Maximal current consuming by single pixel, mA (see in datasheet)"
+				default 33
 
 			config EL_MATRIX_MAX_CURRENT
-				int "Maximal current consuming by LEDs, mA"
+				int "Restrict maximal current consuming by all LEDs, mA"
 				default 5000
-	
+
 		endmenu
 
 		menu "Buttons configuration"

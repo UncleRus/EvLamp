@@ -107,7 +107,10 @@ esp_err_t surface_init()
     led_strip_install();
 
     size_t strip_len = sys_settings.leds.block_width * sys_settings.leds.block_height;
-    uint8_t brightness = (uint8_t)(((float)sys_settings.leds.current_limit / strip_len) / (CONFIG_EL_SINGLE_LED_CURRENT_MA / 256.0f));
+
+    int max_brightness = (int)(((float)sys_settings.leds.current_limit / (float)(strip_len * num_blocks)) / ((float)CONFIG_EL_SINGLE_LED_CURRENT_MA / 256.0f));
+    uint8_t brightness = max_brightness > 255 ? 255 : max_brightness;
+    ESP_LOGI(TAG, "Maximal LED brightness: %d", brightness);
 
     ESP_LOGI(TAG, "Surface configuration: %dx%d LEDs (%dx%d blocks, %d total)",
         sys_settings.leds.h_blocks * sys_settings.leds.block_width,
