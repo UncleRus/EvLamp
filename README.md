@@ -4,7 +4,7 @@ Clean implementation of Alex Guyver's FireLamp analogue in pure C for ESP32.
 
 ## What it does
 
-Display beautiful effects on a multiple matrices of NxN WS2812B/SK6812/APA106 LEDs.
+Display beautiful effects on a multiple matrices of NxN WS2812B/SK6812/APA106/SM16703 LEDs.
 
 ### Features
 
@@ -19,7 +19,7 @@ Display beautiful effects on a multiple matrices of NxN WS2812B/SK6812/APA106 LE
 You will need:
 
 - ESP32 (ESP32 only! ESP32-S2/ESP32-C3/ESP32-C4 and others are not yet supported)
-- One or more WS2812B/SK6812/APA106 LED matrices
+- One or more WS2812B/SK6812/APA106/SM16703 LED matrices
 - 4 buttons:
 	- Main: long press - On/Off, click - next effect
 	- Up/Down: brightness up/down

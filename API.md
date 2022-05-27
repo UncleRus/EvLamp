@@ -170,8 +170,8 @@ EvLamp provides a simple API based on HTTP GET and POST requests containing JSON
   "block_height": <Integer, single block (LED matrix) height (number of rows), 8..128>,
   "h_blocks": <Integer, number of blocks horizontally>,
   "v_blocks": <Integer, number of blocks vertically>,
-  "type": <Integer, Type of LEDs. 0 - WS2812, 1 - SK6812, 2 - APA106>,
-  "current_limit": <Integer, Approximate limit of current consumed by the single block (LED matrix) in milliamps.
+  "type": <Integer, Type of LEDs. 0 - WS2812, 1 - SK6812, 2 - APA106, 3 - SM16703>,
+  "current_limit": <Integer, Approximate limit of current consumed by all LEDs in milliamps.
                    The larger this value, the higher the maximum brightness.>,
 }
 ```
@@ -207,8 +207,8 @@ Single 16x16 WS2812B matrix:
   "block_height": <Integer, single block (LED matrix) height (number of rows), 8..128>,
   "h_blocks": <Integer, number of blocks horizontally>,
   "v_blocks": <Integer, number of blocks vertically>,
-  "type": <Integer, Type of LEDs. 0 - WS2812, 1 - SK6812, 2 - APA106>,
-  "current_limit": <Integer, Approximate limit of current consumed by the single block (LED matrix) in milliamps.
+  "type": <Integer, Type of LEDs. 0 - WS2812, 1 - SK6812, 2 - APA106, 3 - SM16703>,
+  "current_limit": <Integer, Approximate limit of current consumed by all LEDs in milliamps.
                    The larger this value, the higher the maximum brightness.>,
 }
 ```

@@ -159,6 +159,9 @@ menu "*** EvLamp configuration ***"
 	
 				config EL_LED_TYPE_APA106
 					bool "APA106"
+
+				config EL_LED_TYPE_SM16703
+					bool "SM16703"
 			endchoice
 
 			config EL_SINGLE_LED_CURRENT_MA
