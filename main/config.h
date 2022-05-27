@@ -58,9 +58,9 @@
 #define FPS_MAX 120
 #define SURFACE_TASK_STACK_SIZE 8192
 #define MAX_SURFACE_BLOCKS RMT_CHANNEL_MAX
-#define MAX_BLOCK_LEDS 512
+#define MAX_BLOCK_LEDS 1024
 #define MIN_BLOCK_SIZE 8
-#define MAX_BLOCK_SIZE 64
+#define MAX_BLOCK_SIZE 128
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Webserver

@@ -39,7 +39,11 @@ The sizes of the most common matrices:
 You can build your own matrix with widely available WS2812B/SK6812/APA106 LED strips.
 
 The dimensions of the matrix side are limited to the range 8..128 and
-number of pixels in matrix cannot be more than 512.
+number of pixels in matrix cannot be more than 1024.
+
+I do not recommend using matrices with a large number of LEDs due to the maximum frame
+rate limitations: for a matrix containing 512 LEDs, this limit is 60 fps, and for a matrix of
+1024 LEDs maximal fps is 30. It is better to use multiple small matrices.
 
 ### Single matrix configuration
 
@@ -55,6 +59,11 @@ You can connect up to 8 LED matrices of the same size to different GPIO pins and
 rendering of the effect. For example:
 
 ![4 blocks configuration example](images/2x2_blocks.png)
+
+### Maximal recommended configuration
+
+2x4 blocks, each 32x16 LEDs.
+Total screen dimensions: 64x64, 4096 LEDs, 60 fps max.
 
 ### Changing LED layout
 
