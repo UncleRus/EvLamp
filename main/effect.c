@@ -2,6 +2,7 @@
 #include <nvs.h>
 #include "settings.h"
 #include "surface.h"
+#include "lib8tion.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -162,6 +163,8 @@ esp_err_t effects_init()
     esp_err_t res = effect_params_load();
     if (res != ESP_OK)
         res = effects_reset();
+
+    random16_set_seed(esp_cpu_get_ccount() & 0xffff);
 
     return res;
 }
