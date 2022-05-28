@@ -21,9 +21,13 @@ You will need:
 - ESP32 (ESP32 only! ESP32-S2/ESP32-C3/ESP32-C4 and others are not yet supported)
 - One or more WS2812B/SK6812/APA106/SM16703 LED matrices
 - 4 buttons:
-	- Main: long press - On/Off, click - next effect
-	- Up/Down: brightness up/down
-	- Reset: long press - Reset settings to defaults
+    - Main: long press - On/Off, click - next effect
+    - Up/Down: brightness up/down
+    - Reset: long press - Reset settings to defaults
+
+You can use the KiCad 6 project located in the [hardware directory](hardware) and containing
+an example implementation: a schematic, a simple board and ready-made Gerber files for production
+(compatible with JLCPCB requirements).
 
 ### LED matrix
 

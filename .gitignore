@@ -64,4 +64,5 @@ sdkconfig
 /.vscode/
 /.idea/
 /cmake-build-debug/
-/images/evlamp-backups/
+/hardware/evlamp-backups/
+/hardware/fp-info-cache

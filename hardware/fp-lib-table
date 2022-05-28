@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name "greenhouse")(type "KiCad")(uri "esp32.pretty")(options "")(descr ""))
+)
