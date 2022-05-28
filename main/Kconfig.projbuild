@@ -138,12 +138,12 @@ menu "*** EvLamp configuration ***"
                 config EL_MATRIX_GPIO_6
                     int "GPIO output for block (LED matrix) 6"
                     range 0 39
-                    default 8
+                    default 22
 
                 config EL_MATRIX_GPIO_7
                     int "GPIO output for block (LED matrix) 7"
                     range 0 39
-                    default 7
+                    default 23
 
 			endmenu
 
