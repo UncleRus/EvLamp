@@ -172,6 +172,23 @@ menu "*** EvLamp configuration ***"
 				int "Restrict maximal current consuming by all LEDs, mA"
 				default 5000
 
+			choice EL_MATRIX_ROTATION_C
+				prompt "Surface rotation"
+				default EL_MATRIX_ROTATION_0
+
+				config EL_MATRIX_ROTATION_0
+					bool "No rotation"
+
+				config EL_MATRIX_ROTATION_90
+					bool "90 degrees clockwise"
+
+				config EL_MATRIX_ROTATION_180
+					bool "180 degrees"
+
+				config EL_MATRIX_ROTATION_270
+					bool "270 degrees clockwise"
+			endchoice
+
 		endmenu
 
 		menu "Buttons configuration"

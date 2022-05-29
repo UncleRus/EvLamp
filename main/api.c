@@ -369,6 +369,7 @@ static esp_err_t get_settings_leds(httpd_req_t *req)
     cJSON_AddNumberToObject(res, "h_blocks", sys_settings.leds.h_blocks);
     cJSON_AddNumberToObject(res, "v_blocks", sys_settings.leds.v_blocks);
     cJSON_AddNumberToObject(res, "type", sys_settings.leds.type);
+    cJSON_AddNumberToObject(res, "rotation", sys_settings.leds.rotation);
     cJSON_AddNumberToObject(res, "current_limit", sys_settings.leds.current_limit);
     cJSON_AddItemToObject(res, "gpio", cJSON_CreateIntArray((const int *)sys_settings.leds.gpio, MAX_SURFACE_BLOCKS));
 
@@ -429,6 +430,13 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
+    cJSON *rotation_item = cJSON_GetObjectItem(json, "rotation");
+    if (rotation_item && !cJSON_IsNumber(rotation_item))
+    {
+        msg = "Item `rotation` invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
     cJSON *limit_item = cJSON_GetObjectItem(json, "current_limit");
     if (!cJSON_IsNumber(limit_item))
     {
@@ -465,12 +473,25 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
     }
 
     uint8_t type = (uint8_t)cJSON_GetNumberValue(type_item);
-    if (type > LED_STRIP_APA106)
+    if (type >= LED_STRIP_TYPE_MAX)
     {
         msg = "Invalid LED type";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
+
+    uint8_t rotation = 0;
+    if (rotation_item)
+    {
+        rotation = (uint8_t)cJSON_GetNumberValue(rotation_item);
+        if (rotation > SURFACE_ROTATION_270)
+        {
+            msg = "Invalid rotation value";
+            err = ESP_ERR_INVALID_ARG;
+            goto exit;
+        }
+    }
+
     size_t leds = block_width * block_height * h_blocks * v_blocks;
     uint32_t limit = (uint32_t)cJSON_GetNumberValue(limit_item);
     if (limit < leds * CONFIG_EL_SINGLE_LED_CURRENT_MA / 50)
@@ -522,6 +543,8 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
     sys_settings.leds.h_blocks = h_blocks;
     sys_settings.leds.v_blocks = v_blocks;
     sys_settings.leds.type = type;
+    if (rotation_item)
+        sys_settings.leds.rotation = rotation;
     sys_settings.leds.current_limit = limit;
     for (int i = 0; i < gpio_count; i++)
         sys_settings.leds.gpio[i] = gpio_array[i];

@@ -11,7 +11,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// Settings
 
-#define SETTINGS_MAGIC 0xbeef0010
+#define SETTINGS_MAGIC 0xbeef0011
 
 #ifdef CONFIG_EL_WIFI_MODE_AP
     #define DEFAULT_WIFI_MODE WIFI_MODE_AP
@@ -37,7 +37,15 @@
     #define DEFAULT_LED_TYPE LED_STRIP_WS2812
 #endif
 
-//#define MIN_LED_CURRENT_LIMIT 100
+#if CONFIG_EL_MATRIX_ROTATION_90
+    #define DEFAULT_SURFACE_ROTATION SURFACE_ROTATION_90
+#elif CONFIG_EL_MATRIX_ROTATION_180
+    #define DEFAULT_SURFACE_ROTATION SURFACE_ROTATION_180
+#elif CONFIG_EL_MATRIX_ROTATION_270
+    #define DEFAULT_SURFACE_ROTATION SURFACE_ROTATION_270
+#else
+    #define DEFAULT_SURFACE_ROTATION SURFACE_ROTATION_0
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Bus
@@ -57,10 +65,14 @@
 
 #define FPS_MAX 120
 #define SURFACE_TASK_STACK_SIZE 8192
-#define MAX_SURFACE_BLOCKS RMT_CHANNEL_MAX
+#define MAX_SURFACE_BLOCKS 8 // RMT_CHANNEL_MAX
 #define MAX_BLOCK_LEDS 1024
 #define MIN_BLOCK_SIZE 8
 #define MAX_BLOCK_SIZE 128
+
+#if CONFIG_EL_MATRIX_H_BLOCKS * CONFIG_EL_MATRIX_V_BLOCKS > MAX_SURFACE_BLOCKS
+    #error Too much LED blocks!
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Webserver

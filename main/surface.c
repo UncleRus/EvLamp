@@ -6,33 +6,43 @@
 #include "effect.h"
 
 #define FRAME_TICKS (pdMS_TO_TICKS(1000 / vol_settings.fps))
-#define BIT_PLAYING (1)
-#define BIT_READY (2)
+#define BIT_READY   BIT(0)
+#define BIT_PLAYING BIT(1)
 
 typedef struct {
     size_t x, y;
+    size_t width, height;
     led_strip_t strip;
 } surface_block_t;
 
 static surface_block_t blocks[MAX_SURFACE_BLOCKS];
-static size_t num_blocks = 0;
+static size_t num_blocks, num_leds, fb_width, fb_height;
 static framebuffer_t framebuffer;
 static EventGroupHandle_t state;
 
-// frame renderer, framebuffer -> LED strip
 static inline rgb_t get_fb_pixel(framebuffer_t *fb, size_t x, size_t y)
 {
-    return fb->data[FB_OFFSET(fb, x, y)];
+    switch (sys_settings.leds.rotation)
+    {
+        case SURFACE_ROTATION_90:
+            return fb->data[FB_OFFSET(fb, fb->height - y - 1, x)];
+        case SURFACE_ROTATION_180:
+            return fb->data[FB_OFFSET(fb, fb->width - x - 1, fb->height - y - 1)];
+        case SURFACE_ROTATION_270:
+            return fb->data[FB_OFFSET(fb, y, fb->width - x - 1)];
+        default:
+            return fb->data[FB_OFFSET(fb, x, y)];
+    }
 }
 
 static inline esp_err_t set_strip_pixel(framebuffer_t *fb, size_t x, size_t y, rgb_t c)
 {
-    // TODO: support block layouts
+    // TODO: support custom layouts
     size_t b = y / sys_settings.leds.block_height * sys_settings.leds.h_blocks + x / sys_settings.leds.block_width;
 
-    size_t ox = x % sys_settings.leds.block_width;
-    size_t oy = y % sys_settings.leds.block_height;
-    size_t strip_idx = oy * sys_settings.leds.block_width + (oy % 2 ? sys_settings.leds.block_width - ox - 1 : ox);
+    size_t bx = x % sys_settings.leds.block_width;
+    size_t by = y % sys_settings.leds.block_height;
+    size_t strip_idx = by * sys_settings.leds.block_width + (by % 2 ? sys_settings.leds.block_width - bx - 1 : bx);
 
     return led_strip_set_pixel(&blocks[b].strip, strip_idx, c);
 }
@@ -45,6 +55,7 @@ static inline esp_err_t flush_strips()
     return ESP_OK;
 }
 
+// frame renderer, framebuffer -> LED strip
 static esp_err_t render_frame(framebuffer_t *fb, void *arg)
 {
     for (size_t y = 0; y < fb->height; y++)
@@ -59,14 +70,13 @@ static void surface_task(void *arg)
     for (size_t i = 0; i < num_blocks; i++)
     {
         ESP_LOGI(TAG, "Block %i LED strip config: %dx%d, GPIO = %d, type = %d", i,
-            sys_settings.leds.block_width, sys_settings.leds.block_height, blocks[i].strip.gpio, blocks[i].strip.type);
+            blocks[i].width, blocks[i].height, blocks[i].strip.gpio, blocks[i].strip.type);
         ESP_ERROR_CHECK(led_strip_init(&blocks[i].strip));
     }
 
     // init framebuffer
     memset(&framebuffer, 0, sizeof(framebuffer_t));
-    ESP_ERROR_CHECK(fb_init(&framebuffer, sys_settings.leds.block_width * sys_settings.leds.h_blocks,
-        sys_settings.leds.block_height * sys_settings.leds.v_blocks, render_frame));
+    ESP_ERROR_CHECK(fb_init(&framebuffer, fb_width, fb_height, render_frame));
 
     ESP_LOGI(TAG, "Surface ready");
 
@@ -78,10 +88,16 @@ static void surface_task(void *arg)
         xEventGroupWaitBits(state, BIT_PLAYING, pdFALSE, pdTRUE, portMAX_DELAY);
 
         TickType_t last_wake_time = xTaskGetTickCount();
-        if (effects[vol_settings.effect].run(&framebuffer) != ESP_OK)
-            ESP_LOGW(TAG, "Frame draw error");
-        if (fb_render(&framebuffer, NULL) != ESP_OK)
-            ESP_LOGW(TAG, "Frame dropped");
+
+        esp_err_t res = effects[vol_settings.effect].run(&framebuffer);
+        if (res == ESP_OK)
+        {
+            res = fb_render(&framebuffer, NULL);
+            if (res != ESP_OK)
+                ESP_LOGW(TAG, "Frame rendering error %d (%s)", res, esp_err_to_name(res));
+        } else
+            ESP_LOGW(TAG, "Effect run error %d (%s)", res, esp_err_to_name(res));
+
         vTaskDelayUntil(&last_wake_time, FRAME_TICKS);
     }
 }
@@ -108,13 +124,15 @@ esp_err_t surface_init()
 
     size_t strip_len = sys_settings.leds.block_width * sys_settings.leds.block_height;
 
-    int max_brightness = (int)(((float)sys_settings.leds.current_limit / (float)(strip_len * num_blocks)) / ((float)CONFIG_EL_SINGLE_LED_CURRENT_MA / 256.0f));
+    int max_brightness = (int)(((float)sys_settings.leds.current_limit / (float)(strip_len * num_blocks)) / (float)CONFIG_EL_SINGLE_LED_CURRENT_MA * 256.0f);
     uint8_t brightness = max_brightness > 255 ? 255 : max_brightness;
     ESP_LOGI(TAG, "Maximal LED brightness: %d", brightness);
 
-    ESP_LOGI(TAG, "Surface configuration: %dx%d LEDs (%dx%d blocks, %d total)",
-        sys_settings.leds.h_blocks * sys_settings.leds.block_width,
-        sys_settings.leds.v_blocks * sys_settings.leds.block_height,
+    fb_width = sys_settings.leds.h_blocks * sys_settings.leds.block_width;
+    fb_height = sys_settings.leds.v_blocks * sys_settings.leds.block_height;
+    num_leds = fb_width * fb_height;
+    ESP_LOGI(TAG, "Surface configuration: %dx%d (%d) LEDs, %dx%d (%d) blocks",
+        fb_width, fb_height, num_leds,
         sys_settings.leds.h_blocks, sys_settings.leds.v_blocks, num_blocks);
 
     // init blocks
@@ -122,10 +140,12 @@ esp_err_t surface_init()
     for (uint8_t y = 0; y < sys_settings.leds.v_blocks; y++)
         for (uint8_t x = 0; x < sys_settings.leds.h_blocks; x++)
         {
+            // TODO: support custom layouts
             size_t i = y * sys_settings.leds.h_blocks + x;
-
             blocks[i].x = x * sys_settings.leds.block_width;
             blocks[i].y = y * sys_settings.leds.block_height;
+            blocks[i].width = sys_settings.leds.block_width;
+            blocks[i].height = sys_settings.leds.block_height;
 
             // prepare strip descriptor for block
             blocks[i].strip.gpio = sys_settings.leds.gpio[i];
@@ -149,10 +169,7 @@ esp_err_t surface_init()
 
     if (vol_settings.effect >= effects_count)
         vol_settings.effect = CONFIG_EL_EFFECT_DEFAULT;
-
-    CHECK(surface_set_effect(vol_settings.effect));
-
-    return ESP_OK;
+    return surface_set_effect(vol_settings.effect);
 }
 
 bool surface_is_playing()
