@@ -28,8 +28,8 @@
         "fab_text_upright": false,
         "other_line_width": 0.15,
         "other_text_italic": false,
-        "other_text_size_h": 1.0,
-        "other_text_size_v": 1.0,
+        "other_text_size_h": 0.7,
+        "other_text_size_v": 0.7,
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
@@ -39,13 +39,13 @@
         },
         "silk_line_width": 0.15,
         "silk_text_italic": false,
-        "silk_text_size_h": 1.0,
-        "silk_text_size_v": 1.0,
+        "silk_text_size_h": 0.7,
+        "silk_text_size_v": 0.7,
         "silk_text_thickness": 0.15,
         "silk_text_upright": false,
         "zones": {
           "45_degree_only": false,
-          "min_clearance": 0.508
+          "min_clearance": 0.3
         }
       },
       "diff_pair_dimensions": [
