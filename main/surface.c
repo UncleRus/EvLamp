@@ -14,7 +14,7 @@ typedef struct {
     led_strip_t strip;
 } surface_block_t;
 
-static surface_block_t blocks[RMT_CHANNEL_MAX];
+static surface_block_t blocks[MAX_SURFACE_BLOCKS];
 static size_t num_blocks = 0;
 static framebuffer_t framebuffer;
 static EventGroupHandle_t state;
@@ -97,9 +97,9 @@ esp_err_t surface_init()
         return ESP_ERR_NO_MEM;
     }
     num_blocks = sys_settings.leds.v_blocks * sys_settings.leds.h_blocks;
-    if (num_blocks > RMT_CHANNEL_MAX)
+    if (num_blocks > MAX_SURFACE_BLOCKS)
     {
-        ESP_LOGE(TAG, "Too much blocks (%d), max %d", num_blocks, RMT_CHANNEL_MAX);
+        ESP_LOGE(TAG, "Too much blocks (%d), max %d", num_blocks, MAX_SURFACE_BLOCKS);
         return ESP_FAIL;
     }
 
