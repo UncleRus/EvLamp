@@ -3,13 +3,6 @@
 
 #include "common.h"
 
-enum {
-    SURFACE_ROTATION_0 = 0,
-    SURFACE_ROTATION_90,
-    SURFACE_ROTATION_180,
-    SURFACE_ROTATION_270
-};
-
 esp_err_t surface_init();
 
 esp_err_t surface_prepare_effect(size_t effect);

@@ -22,17 +22,7 @@ static EventGroupHandle_t state;
 
 static inline rgb_t get_fb_pixel(framebuffer_t *fb, size_t x, size_t y)
 {
-    switch (sys_settings.leds.rotation)
-    {
-        case SURFACE_ROTATION_90:
-            return fb->data[FB_OFFSET(fb, fb->height - y - 1, x)];
-        case SURFACE_ROTATION_180:
-            return fb->data[FB_OFFSET(fb, fb->width - x - 1, fb->height - y - 1)];
-        case SURFACE_ROTATION_270:
-            return fb->data[FB_OFFSET(fb, y, fb->width - x - 1)];
-        default:
-            return fb->data[FB_OFFSET(fb, x, y)];
-    }
+    return fb->data[FB_OFFSET(fb, x, y)];
 }
 
 static inline esp_err_t set_strip_pixel(framebuffer_t *fb, size_t x, size_t y, rgb_t c)

@@ -238,17 +238,6 @@
 						<option value="3">SM16703</option>
 					</select>
 				</div>
-				<!--
-				<div class="ui-widget">
-					<label for="i_leds_rotation">Surface rotation:</label>
-					<select id="i_leds_rotation">
-						<option value="0">No rotation</option>
-						<option value="1">90 degrees clockwise</option>
-						<option value="2">180 degrees</option>
-						<option value="3">270 degrees clockwise</option>
-					</select>
-				</div>
-				-->
 				<div class="ui-widget">
 					<label for="i_leds_current_limit">Current limit, mA:</label>
 					<input type="number" id="i_leds_current_limit" />
@@ -535,7 +524,6 @@
 				h_blocks: parseInt($('#i_leds_h_blocks').val()),
 				v_blocks: parseInt($('#i_leds_v_blocks').val()),
 				type: parseInt($('#i_leds_type').val()),
-				// rotation: parseInt($('#i_leds_rotation').val()),
 				current_limit: parseInt($('#i_leds_current_limit').val()),
 			};
 			console.log(data);
@@ -601,7 +589,6 @@
 				$('#i_leds_h_blocks').val(data.h_blocks);
 				$('#i_leds_v_blocks').val(data.v_blocks);
 				$('#i_leds_type').val(data.type);
-				// $('#i_leds_rotation').val(data.rotation);
 				$('#i_leds_current_limit').val(data.current_limit);
 
 				$('#i_leds_v_blocks').change();

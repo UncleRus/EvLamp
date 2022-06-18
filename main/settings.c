@@ -43,7 +43,6 @@ static system_settings_t sys_defaults = {
         .h_blocks      = CONFIG_EL_MATRIX_H_BLOCKS,
         .v_blocks      = CONFIG_EL_MATRIX_V_BLOCKS,
         .type          = DEFAULT_LED_TYPE,
-        .rotation      = DEFAULT_SURFACE_ROTATION,
         .current_limit = CONFIG_EL_MATRIX_MAX_CURRENT,
         .gpio          = {
             [RMT_CHANNEL_0] = CONFIG_EL_MATRIX_GPIO_0,
