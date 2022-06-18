@@ -12,8 +12,8 @@
 #define P_SPEED 1
 
 EFFECT_PARAMS(holiday, 2) = {
-    DECL_PARAM(P_MODE, "Mode", 0, 3, 0),
-    DECL_PARAM(P_SPEED, "Speed", 1, 20, 8),
+    DECL_PARAM_RANGE(P_MODE, "Mode", 0, 3, 0),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 1, 20, 8),
 };
 
 static uint8_t hue = 0;

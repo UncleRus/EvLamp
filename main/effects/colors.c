@@ -10,9 +10,9 @@
 #define P_MAX_SAT 2
 
 EFFECT_PARAMS(colors, 3) = {
-    DECL_PARAM(P_SPEED, "Speed", 128, 254, 192),
-    DECL_PARAM(P_MIN_SAT, "Minimal saturation", 1, 255, 128),
-    DECL_PARAM(P_MAX_SAT, "Maximal saturation", 1, 255, 255),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 128, 254, 192),
+    DECL_PARAM_RANGE(P_MIN_SAT, "Minimal saturation", 1, 255, 128),
+    DECL_PARAM_RANGE(P_MAX_SAT, "Maximal saturation", 1, 255, 255),
 };
 
 static rgb_t prev_color, next_color;

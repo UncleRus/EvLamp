@@ -14,7 +14,7 @@
 #define P_SPEED 0
 
 EFFECT_PARAMS(tunnel, 1) = {
-    DECL_PARAM(P_SPEED, "Speed", 1, 170, 90),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 1, 170, 90),
 };
 
 static uint8_t half_width = 0;

@@ -12,8 +12,8 @@
 #define P_DIAMETER 1
 
 EFFECT_PARAMS(flower, 2) = {
-    DECL_PARAM(P_SPEED, "Speed", 1, 255, 100),
-    DECL_PARAM(P_DIAMETER, "Diameter", 50, 150, 128),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 1, 255, 100),
+    DECL_PARAM_RANGE(P_DIAMETER, "Diameter", 50, 150, 128),
 };
 
 static uint32_t last_update_ms = 0;

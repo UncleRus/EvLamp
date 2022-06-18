@@ -6,9 +6,9 @@
 
 // 2500 K by default
 EFFECT_PARAMS(lamp, 3) = {
-    DECL_PARAM(P_RED, "Red", 0, 255, 255),
-    DECL_PARAM(P_GREEN, "Green", 0, 255, 159),
-    DECL_PARAM(P_BLUE, "Blue", 0, 255, 70),
+    DECL_PARAM_RANGE(P_RED, "Red", 0, 255, 255),
+    DECL_PARAM_RANGE(P_GREEN, "Green", 0, 255, 159),
+    DECL_PARAM_RANGE(P_BLUE, "Blue", 0, 255, 70),
 };
 
 esp_err_t effect_lamp_run(framebuffer_t *fb)

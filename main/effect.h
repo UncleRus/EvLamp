@@ -4,9 +4,16 @@
 #include "common.h"
 #include <framebuffer.h>
 
+typedef enum {
+    PARAM_TYPE_RANGE = 0,
+    PARAM_TYPE_BOOL,
+} effect_param_type_t;
+
 #define EFFECT_PARAMS(name, count) effect_param_t effect_ ##name## _params[count]
 
-#define DECL_PARAM(ID, NAME, MIN, MAX, DEF) [ID] = { .name = NAME, .min = MIN, .max = MAX, .def = DEF, .value = DEF }
+#define DECL_PARAM(ID, NAME, MIN, MAX, DEF, TYPE) [ID] = { .name = NAME, .min = MIN, .max = MAX, .def = DEF, .value = DEF, .type = TYPE }
+#define DECL_PARAM_RANGE(ID, NAME, MIN, MAX, DEF) [ID] = { .name = NAME, .min = MIN, .max = MAX, .def = DEF, .value = DEF, .type = PARAM_TYPE_RANGE }
+#define DECL_PARAM_BOOL(ID, NAME, DEF) [ID] = { .name = NAME, .min = 0, .max = 1, .def = DEF, .value = DEF, .type = PARAM_TYPE_BOOL }
 
 #define PARAM_VAL(name, X) (effect_ ##name## _params[(X)].value)
 
@@ -27,7 +34,7 @@
 typedef struct
 {
     char name[32];
-    uint8_t min, max, def, value;
+    uint8_t min, max, def, value, type;
 } effect_param_t;
 
 typedef esp_err_t (*effect_prepare_cb)(framebuffer_t *fb);

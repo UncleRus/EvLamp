@@ -20,15 +20,17 @@
 #define P_HEIGHT 3
 
 EFFECT_PARAMS(polar_lights, 4) = {
-    DECL_PARAM(P_SPEED, "Speed", 1, 255, 127),
-    DECL_PARAM(P_SCALE, "Scale", 1, 255, 60),
-    DECL_PARAM(P_PALETTE, "Palette", 0, 1, 0),
-    DECL_PARAM(P_HEIGHT, "Height adjustment", 1, 255, 50),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 1, 255, 127),
+    DECL_PARAM_RANGE(P_SCALE, "Scale", 1, 255, 60),
+    DECL_PARAM_RANGE(P_PALETTE, "Palette", 0, 1, 0),
+    DECL_PARAM_RANGE(P_HEIGHT, "Height adjustment", 1, 255, 50),
 };
 
 #define PALETTE_SIZE 4
 
 static rgb_t palette[PALETTE_SIZE];
+
+// fixme: use colors from palettes.h
 
 static const rgb_t C_BLACK  = { 0 };
 static const rgb_t C_BLUE   = { .r = 0,   .g = 0,   .b = 255 };

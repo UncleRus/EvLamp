@@ -20,10 +20,10 @@
 #define P_SPARKING 3
 
 EFFECT_PARAMS(waterfall, 4) = {
-    DECL_PARAM(P_MODE, "Mode", 0, 2, 0),
-    DECL_PARAM(P_HUE, "Color", 0, 255, 160),
-    DECL_PARAM(P_COOLING, "Cooling", 5, 100, 10),
-    DECL_PARAM(P_SPARKING, "Sparking", 20, 200, 60),
+    DECL_PARAM_RANGE(P_MODE, "Mode", 0, 2, 0),
+    DECL_PARAM_RANGE(P_HUE, "Color", 0, 255, 160),
+    DECL_PARAM_RANGE(P_COOLING, "Cooling", 5, 100, 10),
+    DECL_PARAM_RANGE(P_SPARKING, "Sparking", 20, 200, 60),
 };
 
 enum {
@@ -36,6 +36,8 @@ enum {
 
 static rgb_t palette[PALETTE_SIZE];
 static uint8_t *map = NULL;
+
+// FIXME: use colors from palettes.h
 
 static const rgb_t C_BLACK  = { 0 };
 static const rgb_t C_WHITE  = { .r = 255, .g = 255, .b = 255 };

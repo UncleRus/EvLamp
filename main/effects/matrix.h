@@ -1,6 +1,8 @@
 #ifndef __EFFECTS_MATRIX_H__
 #define __EFFECTS_MATRIX_H__
 
+// FIXME: need to rewrite completely
+
 #include "effect.h"
 
 extern EFFECT_PARAMS(matrix, 1);

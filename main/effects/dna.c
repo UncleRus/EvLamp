@@ -15,9 +15,9 @@
 #define P_BORDER 2
 
 EFFECT_PARAMS(dna, 3) = {
-    DECL_PARAM(P_SPEED, "Rotation speed", 10, 100, 50),
-    DECL_PARAM(P_SIZE, "Spiral size", 1, 10, 5),
-    DECL_PARAM(P_BORDER, "Add white border", 0, 1, 1),
+    DECL_PARAM_RANGE(P_SPEED, "Rotation speed", 10, 100, 50),
+    DECL_PARAM_RANGE(P_SIZE, "Spiral size", 1, 10, 5),
+    DECL_PARAM_BOOL(P_BORDER, "Add white border", 1),
 };
 
 static uint32_t offset;

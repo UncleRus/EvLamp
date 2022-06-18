@@ -12,8 +12,8 @@
 #define P_PALETTE 1
 
 EFFECT_PARAMS(dunes, 2) = {
-    DECL_PARAM(P_SPEED, "Speed", 1, 40, 5),
-    DECL_PARAM(P_PALETTE, "Palette", 0, PALETTE_MAX - 1, PALETTE_WOOD_FIRE),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 1, 40, 5),
+    DECL_PARAM_RANGE(P_PALETTE, "Palette", 0, PALETTE_MAX - 1, PALETTE_WOOD_FIRE),
 };
 
 esp_err_t effect_dunes_run(framebuffer_t *fb)

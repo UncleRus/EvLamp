@@ -13,10 +13,10 @@
 #define P_PIXELS 3
 
 EFFECT_PARAMS(relax, 4) = {
-    DECL_PARAM(P_SPEED, "Speed", 1, 100, 15),
-    DECL_PARAM(P_HUE, "Start hue", 0, 255, 0),
-    DECL_PARAM(P_SAT, "Saturation", 0, 255, 255),
-    DECL_PARAM(P_PIXELS, "Pixels to update", 1, 50, 1),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 1, 100, 15),
+    DECL_PARAM_RANGE(P_HUE, "Start hue", 0, 255, 100),
+    DECL_PARAM_RANGE(P_SAT, "Saturation", 0, 255, 255),
+    DECL_PARAM_RANGE(P_PIXELS, "Pixels to update", 1, 50, 1),
 };
 
 static uint8_t hue = 0;

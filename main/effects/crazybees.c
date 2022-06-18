@@ -13,9 +13,9 @@
 #define P_BEE_SAT  2
 
 EFFECT_PARAMS(crazybees, 3) = {
-    DECL_PARAM(P_NUM_BEES, "Number of bees", 1, MAX_BEES, 3),
-    DECL_PARAM(P_BEE_HUE, "Bee hue", 0, 255, 100),
-    DECL_PARAM(P_BEE_SAT, "Bee saturation", 0, 255, 0),
+    DECL_PARAM_RANGE(P_NUM_BEES, "Number of bees", 1, MAX_BEES, 3),
+    DECL_PARAM_RANGE(P_BEE_HUE, "Bee hue", 0, 255, 100),
+    DECL_PARAM_RANGE(P_BEE_SAT, "Bee saturation", 0, 255, 0),
 };
 
 typedef struct

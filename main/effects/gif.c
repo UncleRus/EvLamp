@@ -44,7 +44,7 @@ static embed_gif_t gifs[] = {
 #define P_FILE 0
 
 EFFECT_PARAMS(gif, 1) = {
-    DECL_PARAM(P_FILE, "File", 0, sizeof(gifs) / sizeof(embed_gif_t) - 1, 0),
+    DECL_PARAM_RANGE(P_FILE, "File", 0, sizeof(gifs) / sizeof(embed_gif_t) - 1, 0),
 };
 
 nsgif_t *gif = NULL;

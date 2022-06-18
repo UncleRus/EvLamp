@@ -13,12 +13,12 @@
 #define P_RAYS  5
 
 EFFECT_PARAMS(wheel, 6) = {
-    DECL_PARAM(P_SPEED, "Rotation speed", 0, 255, 60),
-    DECL_PARAM(P_HUE1, "Hue 1", 0, 255, 0),
-    DECL_PARAM(P_SAT1, "Saturation 1", 0, 255, 255),
-    DECL_PARAM(P_HUE2, "Hue 2", 0, 255, 150),
-    DECL_PARAM(P_SAT2, "Saturation 2", 0, 255, 0),
-    DECL_PARAM(P_RAYS, "Number of rays", 2, 6, 3),
+    DECL_PARAM_RANGE(P_SPEED, "Rotation speed", 0, 255, 60),
+    DECL_PARAM_RANGE(P_HUE1, "Hue 1", 0, 255, 0),
+    DECL_PARAM_RANGE(P_SAT1, "Saturation 1", 0, 255, 255),
+    DECL_PARAM_RANGE(P_HUE2, "Hue 2", 0, 255, 150),
+    DECL_PARAM_RANGE(P_SAT2, "Saturation 2", 0, 255, 0),
+    DECL_PARAM_RANGE(P_RAYS, "Number of rays", 2, 6, 3),
 };
 
 #define BLACK_TH 40

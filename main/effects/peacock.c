@@ -12,17 +12,16 @@
 #define P_SATURATION 2
 
 EFFECT_PARAMS(peacock, 3) = {
-    DECL_PARAM(P_SPEED, "Speed", 1, 255, 200),
-    DECL_PARAM(P_SCALE, "Scale", 1, 10, 4),
-    DECL_PARAM(P_SATURATION, "Saturation", 0, 255, 255),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 1, 255, 200),
+    DECL_PARAM_RANGE(P_SCALE, "Scale", 1, 10, 4),
+    DECL_PARAM_RANGE(P_SATURATION, "Saturation", 0, 255, 255),
 };
 
 esp_err_t effect_peacock_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 
-    uint32_t time_ms = esp_timer_get_time() / 1000;
-    float t = time_ms / (1000.0f - PARAM_VAL(peacock, P_SPEED) * 4);
+    float t = (float)(esp_timer_get_time() / 1000) / (1000.0f - PARAM_VAL(peacock, P_SPEED) * 4);
 
     for (size_t x = 0; x < fb->width; x++)
         for (size_t y = 0; y < fb->height; y++)

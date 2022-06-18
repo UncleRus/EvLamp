@@ -19,9 +19,9 @@
 #define P_IRIDESCENT 2
 
 EFFECT_PARAMS(twister, 3) = {
-    DECL_PARAM(P_SPEED, "Speed", 0, 40, 30),
-    DECL_PARAM(P_BORDER, "Add black border", 0, 1, 1),
-    DECL_PARAM(P_IRIDESCENT, "Iridescent colors", 0, 1, 0),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 0, 40, 30),
+    DECL_PARAM_BOOL(P_BORDER, "Add black border", 1),
+    DECL_PARAM_BOOL(P_IRIDESCENT, "Iridescent colors", 0),
 };
 
 static const rgb_t c_black = C_BLACK;

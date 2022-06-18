@@ -15,8 +15,8 @@
 #define P_PALETTE 1
 
 EFFECT_PARAMS(sun, 2) = {
-    DECL_PARAM(P_SIZE, "Size", 4, 32, 8),
-    DECL_PARAM(P_PALETTE, "Palette", 0, PALETTE_MAX - 1, PALETTE_HEAT),
+    DECL_PARAM_RANGE(P_SIZE, "Size", 4, 32, 8),
+    DECL_PARAM_RANGE(P_PALETTE, "Palette", 0, PALETTE_MAX - 1, PALETTE_HEAT),
 };
 
 static uint8_t *bump_map = NULL;

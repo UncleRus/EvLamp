@@ -21,8 +21,8 @@
 #define P_SCALE   1
 
 EFFECT_PARAMS(fire, 2) = {
-    DECL_PARAM(P_PALETTE, "Palette", PALETTE_FIRE, PALETTE_LITHIUM_FIRE, 0),
-    DECL_PARAM(P_SCALE, "Scale", 10, MAX_SCALE, 60),
+    DECL_PARAM_RANGE(P_PALETTE, "Palette", PALETTE_FIRE, PALETTE_LITHIUM_FIRE, 0),
+    DECL_PARAM_RANGE(P_SCALE, "Scale", 10, MAX_SCALE, 60),
 };
 
 static uint32_t time_scale = 1;

@@ -16,11 +16,11 @@
 #define P_TIME_SCALE 4
 
 EFFECT_PARAMS(whirls, 5) = {
-    DECL_PARAM(P_COUNT, "Count", 10, MAX_WHIRLS, 20),
-    DECL_PARAM(P_SCALE, "Scale", 5, 50, 26),
-    DECL_PARAM(P_PALETTE, "Palette", PALETTE_FIRE, PALETTE_MAX - 1, 0),
-    DECL_PARAM(P_FADEOUT, "Fadeout", 10, 250, 50),
-    DECL_PARAM(P_TIME_SCALE, "Time scale", 1, 10, 10),
+    DECL_PARAM_RANGE(P_COUNT, "Count", 10, MAX_WHIRLS, 20),
+    DECL_PARAM_RANGE(P_SCALE, "Scale", 5, 50, 26),
+    DECL_PARAM_RANGE(P_PALETTE, "Palette", PALETTE_FIRE, PALETTE_MAX - 1, 0),
+    DECL_PARAM_RANGE(P_FADEOUT, "Fadeout", 10, 250, 50),
+    DECL_PARAM_RANGE(P_TIME_SCALE, "Time scale", 1, 10, 10),
 };
 
 typedef struct

@@ -11,7 +11,7 @@
 #define P_SPEED 0
 
 EFFECT_PARAMS(diagonals, 1) = {
-    DECL_PARAM(P_SPEED, "Speed", 1, MAX_SPEED, MAX_SPEED / 2),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 1, MAX_SPEED, MAX_SPEED / 2),
 };
 
 static uint8_t slowdown;

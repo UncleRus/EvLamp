@@ -43,6 +43,7 @@ static cJSON *effect_params_json(size_t effect)
         cJSON_AddNumberToObject(p, "max", effects[effect].params[c].max);
         cJSON_AddNumberToObject(p, "default", effects[effect].params[c].def);
         cJSON_AddNumberToObject(p, "value", effects[effect].params[c].value);
+        cJSON_AddNumberToObject(p, "type", effects[effect].params[c].type);
     }
     return params;
 }

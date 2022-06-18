@@ -10,9 +10,9 @@
 #define P_SPEED     2
 
 EFFECT_PARAMS(rainbow, 3) = {
-    DECL_PARAM(P_DIRECTION, "Direction", 0, 2, 0),
-    DECL_PARAM(P_SCALE, "Scale", 1, 50, 20),
-    DECL_PARAM(P_SPEED, "Speed", 1, 40, 5),
+    DECL_PARAM_RANGE(P_DIRECTION, "Direction", 0, 2, 0),
+    DECL_PARAM_RANGE(P_SCALE, "Scale", 1, 50, 20),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 1, 40, 5),
 };
 
 enum {

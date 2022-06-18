@@ -13,7 +13,7 @@
 #define P_SPEED 0
 
 EFFECT_PARAMS(hoop, 1) = {
-    DECL_PARAM(P_SPEED, "Speed", 1,  50,  15),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 1,  50,  15),
 };
 
 static uint32_t m = 0;

@@ -15,9 +15,9 @@
 #define P_MAX_RAYS 2
 
 EFFECT_PARAMS(rays, 3) = {
-    DECL_PARAM(P_SPEED, "Speed", 0, 50, 10),
-    DECL_PARAM(P_MIN_RAYS, "Min rays", 1, 10, 3),
-    DECL_PARAM(P_MAX_RAYS, "Max rays", 1, 20, 6),
+    DECL_PARAM_RANGE(P_SPEED, "Speed", 0, 50, 10),
+    DECL_PARAM_RANGE(P_MIN_RAYS, "Min rays", 1, 10, 3),
+    DECL_PARAM_RANGE(P_MAX_RAYS, "Max rays", 1, 20, 6),
 };
 
 static uint8_t hue;

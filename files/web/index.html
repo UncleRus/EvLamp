@@ -71,13 +71,21 @@
 	</svg>
 	<!-- -------------------------------------------------------------------------- -->
 	<div id="container" style="display: none;">
-		<div class="row" id="param_src">
+		<!-- Params proto -->
+		<div class="row" id="param_range">
 			<div class="cell-name"></div>
 			<div class="cell-max">
 				<input class="fullwidth" type="range" min="1" max="255" step="1">
 			</div>
 			<div class="cell-val"></div>
-		</div>				
+		</div>
+		<div class="row" id="param_bool">
+			<div class="cell-name"></div>
+			<div class="cell-max">
+				<input type="checkbox" style="min-width: auto;">
+			</div>
+			<div class="cell-val"></div>
+		</div>
 		<!-- Main page -->
 		<div id="f_main">
 			<div class="row">
@@ -328,8 +336,9 @@
 		let $brightness_val = $('#brightness-val');
 		let $fps = $('#fps');
 		let $fps_val = $('#fps-val');
-		let $param_src = $('#param_src');
-		
+		let $param_range = $('#param_range');
+		let $param_bool = $('#param_bool');
+
 		// load info
 		$.getJSON('/api/info', function(info) {
 			$('#app_name').html(info.app_name);
@@ -381,7 +390,16 @@
 				params: []
 			};
 			$effect_params.find('input').each(function(i, el) {
-				req.params.push(parseInt($(el).val()));
+				let $el = $(el);
+				switch ($el.prop('type'))
+				{
+					case 'range':
+						req.params.push(parseInt($el.val()));
+						break;
+					case 'checkbox':
+						req.params.push(+$el.prop('checked'));
+						break;
+				}
 			});
 			console.log(req);
 			$.ajax({
@@ -405,19 +423,35 @@
 				$effect.val(res.effect);
 				$effect_params.html('');
 				res.params.forEach(function(p, i) {
-					let $param = $param_src.clone().prop('id', 'param' + i).data('id', i);
-					$param.appendTo($effect_params);
-					$param.find('.cell-name').html(p.name);
-					let $input = $param.find('input');
-					$input.prop('min', p.min).prop('max', p.max).val(p.value);
-					let $cell_val = $param.find('.cell-val');
-					$cell_val.html(p.value);
-					$input.change(function() {
-						post_effect_params();
-					});
-					$input.on('input', function() {
-						$cell_val.html($input.val());
-					});
+					let $param = undefined;
+					let $input = undefined;
+					switch (p.type) {
+						case 0:
+							$param = $param_range.clone().prop('id', 'param' + i).data('id', i);
+							$param.appendTo($effect_params);
+							$param.find('.cell-name').html(p.name);
+							$input = $param.find('input');
+							$input.prop('min', p.min).prop('max', p.max).val(p.value);
+							let $cell_val = $param.find('.cell-val');
+							$cell_val.html(p.value);
+							$input.change(function () {
+								post_effect_params();
+							});
+							$input.on('input', function () {
+								$cell_val.html($input.val());
+							});
+							break;
+						case 1:
+							$param = $param_bool.clone().prop('id', 'param' + i).data('id', i);
+							$param.appendTo($effect_params);
+							$param.find('.cell-name').html(p.name);
+							$input = $param.find('input');
+							$input.prop('checked', !!p.value);
+							$input.change(function () {
+								post_effect_params();
+							});
+							break;
+					}
 				});
 			});
 		}
