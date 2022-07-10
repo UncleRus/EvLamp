@@ -339,6 +339,10 @@ static esp_err_t post_settings_wifi(httpd_req_t *req)
     strncpy(sys_settings.wifi.ip.gateway, cJSON_GetStringValue(ip_gateway_item), sizeof(sys_settings.wifi.ip.gateway) - 1);
     strncpy(sys_settings.wifi.ip.dns, cJSON_GetStringValue(ip_dns_item), sizeof(sys_settings.wifi.ip.dns) - 1);
     sys_settings.wifi.ap.channel = ap_channel;
+    memset(sys_settings.wifi.ap.ssid, 0, sizeof(sys_settings.wifi.ap.ssid));
+    memset(sys_settings.wifi.ap.password, 0, sizeof(sys_settings.wifi.ap.password));
+    memset(sys_settings.wifi.sta.ssid, 0, sizeof(sys_settings.wifi.sta.ssid));
+    memset(sys_settings.wifi.sta.password, 0, sizeof(sys_settings.wifi.sta.password));
     strncpy((char *)sys_settings.wifi.ap.ssid, ap_ssid, sizeof(sys_settings.wifi.ap.ssid) - 1);
     strncpy((char *)sys_settings.wifi.ap.password, ap_password, sizeof(sys_settings.wifi.ap.password) - 1);
     strncpy((char *)sys_settings.wifi.sta.ssid, sta_ssid, sizeof(sys_settings.wifi.sta.ssid) - 1);

@@ -113,6 +113,8 @@ static void ip_handler(void *arg, esp_event_base_t event_base, int32_t event_id,
             if ( (res = esp_wifi_connect()) != ESP_OK )
                 ESP_LOGE(TAG, "WiFi error %d [%s]", res, esp_err_to_name(res));
             break;
+        default:
+            break;
     }
 }
 
