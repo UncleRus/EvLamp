@@ -78,7 +78,7 @@ static esp_err_t _storage_load(const char *storage_name, void *target, size_t si
     res = nvs_get_u32(nvs, OPT_MAGIC, &magic);
     if (magic != SETTINGS_MAGIC)
     {
-        ESP_LOGW(TAG, "Invalid magic 0x%08x, expected 0x%08x", magic, SETTINGS_MAGIC);
+        ESP_LOGW(TAG, "Invalid magic 0x%08lx, expected 0x%08x", magic, SETTINGS_MAGIC);
         res = ESP_FAIL;
     }
     if (res != ESP_OK)

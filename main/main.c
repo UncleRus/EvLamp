@@ -93,7 +93,7 @@ static void main_loop(void *arg)
 void app_main()
 {
     ESP_LOGI(TAG, "Starting " APP_NAME);
-    ESP_LOGI(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
+    ESP_LOGI(TAG, "Free heap: %lu bytes", esp_get_free_heap_size());
 
     // Initialize NVS
     ESP_ERROR_CHECK(settings_init());

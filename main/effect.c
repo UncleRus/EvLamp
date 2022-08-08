@@ -164,7 +164,7 @@ esp_err_t effects_init()
     if (res != ESP_OK)
         res = effects_reset();
 
-    random16_set_seed(esp_cpu_get_ccount() & 0xffff);
+    random16_set_seed(esp_cpu_get_cycle_count() & 0xffff);
 
     return res;
 }

@@ -110,7 +110,7 @@ esp_err_t effect_gif_prepare(framebuffer_t *fb)
     }
 
     gif_info = nsgif_get_info(gif);
-    ESP_LOGI(TAG, "GIF frame_count=%d, width=%d, height=%d", gif_info->frame_count, gif_info->width, gif_info->height);
+    ESP_LOGI(TAG, "GIF frame_count=%lu, width=%lu, height=%lu", gif_info->frame_count, gif_info->width, gif_info->height);
 
     pos_x = fb->width / 2 - gif_info->width / 2;
     pos_y = fb->height / 2 - gif_info->height / 2;
