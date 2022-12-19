@@ -333,6 +333,7 @@ static esp_err_t post_settings_wifi(httpd_req_t *req)
     }
 
     sys_settings.wifi.mode = mode;
+    memset(&sys_settings.wifi.ip, 0, sizeof(sys_settings.wifi.ip));
     sys_settings.wifi.ip.dhcp = cJSON_IsTrue(ip_dhcp_item);
     strncpy(sys_settings.wifi.ip.ip, cJSON_GetStringValue(ip_ip_item), sizeof(sys_settings.wifi.ip.ip) - 1);
     strncpy(sys_settings.wifi.ip.netmask, cJSON_GetStringValue(ip_netmask_item), sizeof(sys_settings.wifi.ip.netmask) - 1);
