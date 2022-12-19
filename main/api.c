@@ -104,7 +104,7 @@ exit:
 
 static esp_err_t get_info(httpd_req_t *req)
 {
-    const esp_app_desc_t *app_desc = esp_ota_get_app_description();
+    const esp_app_desc_t *app_desc = esp_app_get_description();
 
     cJSON *res = cJSON_CreateObject();
     cJSON_AddStringToObject(res, "app_name", app_desc->project_name);
