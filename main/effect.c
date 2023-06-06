@@ -37,6 +37,7 @@
 #include "effects/fireflies.h"
 #include "effects/tunnel.h"
 #include "effects/dunes.h"
+#include "effects/octopus.h"
 
 const effect_descriptor_t effects[] = {
     DESCR_EFFECT_LAMP,
@@ -70,6 +71,7 @@ const effect_descriptor_t effects[] = {
     DESCR_EFFECT_FIREFLIES,
     DESCR_EFFECT_TUNNEL,
     DESCR_EFFECT_DUNES,
+    DESCR_EFFECT_OCTOPUS,
 };
 
 const size_t effects_count = sizeof(effects) / sizeof(effect_descriptor_t);

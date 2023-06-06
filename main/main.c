@@ -7,11 +7,11 @@
 #include "input.h"
 #include "webserver.h"
 
-static void process_button_event(event_t *e)
+inline static void process_button_event(event_t *e)
 {
     size_t button_id = *((size_t *)e->data);
 
-    //ESP_LOGI(TAG, "Got button %d event %d", button_id, e->type);
+    ESP_LOGD(TAG, "Got button %d event %d", button_id, e->type);
 
     if (button_id == INPUT_BTN_RESET)
     {
