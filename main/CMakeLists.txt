@@ -14,6 +14,7 @@ idf_component_register(
 		webserver.c
 		api.c
 		palettes.c
+		utils.c
 		
 		effects/crazybees.c
 		effects/dna.c

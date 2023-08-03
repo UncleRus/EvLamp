@@ -100,6 +100,7 @@ esp_err_t effect_gif_prepare(framebuffer_t *fb)
 
     size_t size = gifs[PARAM_VAL(gif, P_FILE)].end - gifs[PARAM_VAL(gif, P_FILE)].start;
     res = nsgif_data_scan(gif, size, (uint8_t *)gifs[PARAM_VAL(gif, P_FILE)].start);
+    nsgif_data_complete(gif);
 
     if (res != NSGIF_OK)
     {
@@ -134,7 +135,10 @@ esp_err_t effect_gif_run(framebuffer_t *fb)
     uint32_t frame;
     nsgif_error res = nsgif_frame_prepare(gif, &frame_rect, &delay_cs, &frame);
     if (res == NSGIF_ERR_ANIMATION_END)
-        return ESP_OK;
+    {
+        nsgif_reset(gif);
+        res = nsgif_frame_prepare(gif, &frame_rect, &delay_cs, &frame);
+    }
     if (res != NSGIF_OK)
     {
         ESP_LOGW(TAG, "Error preparing GIF frame: %d (%s)", res, nsgif_strerror(res));

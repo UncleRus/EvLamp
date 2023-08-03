@@ -10,6 +10,8 @@
 #include <lib8tion.h>
 #include <noise.h>
 #include <math.h>
+#include "utils.h"
+#include "palettes.h"
 
 #define PALETTE_BLUE  0
 #define PALETTE_GREEN 1
@@ -30,36 +32,29 @@ EFFECT_PARAMS(polar_lights, 4) = {
 
 static rgb_t palette[PALETTE_SIZE];
 
-// fixme: use colors from palettes.h
-
-static const rgb_t C_BLACK  = { 0 };
-static const rgb_t C_BLUE   = { .r = 0,   .g = 0,   .b = 255 };
-static const rgb_t C_RED    = { .r = 255, .g = 0,   .b = 0 };
-static const rgb_t C_YELLOW = { .r = 255, .g = 255, .b = 0 };
-static const rgb_t C_GREEN  = { .r = 0,   .g = 150, .b = 0 };
+static const rgb_t BLACK  = C_BLACK;
+static const rgb_t BLUE   = C_BLUE;
+static const rgb_t RED    = C_RED;
+static const rgb_t YELLOW = C_YELLOW;
+static const rgb_t GREEN  = C_GREEN;
 
 static float height_adj;
 static uint16_t p_scale;
 static uint8_t p_speed;
 static uint32_t t = 0;
 
-static int map(int x, int in_min, int in_max, int out_min, int out_max)
-{
-    return (out_max - out_min) * (x - in_min) / (in_max - in_min) + out_min;
-}
-
 esp_err_t effect_polar_lights_prepare(framebuffer_t *fb)
 {
-    palette[0] = C_BLACK;
-    palette[2] = C_YELLOW;
-    palette[3] = C_RED;
+    palette[0] = BLACK;
+    palette[2] = YELLOW;
+    palette[3] = RED;
     switch (PARAM_VAL(polar_lights, P_PALETTE))
     {
         case PALETTE_BLUE:
-            palette[1] = C_BLUE;
+            palette[1] = BLUE;
             break;
         default:
-            palette[1] = C_GREEN;
+            palette[1] = GREEN;
     }
 
     height_adj = PARAM_VAL(polar_lights, P_HEIGHT) / 2.0f;
