@@ -11,7 +11,6 @@ typedef enum {
 
 #define EFFECT_PARAMS(name, count) effect_param_t effect_ ##name## _params[count]
 
-#define DECL_PARAM(ID, NAME, MIN, MAX, DEF, TYPE) [ID] = { .name = NAME, .min = MIN, .max = MAX, .def = DEF, .value = DEF, .type = TYPE }
 #define DECL_PARAM_RANGE(ID, NAME, MIN, MAX, DEF) [ID] = { .name = NAME, .min = MIN, .max = MAX, .def = DEF, .value = DEF, .type = PARAM_TYPE_RANGE }
 #define DECL_PARAM_BOOL(ID, NAME, DEF) [ID] = { .name = NAME, .min = 0, .max = 1, .def = DEF, .value = DEF, .type = PARAM_TYPE_BOOL }
 

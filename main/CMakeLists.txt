@@ -47,6 +47,7 @@ idf_component_register(
 		effects/tunnel.c
 		effects/dunes.c
 		effects/octopus.c
+		effects/nuclear.c
 
 	EMBED_TXTFILES
 		${EMBED}/web/jquery.js
