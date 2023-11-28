@@ -9,6 +9,17 @@
 #define BIT_READY   BIT(0)
 #define BIT_PLAYING BIT(1)
 
+static const int rmt_gpio[MAX_SURFACE_BLOCKS] = {
+    CONFIG_EL_MATRIX_GPIO_0,
+    CONFIG_EL_MATRIX_GPIO_1,
+    CONFIG_EL_MATRIX_GPIO_2,
+    CONFIG_EL_MATRIX_GPIO_3,
+    CONFIG_EL_MATRIX_GPIO_4,
+    CONFIG_EL_MATRIX_GPIO_5,
+    CONFIG_EL_MATRIX_GPIO_6,
+    CONFIG_EL_MATRIX_GPIO_7,
+};
+
 typedef struct {
     size_t x, y;
     size_t width, height;
@@ -25,9 +36,14 @@ static inline rgb_t get_fb_pixel(framebuffer_t *fb, size_t x, size_t y)
     return fb->data[FB_OFFSET(fb, x, y)];
 }
 
+static inline size_t get_block_by_pos(size_t x, size_t y)
+{
+    return y * sys_settings.leds.h_blocks + x;
+}
+
 static inline esp_err_t set_strip_pixel(framebuffer_t *fb, size_t x, size_t y, rgb_t c)
 {
-    // TODO: support custom layouts
+    // TODO: support rotation
     size_t b = y / sys_settings.leds.block_height * sys_settings.leds.h_blocks + x / sys_settings.leds.block_width;
 
     size_t bx = x % sys_settings.leds.block_width;
@@ -118,27 +134,31 @@ esp_err_t surface_init()
     uint8_t brightness = max_brightness > 255 ? 255 : max_brightness;
     ESP_LOGI(TAG, "Maximal LED brightness: %d", brightness);
 
+//    if (sys_settings.leds.rotation == MATRIX_ROTATION_90 || sys_settings.leds.rotation == MATRIX_ROTATION_270)
+//    {
+//        fb_width = sys_settings.leds.v_blocks * sys_settings.leds.block_height;
+//        fb_height = sys_settings.leds.h_blocks * sys_settings.leds.block_width;
+//    }
     fb_width = sys_settings.leds.h_blocks * sys_settings.leds.block_width;
     fb_height = sys_settings.leds.v_blocks * sys_settings.leds.block_height;
     num_leds = fb_width * fb_height;
-    ESP_LOGI(TAG, "Surface configuration: %dx%d (%d) LEDs, %dx%d (%d) blocks",
+    ESP_LOGI(TAG, "Surface configuration: %dx%d (%d) LEDs, %dx%d (%d) blocks, rotation: %d",
         fb_width, fb_height, num_leds,
-        sys_settings.leds.h_blocks, sys_settings.leds.v_blocks, num_blocks);
+        sys_settings.leds.h_blocks, sys_settings.leds.v_blocks, num_blocks, sys_settings.leds.rotation);
 
     // init blocks
     memset(blocks, 0, sizeof(blocks));
     for (uint8_t y = 0; y < sys_settings.leds.v_blocks; y++)
         for (uint8_t x = 0; x < sys_settings.leds.h_blocks; x++)
         {
-            // TODO: support custom layouts
-            size_t i = y * sys_settings.leds.h_blocks + x;
+            size_t i = get_block_by_pos(x, y);
             blocks[i].x = x * sys_settings.leds.block_width;
             blocks[i].y = y * sys_settings.leds.block_height;
             blocks[i].width = sys_settings.leds.block_width;
             blocks[i].height = sys_settings.leds.block_height;
 
             // prepare strip descriptor for block
-            blocks[i].strip.gpio = sys_settings.leds.gpio[i];
+            blocks[i].strip.gpio = rmt_gpio[i];
             blocks[i].strip.channel = i;
             blocks[i].strip.type = sys_settings.leds.type;
             blocks[i].strip.length = strip_len;

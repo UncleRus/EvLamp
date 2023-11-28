@@ -1,17 +1,19 @@
 #ifndef EVLAMP_CONFIG_H_
 #define EVLAMP_CONFIG_H_
 
-#include <driver/rmt.h>
-
 ////////////////////////////////////////////////////////////////////////////////
 /// System
+
+#if !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32S3)
+    #error Unsupported target
+#endif
 
 #define APP_NAME "EvLamp"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Settings
 
-#define SETTINGS_MAGIC 0xbeef0012
+#define SETTINGS_MAGIC 0xbeef001a
 
 #ifdef CONFIG_EL_WIFI_MODE_AP
     #define DEFAULT_WIFI_MODE WIFI_MODE_AP
@@ -38,13 +40,13 @@
 #endif
 
 #if CONFIG_EL_MATRIX_ROTATION_90
-    #define DEFAULT_SURFACE_ROTATION SURFACE_ROTATION_90
+    #define DEFAULT_MATRIX_ROTATION MATRIX_ROTATION_90
 #elif CONFIG_EL_MATRIX_ROTATION_180
-    #define DEFAULT_SURFACE_ROTATION SURFACE_ROTATION_180
+    #define DEFAULT_MATRIX_ROTATION MATRIX_ROTATION_180
 #elif CONFIG_EL_MATRIX_ROTATION_270
-    #define DEFAULT_SURFACE_ROTATION SURFACE_ROTATION_270
+    #define DEFAULT_MATRIX_ROTATION MATRIX_ROTATION_270
 #else
-    #define DEFAULT_SURFACE_ROTATION SURFACE_ROTATION_0
+    #define DEFAULT_MATRIX_ROTATION MATRIX_ROTATION_0
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

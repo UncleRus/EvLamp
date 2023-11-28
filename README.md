@@ -91,5 +91,5 @@ You can select GPIOs, set default WiFi config, LED layout and more in `idf.py me
 - `git submodule init --recursive --remote`
 - `idf.py menuconfig`
 - `idf.py build`
-- `idf.py erase_flash` (not necessary but recommended)
+- `idf.py erase-flash` (not necessary but recommended)
 - `idf.py flash` to upload firmware to ESP

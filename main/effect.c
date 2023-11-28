@@ -29,7 +29,6 @@
 #include "effects/relax.h"
 #include "effects/wheel.h"
 #include "effects/peacock.h"
-#include "effects/colors.h"
 #include "effects/diagonals.h"
 #include "effects/whirls.h"
 #include "effects/sun.h"
@@ -64,7 +63,6 @@ const effect_descriptor_t effects[] = {
     DESCR_EFFECT_RELAX,
     DESCR_EFFECT_WHEEL,
     DESCR_EFFECT_PEACOCK,
-    DESCR_EFFECT_COLORS,
     DESCR_EFFECT_DIAGONALS,
     DESCR_EFFECT_WHIRLS,
     DESCR_EFFECT_SUN,

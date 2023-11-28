@@ -2,7 +2,6 @@
 #include <led_strip.h>
 #include <lwip/ip_addr.h>
 #include <esp_ota_ops.h>
-#include <driver/gpio.h>
 #include "settings.h"
 #include "effect.h"
 #include "surface.h"
@@ -375,8 +374,8 @@ static esp_err_t get_settings_leds(httpd_req_t *req)
     cJSON_AddNumberToObject(res, "h_blocks", sys_settings.leds.h_blocks);
     cJSON_AddNumberToObject(res, "v_blocks", sys_settings.leds.v_blocks);
     cJSON_AddNumberToObject(res, "type", sys_settings.leds.type);
+    cJSON_AddNumberToObject(res, "rotation", sys_settings.leds.rotation);
     cJSON_AddNumberToObject(res, "current_limit", sys_settings.leds.current_limit);
-    cJSON_AddItemToObject(res, "gpio", cJSON_CreateIntArray((const int *)sys_settings.leds.gpio, MAX_SURFACE_BLOCKS));
 
     return respond_json(req, res);
 }
@@ -394,8 +393,6 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
     const char *msg = NULL;
     cJSON *json = NULL;
 
-    int gpio_array[MAX_SURFACE_BLOCKS] = { 0 };
-
     esp_err_t err = parse_post_json(req, &msg, &json);
     if (err != ESP_OK)
         goto exit;
@@ -403,47 +400,52 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
     cJSON *block_width_item = cJSON_GetObjectItem(json, "block_width");
     if (!cJSON_IsNumber(block_width_item))
     {
-        msg = "Item `block_width` not found or invalid";
+        msg = "Field `block_width` not found or invalid";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
     cJSON *block_height_item = cJSON_GetObjectItem(json, "block_height");
     if (!cJSON_IsNumber(block_height_item))
     {
-        msg = "Item `block_height` not found or invalid";
+        msg = "Field `block_height` not found or invalid";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
     cJSON *h_blocks_item = cJSON_GetObjectItem(json, "h_blocks");
     if (!cJSON_IsNumber(h_blocks_item))
     {
-        msg = "Item `h_blocks` not found or invalid";
+        msg = "Field `h_blocks` not found or invalid";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
     cJSON *v_blocks_item = cJSON_GetObjectItem(json, "v_blocks");
     if (!cJSON_IsNumber(v_blocks_item))
     {
-        msg = "Item `v_blocks` not found or invalid";
+        msg = "Field `v_blocks` not found or invalid";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
     cJSON *type_item = cJSON_GetObjectItem(json, "type");
     if (!cJSON_IsNumber(type_item))
     {
-        msg = "Item `type` not found or invalid";
+        msg = "Field `type` not found or invalid";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+    cJSON *rotation_item = cJSON_GetObjectItem(json, "rotation");
+    if (!cJSON_IsNumber(rotation_item))
+    {
+        msg = "Field `rotation` not found or invalid";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
     cJSON *limit_item = cJSON_GetObjectItem(json, "current_limit");
     if (!cJSON_IsNumber(limit_item))
     {
-        msg = "Item `current_limit` not found or invalid";
+        msg = "Field `current_limit` not found or invalid";
         err = ESP_ERR_INVALID_ARG;
         goto exit;
     }
-    cJSON *gpio_item = cJSON_GetObjectItem(json, "gpio");
-
 
     size_t block_width = (size_t)cJSON_GetNumberValue(block_width_item);
     size_t block_height = (size_t)cJSON_GetNumberValue(block_height_item);
@@ -470,6 +472,14 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
         goto exit;
     }
 
+    uint8_t rotation = (uint8_t)cJSON_GetNumberValue(rotation_item);
+    if (rotation > MATRIX_ROTATION_270)
+    {
+        msg = "Invalid matrix rotation value";
+        err = ESP_ERR_INVALID_ARG;
+        goto exit;
+    }
+
     uint8_t type = (uint8_t)cJSON_GetNumberValue(type_item);
     if (type >= LED_STRIP_TYPE_MAX)
     {
@@ -487,51 +497,13 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
         goto exit;
     }
 
-    int gpio_count = cJSON_GetArraySize(gpio_item);
-    if (gpio_count)
-    {
-        if (gpio_count != h_blocks * v_blocks)
-        {
-            msg = "Invalid GPIO count";
-            err = ESP_ERR_INVALID_ARG;
-            goto exit;
-        }
-
-        for (int i = 0; i < gpio_count; i++)
-        {
-            int gpio_num = (int) cJSON_GetNumberValue(cJSON_GetArrayItem(gpio_item, i));
-            if (gpio_num == CONFIG_EL_BUTTON_RESET_GPIO || gpio_num == CONFIG_EL_BUTTON_MAIN_GPIO
-                || gpio_num == CONFIG_EL_BUTTON_UP_GPIO || gpio_num == CONFIG_EL_BUTTON_DOWN_GPIO)
-            {
-                msg = "GPIO occupied by button";
-                err = ESP_ERR_INVALID_ARG;
-                goto exit;
-            }
-            if (gpio_num < 0 || gpio_num >= GPIO_NUM_MAX)
-            {
-                msg = "Invalid GPIO number";
-                err = ESP_ERR_INVALID_ARG;
-                goto exit;
-            }
-            for (int b = 0; b < i; b++)
-                if (gpio_array[b] == gpio_num)
-                {
-                    msg = "GPIO already occupied by another LED block";
-                    err = ESP_ERR_INVALID_ARG;
-                    goto exit;
-                }
-            gpio_array[i] = gpio_num;
-        }
-    }
-
     sys_settings.leds.block_width = block_width;
     sys_settings.leds.block_height = block_height;
     sys_settings.leds.h_blocks = h_blocks;
     sys_settings.leds.v_blocks = v_blocks;
     sys_settings.leds.type = type;
+    sys_settings.leds.rotation = rotation;
     sys_settings.leds.current_limit = limit;
-    for (int i = 0; i < gpio_count; i++)
-        sys_settings.leds.gpio[i] = gpio_array[i];
 
     err = sys_settings_save();
     msg = err != ESP_OK
@@ -553,6 +525,7 @@ static const httpd_uri_t route_post_settings_leds = {
 
 static esp_err_t get_reboot(httpd_req_t *req)
 {
+    (void)req;
     esp_restart();
 
     return ESP_OK; // dummy
@@ -766,7 +739,7 @@ static esp_err_t post_lamp_effect(httpd_req_t *req)
 
     for (size_t p = 0; p < effects[effect].params_count; p++)
     {
-        cJSON *item = cJSON_GetArrayItem(params, p);
+        cJSON *item = cJSON_GetArrayItem(params, (int)p);
         if (!cJSON_IsNumber(item))
         {
             err = ESP_ERR_INVALID_ARG;

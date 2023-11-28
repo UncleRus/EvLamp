@@ -43,19 +43,8 @@ static system_settings_t sys_defaults = {
         .h_blocks      = CONFIG_EL_MATRIX_H_BLOCKS,
         .v_blocks      = CONFIG_EL_MATRIX_V_BLOCKS,
         .type          = DEFAULT_LED_TYPE,
+        .rotation      = DEFAULT_MATRIX_ROTATION,
         .current_limit = CONFIG_EL_MATRIX_MAX_CURRENT,
-        .gpio          = {
-            [RMT_CHANNEL_0] = CONFIG_EL_MATRIX_GPIO_0,
-            [RMT_CHANNEL_1] = CONFIG_EL_MATRIX_GPIO_1,
-            [RMT_CHANNEL_2] = CONFIG_EL_MATRIX_GPIO_2,
-            [RMT_CHANNEL_3] = CONFIG_EL_MATRIX_GPIO_3,
-#if SOC_RMT_CHANNELS_PER_GROUP > 4
-            [RMT_CHANNEL_4] = CONFIG_EL_MATRIX_GPIO_4,
-            [RMT_CHANNEL_5] = CONFIG_EL_MATRIX_GPIO_5,
-            [RMT_CHANNEL_6] = CONFIG_EL_MATRIX_GPIO_6,
-            [RMT_CHANNEL_7] = CONFIG_EL_MATRIX_GPIO_7,
-#endif
-        },
     },
 };
 
@@ -65,7 +54,7 @@ static const volatile_settings_t vol_defaults = {
     .effect     = CONFIG_EL_EFFECT_DEFAULT,
 };
 
-static esp_err_t _storage_load(const char *storage_name, void *target, size_t size)
+static esp_err_t storage_load(const char *storage_name, void *target, size_t size)
 {
     nvs_handle_t nvs;
     esp_err_t res;
@@ -89,7 +78,7 @@ static esp_err_t _storage_load(const char *storage_name, void *target, size_t si
 
     size_t tmp = size;
     res = nvs_get_blob(nvs, OPT_SETTINGS, target, &tmp);
-    if (tmp != size)
+    if (tmp != size) // NOLINT
     {
         ESP_LOGW(TAG, "Invalid settings size");
         res = ESP_FAIL;
@@ -108,7 +97,7 @@ static esp_err_t _storage_load(const char *storage_name, void *target, size_t si
     return ESP_OK;
 }
 
-static esp_err_t _storage_save(const char *storage_name, const void *source, size_t size)
+static esp_err_t storage_save(const char *storage_name, const void *source, size_t size)
 {
     ESP_LOGD(TAG, "Saving settings to '%s'...", storage_name);
 
@@ -158,7 +147,7 @@ esp_err_t sys_settings_reset()
 
 esp_err_t sys_settings_load()
 {
-    esp_err_t res = _storage_load(STORAGE_SYSTEM_NAME, &sys_settings, sizeof(system_settings_t));
+    esp_err_t res = storage_load(STORAGE_SYSTEM_NAME, &sys_settings, sizeof(system_settings_t));
     if (res != ESP_OK)
         return sys_settings_reset();
 
@@ -167,7 +156,7 @@ esp_err_t sys_settings_load()
 
 esp_err_t sys_settings_save()
 {
-    return _storage_save(STORAGE_SYSTEM_NAME, &sys_settings, sizeof(system_settings_t));
+    return storage_save(STORAGE_SYSTEM_NAME, &sys_settings, sizeof(system_settings_t));
 }
 
 esp_err_t vol_settings_reset()
@@ -182,7 +171,7 @@ esp_err_t vol_settings_reset()
 
 esp_err_t vol_settings_load()
 {
-    esp_err_t res = _storage_load(STORAGE_VOLATILE_NAME, &vol_settings, sizeof(volatile_settings_t));
+    esp_err_t res = storage_load(STORAGE_VOLATILE_NAME, &vol_settings, sizeof(volatile_settings_t));
     if (res != ESP_OK)
         return vol_settings_reset();
 
@@ -191,5 +180,5 @@ esp_err_t vol_settings_load()
 
 esp_err_t vol_settings_save()
 {
-    return _storage_save(STORAGE_VOLATILE_NAME, &vol_settings, sizeof(volatile_settings_t));
+    return storage_save(STORAGE_VOLATILE_NAME, &vol_settings, sizeof(volatile_settings_t));
 }

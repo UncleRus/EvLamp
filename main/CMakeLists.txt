@@ -39,7 +39,6 @@ idf_component_register(
 		effects/relax.c
 		effects/wheel.c
 		effects/peacock.c
-		effects/colors.c
 		effects/diagonals.c
 		effects/whirls.c
 		effects/sun.c

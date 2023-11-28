@@ -4,6 +4,13 @@
 #include "common.h"
 #include <cJSON.h>
 
+typedef enum {
+    MATRIX_ROTATION_0 = 0,
+    MATRIX_ROTATION_90,
+    MATRIX_ROTATION_180,
+    MATRIX_ROTATION_270
+} matrix_rotation_t;
+
 typedef struct
 {
     struct {
@@ -26,7 +33,6 @@ typedef struct
         uint8_t type;
         uint8_t rotation;
         uint32_t current_limit;
-        int gpio[MAX_SURFACE_BLOCKS];
     } leds;
 } system_settings_t;
 
