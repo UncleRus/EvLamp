@@ -14,10 +14,12 @@
 
 #define P_SPEED 0
 #define P_LEGS 1
+#define P_CLOCKWISE 2
 
-EFFECT_PARAMS(octopus, 2) = {
+EFFECT_PARAMS(octopus, 3) = {
     DECL_PARAM_RANGE(P_SPEED, "Speed", 1, 10, 3),
     DECL_PARAM_RANGE(P_LEGS, "Legs", 2, 10, 3),
+    DECL_PARAM_BOOL(P_CLOCKWISE, "Clockwise", 0),
 };
 
 typedef struct {
@@ -34,6 +36,12 @@ static uint16_t t = 0;
 esp_err_t effect_octopus_prepare(framebuffer_t *fb)
 {
     CHECK_ARG(fb);
+
+    if (fb->width % 2 || fb->height % 2)
+    {
+        ESP_LOGE("octopus", "Only even-sized framebuffers are supported");
+        return ESP_FAIL;
+    }
 
     if (!map) map = calloc(fb->width * fb->height, sizeof(map_item_t));
     if (!map) return ESP_ERR_NO_MEM;
@@ -66,8 +74,9 @@ esp_err_t effect_octopus_run(framebuffer_t *fb)
     for (size_t x = 0; x < fb->width; x++)
         for (size_t y = 0; y < fb->height; y++)
         {
+            size_t px = !PARAM_VAL(octopus, P_CLOCKWISE) ? x : fb->width - x - 1;
             map_item_t i = MAP_XY(x, y);
-            fb_set_pixel_hsv(fb, x, y,
+            fb_set_pixel_hsv(fb, px, y,
                 hsv_from_values(
                     t / 2 - i.radius,
                     255,

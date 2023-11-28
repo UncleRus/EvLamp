@@ -11,7 +11,7 @@
 
 #include "effect.h"
 
-extern EFFECT_PARAMS(octopus, 2);
+extern EFFECT_PARAMS(octopus, 3);
 
 esp_err_t effect_octopus_prepare(framebuffer_t *fb);
 

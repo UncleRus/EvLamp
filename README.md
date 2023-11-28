@@ -25,7 +25,7 @@ You will need:
     - Up/Down: brightness up/down
     - Reset: long press - Reset settings to defaults
 
-You can use the KiCad 6 project located in the [hardware directory](hardware) and containing
+You can use the KiCad 7 project located in the [hardware directory](hardware) and containing
 an example implementation: a schematic, a simple board and ready-made Gerber files for production
 (compatible with JLCPCB requirements).
 
@@ -55,7 +55,7 @@ To control one matrix, only one GPIO pin of the microcontroller is needed:
 
 ![Single matrix](images/single_block.png)
 
-This configuration is the simplest supported.  
+This configuration is the simplest supported.
 
 ### Multiple LED matrices (blocks) configuration
 
@@ -66,7 +66,7 @@ rendering of the effect. For example:
 
 ### Minimal recommended configuration
 
-1 block, 16x16 LEDs, 90 fps.
+1 block, 16x16 LEDs, 90 fps max.
 
 ### Maximal recommended configuration
 
