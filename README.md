@@ -18,7 +18,7 @@ Display beautiful effects on a multiple matrices of NxN WS2812B/SK6812/APA106/SM
 
 You will need:
 
-- ESP32 (ESP32 only! ESP32-S2/ESP32-C3/ESP32-C4 and others are not yet supported)
+- ESP32 or ESP32-S3 (ESP32-S2/ESP32-C3/ESP32-C4 and others are not supported)
 - One or more WS2812B/SK6812/APA106/SM16703 LED matrices
 - 4 buttons:
     - Main: long press - On/Off, click - next effect
@@ -63,6 +63,10 @@ You can connect up to 8 LED matrices of the same size to different GPIO pins and
 rendering of the effect. For example:
 
 ![4 blocks configuration example](images/2x2_blocks.png)
+
+### Minimal recommended configuration
+
+1 block, 16x16 LEDs, 90 fps.
 
 ### Maximal recommended configuration
 
