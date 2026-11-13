@@ -2,6 +2,9 @@ set(EMBED ../files)
 
 idf_component_register(
 	INCLUDE_DIRS .
+	REQUIRED_IDF_TARGETS
+		esp32
+		esp32s3
 	SRCS
 		common.c
 		main.c
