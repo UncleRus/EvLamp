@@ -2,7 +2,6 @@
 #define EVLAMP_SETTINGS_H_
 
 #include "common.h"
-#include <cJSON.h>
 
 typedef enum {
     MATRIX_ROTATION_0 = 0,

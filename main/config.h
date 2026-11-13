@@ -11,6 +11,17 @@
 #define APP_NAME "EvLamp"
 
 ////////////////////////////////////////////////////////////////////////////////
+/// LED types
+
+typedef enum {
+    LED_TYPE_WS2812 = 0,
+    LED_TYPE_SK6812,
+    LED_TYPE_APA106,
+    LED_TYPE_SM16703,
+    LED_TYPE_MAX
+} led_type_t;
+
+////////////////////////////////////////////////////////////////////////////////
 /// Settings
 
 #define SETTINGS_MAGIC 0xbeef001a
@@ -30,13 +41,13 @@
 #define DEFAULT_WIFI_AP_MAXCONN 5
 
 #if CONFIG_EL_LED_TYPE_APA106
-    #define DEFAULT_LED_TYPE LED_STRIP_APA106
+    #define DEFAULT_LED_TYPE LED_TYPE_APA106
 #elif CONFIG_EL_LED_TYPE_SK6812
-    #define DEFAULT_LED_TYPE LED_STRIP_SK6812
+    #define DEFAULT_LED_TYPE LED_TYPE_SK6812
 #elif CONFIG_EL_LED_TYPE_SM16703
-    #define DEFAULT_LED_TYPE LED_STRIP_SM16703
+    #define DEFAULT_LED_TYPE LED_TYPE_SM16703
 #else
-    #define DEFAULT_LED_TYPE LED_STRIP_WS2812
+    #define DEFAULT_LED_TYPE LED_TYPE_WS2812
 #endif
 
 #if CONFIG_EL_MATRIX_ROTATION_90

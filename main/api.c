@@ -1,5 +1,5 @@
 #include "api.h"
-#include <led_strip.h>
+#include <cJSON.h>
 #include <lwip/ip_addr.h>
 #include <esp_ota_ops.h>
 #include "settings.h"
@@ -481,7 +481,7 @@ static esp_err_t post_settings_leds(httpd_req_t *req)
     }
 
     uint8_t type = (uint8_t)cJSON_GetNumberValue(type_item);
-    if (type >= LED_STRIP_TYPE_MAX)
+    if (type >= LED_TYPE_MAX)
     {
         msg = "Invalid LED type";
         err = ESP_ERR_INVALID_ARG;

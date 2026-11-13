@@ -1,0 +1,9 @@
+dependencies:
+  idf: ">=5.2"
+  espressif/cjson: "^1.7.19"
+  espressif/led_strip: "^3.1.1"
+  esp-idf-lib/button: "^2.0.1"
+  esp-idf-lib/color: "^1.0.8"
+  esp-idf-lib/framebuffer: "^0.0.10"
+  esp-idf-lib/lib8tion: "^1.0.9"
+  esp-idf-lib/noise: "^1.0.8"

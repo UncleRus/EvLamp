@@ -2,7 +2,6 @@
 #include <string.h>
 #include <nvs_flash.h>
 #include <nvs.h>
-#include <led_strip.h>
 #include "surface.h"
 
 static const char *STORAGE_SYSTEM_NAME   = "system";

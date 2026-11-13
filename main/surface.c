@@ -2,6 +2,7 @@
 #include <framebuffer.h>
 #include <led_strip.h>
 #include <soc/soc.h>
+#include <soc/soc_caps.h>
 #include "settings.h"
 #include "effect.h"
 
@@ -23,13 +24,14 @@ static const int rmt_gpio[MAX_SURFACE_BLOCKS] = {
 typedef struct {
     size_t x, y;
     size_t width, height;
-    led_strip_t strip;
+    led_strip_handle_t strip;
 } surface_block_t;
 
 static surface_block_t blocks[MAX_SURFACE_BLOCKS];
 static size_t num_blocks, num_leds, fb_width, fb_height;
 static framebuffer_t framebuffer;
 static EventGroupHandle_t state;
+static uint8_t strip_brightness = 255;
 
 static inline rgb_t get_fb_pixel(framebuffer_t *fb, size_t x, size_t y)
 {
@@ -50,13 +52,13 @@ static inline esp_err_t set_strip_pixel(framebuffer_t *fb, size_t x, size_t y, r
     size_t by = y % sys_settings.leds.block_height;
     size_t strip_idx = by * sys_settings.leds.block_width + (by % 2 ? sys_settings.leds.block_width - bx - 1 : bx);
 
-    return led_strip_set_pixel(&blocks[b].strip, strip_idx, c);
+    return led_strip_set_pixel(blocks[b].strip, strip_idx, c.r, c.g, c.b);
 }
 
 static inline esp_err_t flush_strips()
 {
     for (size_t i = 0; i < num_blocks; i++)
-        CHECK(led_strip_flush(&blocks[i].strip));
+        CHECK(led_strip_refresh(blocks[i].strip));
 
     return ESP_OK;
 }
@@ -66,9 +68,66 @@ static esp_err_t render_frame(framebuffer_t *fb, void *arg)
 {
     for (size_t y = 0; y < fb->height; y++)
         for (size_t x = 0; x < fb->width; x++)
-            set_strip_pixel(fb, x, y, rgb_scale_video(get_fb_pixel(fb, x, y), vol_settings.brightness));
+        {
+            rgb_t color = rgb_scale_video(get_fb_pixel(fb, x, y), vol_settings.brightness);
+            set_strip_pixel(fb, x, y, rgb_scale_video(color, strip_brightness));
+        }
 
     return flush_strips();
+}
+
+static esp_err_t strip_init(surface_block_t *block, size_t index, size_t length, uint8_t type)
+{
+    led_strip_config_t config = {
+        .strip_gpio_num = rmt_gpio[index],
+        .max_leds = length,
+        .led_model = LED_MODEL_WS2812,
+        .color_component_format = LED_STRIP_COLOR_COMPONENT_FMT_GRB,
+    };
+
+    switch (type)
+    {
+        case LED_TYPE_WS2812:
+            config.led_model = LED_MODEL_WS2812;
+            break;
+
+        case LED_TYPE_SK6812:
+            config.led_model = LED_MODEL_SK6812;
+            break;
+
+        case LED_TYPE_APA106:
+            config.led_model = LED_MODEL_CUSTOM;
+            config.color_component_format = LED_STRIP_COLOR_COMPONENT_FMT_RGB;
+            config.timings = (led_strip_timings_t) {
+                .t0h_ns = 350, .t0l_ns = 1360,
+                .t1h_ns = 1360, .t1l_ns = 350,
+                .reset_us = 50,
+            };
+            break;
+
+        case LED_TYPE_SM16703:
+            config.led_model = LED_MODEL_CUSTOM;
+            config.color_component_format = LED_STRIP_COLOR_COMPONENT_FMT_RGB;
+            config.timings = (led_strip_timings_t) {
+                .t0h_ns = 300, .t0l_ns = 900,
+                .t1h_ns = 1360, .t1l_ns = 350,
+                .reset_us = 50,
+            };
+            break;
+
+        default:
+            ESP_LOGE(TAG, "Unsupported LED type %d", type);
+            return ESP_ERR_INVALID_ARG;
+    }
+
+    led_strip_rmt_config_t rmt_config = {
+        .clk_src = RMT_CLK_SRC_DEFAULT,
+        .resolution_hz = 10 * 1000 * 1000,
+        // one RMT memory block per channel, so all max blocks can be used
+        .mem_block_symbols = SOC_RMT_MEM_WORDS_PER_CHANNEL,
+    };
+
+    return led_strip_new_rmt_device(&config, &rmt_config, &block->strip);
 }
 
 static void surface_task(void *arg)
@@ -76,8 +135,9 @@ static void surface_task(void *arg)
     for (size_t i = 0; i < num_blocks; i++)
     {
         ESP_LOGI(TAG, "Block %i LED strip config: %dx%d, GPIO = %d, type = %d", i,
-            blocks[i].width, blocks[i].height, blocks[i].strip.gpio, blocks[i].strip.type);
-        ESP_ERROR_CHECK(led_strip_init(&blocks[i].strip));
+            blocks[i].width, blocks[i].height, rmt_gpio[i], sys_settings.leds.type);
+        ESP_ERROR_CHECK(strip_init(&blocks[i], i,
+            blocks[i].width * blocks[i].height, sys_settings.leds.type));
     }
 
     // init framebuffer
@@ -125,14 +185,11 @@ esp_err_t surface_init()
         return ESP_FAIL;
     }
 
-    // prepare led_strip
-    led_strip_install();
-
     size_t strip_len = sys_settings.leds.block_width * sys_settings.leds.block_height;
 
     int max_brightness = (int)(((float)sys_settings.leds.current_limit / (float)(strip_len * num_blocks)) / (float)CONFIG_EL_SINGLE_LED_CURRENT_MA * 256.0f);
-    uint8_t brightness = max_brightness > 255 ? 255 : max_brightness;
-    ESP_LOGI(TAG, "Maximal LED brightness: %d", brightness);
+    strip_brightness = max_brightness > 255 ? 255 : max_brightness;
+    ESP_LOGI(TAG, "Maximal LED brightness: %d", strip_brightness);
 
 //    if (sys_settings.leds.rotation == MATRIX_ROTATION_90 || sys_settings.leds.rotation == MATRIX_ROTATION_270)
 //    {
@@ -156,13 +213,6 @@ esp_err_t surface_init()
             blocks[i].y = y * sys_settings.leds.block_height;
             blocks[i].width = sys_settings.leds.block_width;
             blocks[i].height = sys_settings.leds.block_height;
-
-            // prepare strip descriptor for block
-            blocks[i].strip.gpio = rmt_gpio[i];
-            blocks[i].strip.channel = i;
-            blocks[i].strip.type = sys_settings.leds.type;
-            blocks[i].strip.length = strip_len;
-            blocks[i].strip.brightness = brightness;
         }
 
     xEventGroupClearBits(state, BIT_READY);

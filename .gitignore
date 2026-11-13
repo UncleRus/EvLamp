@@ -55,6 +55,7 @@ dkms.conf
 build/
 sdkconfig.old
 sdkconfig
+managed_components/
 /.cproject
 /.project
 /.settings/
@@ -66,3 +67,4 @@ sdkconfig
 /cmake-build-debug/
 /hardware/evlamp-backups/
 /hardware/fp-info-cache
+dependencies.lock
